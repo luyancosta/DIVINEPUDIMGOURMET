@@ -3,1637 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema de Controle V2</title>
-    <!-- Font Awesome para ícones -->
+    <title>Divine Pudim Gourmet - Sistema Online</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
     <style>
-/* ================================
-   DIVINE PUDIM GOURMET - STYLES V2
-   Sistema de Controle de Pedidos
-   ================================ */
-
-/* RESET E VARIÁVEIS */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-:root {
-    /* Cores Rosa Elegante */
-    --primary: #ec4899;
-    --primary-dark: #be185d;
-    --primary-light: #fdf2f8;
-    --secondary: #f8b4d0;
-    --accent: #ffd700;
-    
-    /* Cores de Status */
-    --status-confirmado: #3b82f6;
-    --status-produzindo: #f59e0b;
-    --status-pronto: #8b5cf6;
-    --status-rota: #06b6d4;
-    --status-entregue: #10b981;
-    
-    /* Cores Neutras */
-    --white: #ffffff;
-    --gray-50: #fafafa;
-    --gray-100: #f5f5f5;
-    --gray-200: #e5e5e5;
-    --gray-300: #d4d4d4;
-    --gray-400: #a3a3a3;
-    --gray-500: #737373;
-    --gray-600: #525252;
-    --gray-700: #404040;
-    --gray-800: #262626;
-    --gray-900: #171717;
-    
-    /* Sombras */
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-    --shadow-md: 0 6px 15px -3px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 25px -5px rgb(0 0 0 / 0.15);
-    
-    /* Transições */
-    --transition: all 0.3s ease;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fbcfe8 100%);
-    color: var(--gray-800);
-    line-height: 1.6;
-    min-height: 100vh;
-}
-
-.container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-/* ================================
-   HEADER
-   ================================ */
-.header {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: var(--white);
-    padding: 20px 0;
-    box-shadow: var(--shadow-lg);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-.header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-.logo {
-    font-size: 28px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.logo i {
-    font-size: 32px;
-    color: var(--accent);
-}
-
-.header-actions {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.btn-header {
-    background: rgba(255, 255, 255, 0.2);
-    color: var(--white);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.btn-header:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: translateY(-2px);
-}
-
-.btn-primary {
-    background: var(--accent);
-    color: var(--gray-900);
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 700;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: var(--shadow-md);
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-}
-
-/* ================================
-   ALERTAS
-   ================================ */
-.alerts-container {
-    position: fixed;
-    top: 80px;
-    right: 20px;
-    z-index: 1500;
-    max-width: 400px;
-}
-
-.alert {
-    background: var(--white);
-    border-left: 4px solid var(--primary);
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 12px;
-    box-shadow: var(--shadow-md);
-    animation: slideIn 0.3s ease;
-}
-
-.alert-warning {
-    border-left-color: #f59e0b;
-}
-
-.alert-danger {
-    border-left-color: #ef4444;
-}
-
-.alert-success {
-    border-left-color: #10b981;
-}
-
-.alert h4 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-    font-size: 16px;
-}
-
-.alert p {
-    font-size: 14px;
-    color: var(--gray-600);
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateX(400px);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-/* ================================
-   TABS NAVIGATION
-   ================================ */
-.tabs-nav {
-    background: var(--white);
-    box-shadow: var(--shadow);
-    position: sticky;
-    top: 72px;
-    z-index: 999;
-}
-
-.tabs-buttons {
-    display: flex;
-    gap: 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-}
-
-.tabs-buttons::-webkit-scrollbar {
-    display: none;
-}
-
-.tab-btn {
-    background: transparent;
-    border: none;
-    padding: 16px 24px;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--gray-600);
-    border-bottom: 3px solid transparent;
-    transition: var(--transition);
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.tab-btn:hover {
-    color: var(--primary);
-    background: var(--gray-50);
-}
-
-.tab-btn.active {
-    color: var(--primary);
-    border-bottom-color: var(--primary);
-    background: var(--primary-light);
-}
-
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-/* ================================
-   DASHBOARD
-   ================================ */
-.dashboard {
-    padding: 40px 0;
-}
-
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    margin-bottom: 40px;
-}
-
-.dashboard-card {
-    background: var(--white);
-    border-radius: 16px;
-    padding: 24px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    box-shadow: var(--shadow-md);
-    transition: var(--transition);
-}
-
-.dashboard-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-lg);
-}
-
-.card-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--white);
-    font-size: 28px;
-    flex-shrink: 0;
-}
-
-.card-info h3 {
-    font-size: 32px;
-    font-weight: 700;
-    color: var(--gray-800);
-    margin-bottom: 4px;
-}
-
-.card-info p {
-    font-size: 14px;
-    color: var(--gray-500);
-    font-weight: 500;
-}
-
-/* ================================
-   RELATÓRIO DE PRODUTOS
-   ================================ */
-.products-report {
-    background: var(--white);
-    border-radius: 16px;
-    padding: 32px;
-    box-shadow: var(--shadow-md);
-}
-
-.section-title {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--gray-800);
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.products-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 16px;
-}
-
-.product-item {
-    background: var(--gray-50);
-    border-radius: 12px;
-    padding: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-left: 4px solid var(--primary);
-    transition: var(--transition);
-}
-
-.product-item:hover {
-    transform: translateX(5px);
-    box-shadow: var(--shadow);
-}
-
-.product-name {
-    font-weight: 600;
-    color: var(--gray-800);
-    font-size: 15px;
-}
-
-.product-quantity {
-    background: var(--primary);
-    color: var(--white);
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-weight: 700;
-    font-size: 14px;
-}
-
-/* ================================
-   BUSCA RÁPIDA
-   ================================ */
-.search-bar {
-    background: var(--white);
-    padding: 24px 0;
-    box-shadow: var(--shadow);
-}
-
-.search-input-container {
-    position: relative;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.search-input-container i {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--gray-400);
-    font-size: 18px;
-}
-
-.search-input-container input {
-    width: 100%;
-    padding: 14px 50px 14px 48px;
-    border: 2px solid var(--gray-200);
-    border-radius: 12px;
-    font-size: 15px;
-    transition: var(--transition);
-}
-
-.search-input-container input:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
-}
-
-.btn-clear-search {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: var(--gray-200);
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    color: var(--gray-600);
-    transition: var(--transition);
-}
-
-.btn-clear-search:hover {
-    background: var(--gray-300);
-}
-
-/* ================================
-   FILTROS
-   ================================ */
-.filters {
-    background: var(--white);
-    padding: 30px 0;
-    box-shadow: var(--shadow);
-}
-
-.filters-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    margin-bottom: 20px;
-}
-
-.filter-group label {
-    display: block;
-    font-weight: 600;
-    color: var(--gray-700);
-    margin-bottom: 8px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.filter-group input,
-.filter-group select {
-    width: 100%;
-    padding: 10px 12px;
-    border: 2px solid var(--gray-200);
-    border-radius: 8px;
-    font-size: 14px;
-    transition: var(--transition);
-    background: var(--gray-50);
-}
-
-.filter-group input:focus,
-.filter-group select:focus {
-    outline: none;
-    border-color: var(--primary);
-    background: var(--white);
-}
-
-.btn-secondary {
-    background: var(--gray-200);
-    color: var(--gray-800);
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: var(--transition);
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.btn-secondary:hover {
-    background: var(--gray-300);
-}
-
-.export-buttons {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 20px;
-}
-
-.btn-export {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: var(--white);
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: var(--shadow);
-}
-
-.btn-export:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
-
-/* ================================
-   LISTA DE PEDIDOS - GRID
-   ================================ */
-.orders-section {
-    padding: 40px 0;
-}
-
-.orders-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-    gap: 24px;
-    margin-top: 24px;
-}
-
-.order-card {
-    background: var(--white);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: var(--shadow-md);
-    transition: var(--transition);
-    border-left: 6px solid var(--primary);
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-.order-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-lg);
-}
-
-.order-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-    margin-bottom: 16px;
-    gap: 12px;
-}
-
-.order-info h3 {
-    font-size: 18px;
-    color: var(--gray-800);
-    margin-bottom: 6px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.order-info p {
-    color: var(--gray-600);
-    font-size: 13px;
-    margin-bottom: 3px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.order-info p i {
-    color: var(--primary);
-    width: 16px;
-}
-
-.order-status {
-    padding: 6px 12px;
-    border-radius: 16px;
-    font-size: 12px;
-    font-weight: 700;
-    display: inline-block;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
-.status-pedidoconfirmado { background: #dbeafe; color: var(--status-confirmado); }
-.status-produzindo { background: #fef3c7; color: var(--status-produzindo); }
-.status-pronto { background: #ede9fe; color: var(--status-pronto); }
-.status-emrota { background: #cffafe; color: var(--status-rota); }
-.status-entregue { background: #d1fae5; color: var(--status-entregue); }
-
-.order-body {
-    flex: 1;
-    margin-bottom: 16px;
-}
-
-.order-section {
-    margin-bottom: 16px;
-}
-
-.order-section h4 {
-    font-size: 13px;
-    color: var(--gray-600);
-    margin-bottom: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.order-items {
-    background: var(--gray-50);
-    padding: 12px;
-    border-radius: 8px;
-}
-
-.order-item {
-    padding: 8px 0;
-    border-bottom: 1px solid var(--gray-200);
-}
-
-.order-item:last-child {
-    border-bottom: none;
-}
-
-.item-name {
-    font-weight: 600;
-    color: var(--gray-800);
-    font-size: 14px;
-}
-
-.item-details {
-    color: var(--gray-600);
-    font-size: 12px;
-    margin-top: 2px;
-}
-
-.order-financial {
-    background: var(--primary-light);
-    padding: 12px;
-    border-radius: 8px;
-}
-
-.financial-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 6px;
-    font-size: 13px;
-}
-
-.financial-row.total {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--primary-dark);
-    padding-top: 8px;
-    border-top: 2px solid var(--primary);
-    margin-top: 6px;
-}
-
-.order-actions {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: auto;
-}
-
-.btn-action {
-    flex: 1;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    min-width: 90px;
-}
-
-.btn-edit {
-    background: #dbeafe;
-    color: #1e40af;
-}
-
-.btn-edit:hover {
-    background: #bfdbfe;
-}
-
-.btn-print {
-    background: #d1fae5;
-    color: #065f46;
-}
-
-.btn-print:hover {
-    background: #a7f3d0;
-}
-
-.btn-history {
-    background: #fef3c7;
-    color: #92400e;
-}
-
-.btn-history:hover {
-    background: #fde68a;
-}
-
-.btn-delete {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-.btn-delete:hover {
-    background: #fecaca;
-}
-
-/* ================================
-   PRODUÇÃO
-   ================================ */
-.production-filters {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 32px;
-    flex-wrap: wrap;
-}
-
-.btn-filter-period {
-    background: var(--white);
-    border: 2px solid var(--gray-200);
-    padding: 12px 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: var(--transition);
-    color: var(--gray-700);
-}
-
-.btn-filter-period:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-}
-
-.btn-filter-period.active {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: var(--white);
-}
-
-.production-report {
-    background: var(--white);
-    border-radius: 16px;
-    padding: 32px;
-    box-shadow: var(--shadow-md);
-}
-
-.production-day {
-    margin-bottom: 40px;
-}
-
-.production-day h3 {
-    font-size: 20px;
-    color: var(--gray-800);
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 3px solid var(--primary);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.production-items {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 16px;
-}
-
-.production-item {
-    background: var(--gray-50);
-    border-radius: 12px;
-    padding: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-left: 4px solid var(--primary);
-}
-
-.production-item-info {
-    flex: 1;
-}
-
-.production-item-name {
-    font-weight: 700;
-    color: var(--gray-800);
-    font-size: 15px;
-    margin-bottom: 4px;
-}
-
-.production-item-size {
-    color: var(--gray-600);
-    font-size: 13px;
-}
-
-.production-item-qty {
-    background: var(--primary);
-    color: var(--white);
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-weight: 700;
-    font-size: 16px;
-    min-width: 60px;
-    text-align: center;
-}
-
-/* ================================
-   CALENDÁRIO
-   ================================ */
-.calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 32px 0;
-    background: var(--white);
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: var(--shadow-md);
-}
-
-.calendar-header h2 {
-    font-size: 24px;
-    color: var(--gray-800);
-    font-weight: 700;
-}
-
-.btn-calendar-nav {
-    background: var(--primary);
-    color: var(--white);
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 18px;
-    transition: var(--transition);
-}
-
-.btn-calendar-nav:hover {
-    background: var(--primary-dark);
-    transform: scale(1.1);
-}
-
-.calendar {
-    background: var(--white);
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: var(--shadow-md);
-    margin-bottom: 32px;
-}
-
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
-}
-
-.calendar-day-header {
-    text-align: center;
-    font-weight: 700;
-    color: var(--gray-700);
-    padding: 12px;
-    font-size: 14px;
-}
-
-.calendar-day {
-    aspect-ratio: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: var(--transition);
-    position: relative;
-    background: var(--gray-50);
-    border: 2px solid transparent;
-}
-
-.calendar-day:hover {
-    background: var(--primary-light);
-    border-color: var(--primary);
-}
-
-.calendar-day.other-month {
-    color: var(--gray-400);
-}
-
-.calendar-day.today {
-    background: var(--primary);
-    color: var(--white);
-    font-weight: 700;
-}
-
-.calendar-day.has-orders {
-    background: #fef3c7;
-}
-
-.calendar-day.selected {
-    background: var(--primary-dark);
-    color: var(--white);
-    font-weight: 700;
-}
-
-.calendar-day-number {
-    font-size: 16px;
-    font-weight: 600;
-}
-
-.calendar-day-badge {
-    position: absolute;
-    bottom: 4px;
-    right: 4px;
-    background: var(--primary);
-    color: var(--white);
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    font-size: 11px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.calendar-orders {
-    background: var(--white);
-    border-radius: 16px;
-    padding: 32px;
-    box-shadow: var(--shadow-md);
-}
-
-/* ================================
-   GRÁFICOS
-   ================================ */
-.charts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-    gap: 32px;
-    margin-top: 32px;
-}
-
-.chart-card {
-    background: var(--white);
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: var(--shadow-md);
-}
-
-.chart-card h3 {
-    font-size: 18px;
-    color: var(--gray-800);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding-bottom: 16px;
-    border-bottom: 2px solid var(--gray-200);
-}
-
-.chart-card canvas {
-    max-height: 300px;
-}
-
-/* ================================
-   MODAL
-   ================================ */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 2000;
-    overflow-y: auto;
-    padding: 20px;
-}
-
-.modal.active {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal-content {
-    background: var(--white);
-    border-radius: 20px;
-    max-width: 1200px;
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: var(--shadow-lg);
-}
-
-.modal-small .modal-content {
-    max-width: 600px;
-}
-
-.modal-header {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: var(--white);
-    padding: 24px 32px;
-    border-radius: 20px 20px 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-header h2 {
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.modal-close {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: var(--white);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 20px;
-    transition: var(--transition);
-}
-
-.modal-close:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.modal-body {
-    padding: 32px;
-}
-
-#orderForm {
-    padding: 32px;
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 24px;
-    margin-bottom: 24px;
-}
-
-.form-section {
-    background: var(--gray-50);
-    padding: 20px;
-    border-radius: 12px;
-    border: 2px solid var(--gray-200);
-}
-
-.form-section.full-width {
-    grid-column: 1 / -1;
-}
-
-.form-section h3 {
-    font-size: 18px;
-    color: var(--gray-800);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid var(--primary);
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    font-weight: 600;
-    color: var(--gray-700);
-    margin-bottom: 8px;
-    font-size: 14px;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid var(--gray-200);
-    border-radius: 8px;
-    font-size: 14px;
-    font-family: inherit;
-    transition: var(--transition);
-    background: var(--white);
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-}
-
-.form-group textarea {
-    resize: vertical;
-}
-
-.form-hint {
-    display: block;
-    margin-top: 4px;
-    font-size: 12px;
-    color: var(--gray-500);
-}
-
-/* CEP INPUT */
-.cep-input-container {
-    display: flex;
-    gap: 8px;
-}
-
-.cep-input-container input {
-    flex: 1;
-}
-
-.btn-buscar-cep {
-    background: var(--primary);
-    color: var(--white);
-    border: none;
-    padding: 0 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    transition: var(--transition);
-    white-space: nowrap;
-}
-
-.btn-buscar-cep:hover {
-    background: var(--primary-dark);
-}
-
-/* ================================
-   ITENS DO PEDIDO
-   ================================ */
-.items-list {
-    display: grid;
-    gap: 16px;
-    margin-bottom: 20px;
-}
-
-.item-row {
-    background: var(--white);
-    padding: 16px;
-    border-radius: 8px;
-    border: 2px solid var(--gray-200);
-}
-
-.item-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
-    gap: 12px;
-    align-items: end;
-}
-
-.btn-remove-item {
-    background: #fee2e2;
-    color: #991b1b;
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 18px;
-    transition: var(--transition);
-}
-
-.btn-remove-item:hover {
-    background: #fecaca;
-}
-
-.btn-add-item {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: var(--white);
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-}
-
-.btn-add-item:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
-
-.total-pedido {
-    background: var(--primary-light);
-    padding: 20px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--primary-dark);
-    margin-top: 16px;
-}
-
-/* ================================
-   ACTIONS
-   ================================ */
-.form-actions {
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-    margin-top: 24px;
-    padding-top: 24px;
-    border-top: 2px solid var(--gray-200);
-}
-
-.form-actions .btn-secondary {
-    width: auto;
-}
-
-/* ================================
-   HISTÓRICO
-   ================================ */
-.history-timeline {
-    position: relative;
-    padding-left: 40px;
-}
-
-.history-timeline::before {
-    content: '';
-    position: absolute;
-    left: 15px;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: var(--gray-200);
-}
-
-.history-item {
-    position: relative;
-    margin-bottom: 24px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid var(--gray-200);
-}
-
-.history-item:last-child {
-    border-bottom: none;
-}
-
-.history-item::before {
-    content: '';
-    position: absolute;
-    left: -33px;
-    top: 4px;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--primary);
-    border: 3px solid var(--white);
-    box-shadow: 0 0 0 2px var(--primary);
-}
-
-.history-time {
-    font-size: 12px;
-    color: var(--gray-500);
-    margin-bottom: 4px;
-}
-
-.history-action {
-    font-weight: 600;
-    color: var(--gray-800);
-    margin-bottom: 4px;
-}
-
-.history-details {
-    font-size: 13px;
-    color: var(--gray-600);
-}
-
-/* ================================
-   RESPONSIVIDADE
-   ================================ */
-@media (max-width: 1024px) {
-    .orders-grid {
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    }
-
-    .charts-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 768px) {
-    .header-content {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .header-actions {
-        justify-content: stretch;
-    }
-
-    .btn-header,
-    .btn-primary {
-        flex: 1;
-        justify-content: center;
-    }
-
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .filters-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .item-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .orders-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .products-list {
-        grid-template-columns: 1fr;
-    }
-
-    .production-items {
-        grid-template-columns: 1fr;
-    }
-
-    .calendar-day-header {
-        font-size: 12px;
-        padding: 8px;
-    }
-
-    .calendar-day-number {
-        font-size: 14px;
-    }
-
-    .order-actions {
-        flex-direction: column;
-    }
-
-    .btn-action {
-        width: 100%;
-    }
-
-    .form-actions {
-        flex-direction: column;
-    }
-
-    .form-actions button {
-        width: 100%;
-    }
-
-    .alerts-container {
-        right: 10px;
-        left: 10px;
-        max-width: none;
-    }
-}
-
-/* ================================
-   ANIMAÇÕES
-   ================================ */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.order-card {
-    animation: fadeIn 0.3s ease;
-}
-
-/* ================================
-   SCROLL SUAVE
-   ================================ */
-html {
-    scroll-behavior: smooth;
-}
-
-/* ================================
-   SCROLLBAR CUSTOMIZADA
-   ================================ */
-::-webkit-scrollbar {
-    width: 10px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--gray-100);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-dark);
-}    </style>
+        /* ================= ESTILOS (CSS) ================= */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #ec4899; --primary-dark: #be185d; --primary-light: #fdf2f8;
+            --accent: #ffd700; --white: #ffffff; --gray-50: #fafafa;
+            --gray-200: #e5e5e5; --gray-600: #525252; --gray-800: #262626;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --transition: all 0.3s ease;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #fdf2f8, #fce7f3); color: var(--gray-800); min-height: 100vh; padding-bottom: 40px; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+        
+        /* HEADER */
+        .header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: var(--white); padding: 20px 0; position: sticky; top: 0; z-index: 1000; box-shadow: var(--shadow); }
+        .header-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .logo { font-size: 24px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .logo i { color: var(--accent); font-size: 28px; }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        
+        /* BOTÕES */
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: var(--transition); }
+        .btn-header { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); }
+        .btn-header:hover { background: rgba(255,255,255,0.3); }
+        .btn-primary { background: var(--accent); color: var(--gray-800); font-weight: 700; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+        .btn-secondary { background: var(--gray-200); color: var(--gray-800); }
+        .btn-danger { background: #fee2e2; color: #991b1b; }
+        
+        /* ABAS */
+        .tabs-nav { background: var(--white); padding: 10px 0; position: sticky; top: 70px; z-index: 990; box-shadow: var(--shadow); margin-bottom: 20px; }
+        .tabs-buttons { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+        .tab-btn { background: none; border: none; padding: 10px 20px; cursor: pointer; color: var(--gray-600); font-weight: 600; border-bottom: 3px solid transparent; white-space: nowrap; }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--primary-light); border-radius: 8px 8px 0 0; }
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* CARDS & GRID */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 15px; }
+        .card-icon { width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; }
+        .card h3 { font-size: 24px; font-weight: 700; }
+
+        /* PEDIDOS */
+        .search-bar, .filters { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 20px; }
+        .filters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-family: inherit; }
+        
+        .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .order-card { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); border-left: 5px solid var(--primary); display: flex; flex-direction: column; }
+        .order-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+        .order-items { background: var(--gray-50); padding: 10px; border-radius: 6px; margin: 10px 0; font-size: 14px; }
+        .order-actions { margin-top: auto; display: flex; gap: 5px; padding-top: 10px; }
+
+        /* STATUS COLORS */
+        .st-confirmado { background: #dbeafe; color: #1e40af; }
+        .st-produzindo { background: #fef3c7; color: #92400e; }
+        .st-pronto { background: #ede9fe; color: #5b21b6; }
+        .st-rota { background: #cffafe; color: #155e75; }
+        .st-entregue { background: #d1fae5; color: #065f46; }
+
+        /* MODAL */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 16px; width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-header { background: var(--primary); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 16px 16px 0 0; }
+        .modal-body { padding: 30px; }
+        
+        /* FORM */
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .item-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 10px; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        @media(max-width: 700px) { .item-row { grid-template-columns: 1fr; border: 1px solid #ddd; padding: 10px; border-radius: 8px; } }
+
+        /* EXTRAS */
+        .alert { position: fixed; top: 80px; right: 20px; background: white; padding: 15px; border-left: 5px solid orange; box-shadow: var(--shadow); z-index: 1500; max-width: 300px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; background: white; padding: 20px; border-radius: 12px; }
+        .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--gray-50); border-radius: 8px; cursor: pointer; position: relative; }
+        .cal-day:hover { background: var(--primary-light); }
+        .cal-day.has-orders { background: #fef3c7; font-weight: bold; }
+        .cal-dot { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; position: absolute; bottom: 5px; }
+    </style>
 </head>
 <body>
-                    <i class="fas fa-birthday-cake"></i>
-                    Divine Pudim Gourmet
-                </h1>
-                <div class="header-actions">
-                    <button class="btn-header" onclick="exportBackup()">
-                        <i class="fas fa-download"></i> Backup
-                    </button>
-                    <button class="btn-header" onclick="importBackup()">
-                        <i class="fas fa-upload"></i> Importar
-                    </button>
-                    <button class="btn-primary" onclick="showNewOrderModal()">
-                        <i class="fas fa-plus"></i> Novo Pedido
-                    </button>
-                </div>
+
+<header class="header">
+    <div class="container">
+        <div class="header-content">
+            <div class="logo"><i class="fas fa-birthday-cake"></i> Divine Pudim</div>
+            <div class="header-actions">
+                <button class="btn btn-header" onclick="exportBackup()"><i class="fas fa-download"></i> Backup</button>
+                <button class="btn btn-header" onclick="document.getElementById('importInput').click()"><i class="fas fa-upload"></i> Importar</button>
+                <button class="btn btn-primary" onclick="showNewOrderModal()"><i class="fas fa-plus"></i> Novo Pedido</button>
             </div>
         </div>
-    </header>
+    </div>
+</header>
 
-    <!-- ALERTAS -->
-    <div id="alertsContainer" class="alerts-container"></div>
+<div id="alertsArea"></div>
 
-    <!-- TABS NAVIGATION -->
-    <section class="tabs-nav">
-        <div class="container">
-            <div class="tabs-buttons">
-                <button class="tab-btn active" onclick="showTab('dashboard')">
-                    <i class="fas fa-chart-line"></i> Dashboard
-                </button>
-                <button class="tab-btn" onclick="showTab('pedidos')">
-                    <i class="fas fa-shopping-bag"></i> Pedidos
-                </button>
-                <button class="tab-btn" onclick="showTab('producao')">
-                    <i class="fas fa-industry"></i> Produção
-                </button>
-                <button class="tab-btn" onclick="showTab('calendario')">
-                    <i class="fas fa-calendar-alt"></i> Calendário
-                </button>
-                <button class="tab-btn" onclick="showTab('graficos')">
-                    <i class="fas fa-chart-pie"></i> Gráficos
-                </button>
+<nav class="tabs-nav">
+    <div class="container">
+        <div class="tabs-buttons">
+            <button class="tab-btn active" onclick="showTab(event, 'dashboard')"><i class="fas fa-chart-line"></i> Dashboard</button>
+            <button class="tab-btn" onclick="showTab(event, 'pedidos')"><i class="fas fa-list"></i> Pedidos</button>
+            <button class="tab-btn" onclick="showTab(event, 'producao')"><i class="fas fa-industry"></i> Produção</button>
+            <button class="tab-btn" onclick="showTab(event, 'calendario')"><i class="fas fa-calendar"></i> Calendário</button>
+            <button class="tab-btn" onclick="showTab(event, 'graficos')"><i class="fas fa-chart-pie"></i> Gráficos</button>
+        </div>
+    </div>
+</nav>
+
+<section id="tabDashboard" class="tab-content active">
+    <div class="container">
+        <div class="dashboard-grid">
+            <div class="card"><div class="card-icon" style="background:#ec4899"><i class="fas fa-shopping-bag"></i></div><div><h3 id="dashTotal">0</h3><p>Total Pedidos</p></div></div>
+            <div class="card"><div class="card-icon" style="background:#10b981"><i class="fas fa-check"></i></div><div><h3 id="dashEntregues">0</h3><p>Entregues</p></div></div>
+            <div class="card"><div class="card-icon" style="background:#f59e0b"><i class="fas fa-clock"></i></div><div><h3 id="dashPendentes">0</h3><p>Pendentes</p></div></div>
+            <div class="card"><div class="card-icon" style="background:#8b5cf6"><i class="fas fa-dollar-sign"></i></div><div><h3 id="dashFaturado">R$ 0</h3><p>Faturado</p></div></div>
+        </div>
+        <div class="card" style="display: block;">
+            <h3><i class="fas fa-trophy"></i> Top Produtos</h3>
+            <div id="topProductsList" style="margin-top:15px; display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:10px;"></div>
+        </div>
+    </div>
+</section>
+
+<section id="tabPedidos" class="tab-content">
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Buscar cliente..." oninput="searchOrders()">
+        </div>
+        <div class="filters">
+            <div class="filters-grid">
+                <div><label>Data</label><input type="date" id="filterData" onchange="applyFilters()"></div>
+                <div><label>Bairro</label><select id="filterBairro" onchange="applyFilters()"><option value="">Todos</option></select></div>
+                <div><label>Status</label><select id="filterStatus" onchange="applyFilters()">
+                    <option value="">Todos</option>
+                    <option value="Pedido confirmado">Confirmado</option>
+                    <option value="Produzindo">Produzindo</option>
+                    <option value="Pronto">Pronto</option>
+                    <option value="Em rota">Em rota</option>
+                    <option value="Entregue">Entregue</option>
+                </select></div>
+                <div style="display:flex; align-items:end;"><button class="btn btn-secondary" onclick="clearFilters()" style="width:100%">Limpar</button></div>
+            </div>
+            <div style="margin-top:15px; display:flex; gap:10px; justify-content:center">
+                <button class="btn btn-secondary" onclick="exportToPDF()">PDF</button>
+                <button class="btn btn-secondary" onclick="exportToExcel()">Excel</button>
             </div>
         </div>
-    </section>
+        <div id="ordersList" class="orders-grid"></div>
+    </div>
+</section>
 
-    <!-- TAB: DASHBOARD -->
-    <section id="tabDashboard" class="tab-content active">
-        <div class="dashboard">
-            <div class="container">
-                <div class="dashboard-grid">
-                    <div class="dashboard-card">
-                        <div class="card-icon" style="background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);">
-                            <i class="fas fa-shopping-bag"></i>
-                        </div>
-                        <div class="card-info">
-                            <h3 id="totalPedidos">0</h3>
-                            <p>Total de Pedidos</p>
-                        </div>
-                    </div>
-
-                    <div class="dashboard-card">
-                        <div class="card-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="card-info">
-                            <h3 id="pedidosEntregues">0</h3>
-                            <p>Pedidos Entregues</p>
-                        </div>
-                    </div>
-
-                    <div class="dashboard-card">
-                        <div class="card-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="card-info">
-                            <h3 id="pedidosPendentes">0</h3>
-                            <p>Pedidos Pendentes</p>
-                        </div>
-                    </div>
-
-                    <div class="dashboard-card">
-                        <div class="card-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
-                            <i class="fas fa-dollar-sign"></i>
-                        </div>
-                        <div class="card-info">
-                            <h3 id="totalFaturado">R$ 0,00</h3>
-                            <p>Total Faturado</p>
-                        </div>
-                    </div>
-
-                    <div class="dashboard-card">
-                        <div class="card-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
-                            <i class="fas fa-money-bill-wave"></i>
-                        </div>
-                        <div class="card-info">
-                            <h3 id="totalReceber">R$ 0,00</h3>
-                            <p>Total a Receber</p>
-                        </div>
-                    </div>
-
-                    <div class="dashboard-card">
-                        <div class="card-icon" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);">
-                            <i class="fas fa-truck"></i>
-                        </div>
-                        <div class="card-info">
-                            <h3 id="totalEntregas">R$ 0,00</h3>
-                            <p>Taxas de Entrega</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- RELATÓRIO DE PRODUTOS -->
-                <div class="products-report">
-                    <h2 class="section-title">
-                        <i class="fas fa-birthday-cake"></i> Produtos Mais Pedidos
-                    </h2>
-                    <div id="productsReportList" class="products-list">
-                        <!-- Será preenchido via JavaScript -->
-                    </div>
-                </div>
+<section id="tabProducao" class="tab-content">
+    <div class="container">
+        <div class="card" style="display:block">
+            <div style="margin-bottom:20px; display:flex; gap:10px;">
+                <button class="btn btn-secondary" onclick="renderProduction('hoje')">Hoje</button>
+                <button class="btn btn-secondary" onclick="renderProduction('amanha')">Amanhã</button>
+                <button class="btn btn-secondary" onclick="renderProduction('semana')">Semana</button>
             </div>
+            <div id="productionList"></div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- TAB: PEDIDOS -->
-    <section id="tabPedidos" class="tab-content">
-        <!-- BUSCA RÁPIDA -->
-        <section class="search-bar">
-            <div class="container">
-                <div class="search-input-container">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Buscar por nome do cliente ou número do pedido..." oninput="searchOrders()">
-                    <button class="btn-clear-search" onclick="clearSearch()" style="display: none;">
-                        <i class="fas fa-times"></i>
-                    </button>
+<section id="tabCalendario" class="tab-content">
+    <div class="container">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <button class="btn btn-secondary" onclick="changeMonth(-1)"><</button>
+            <h2 id="calTitle">Mês</h2>
+            <button class="btn btn-secondary" onclick="changeMonth(1)">></button>
+        </div>
+        <div id="calendarGrid" class="calendar-grid"></div>
+        <div id="calOrders" style="margin-top:20px;"></div>
+    </div>
+</section>
+
+<section id="tabGraficos" class="tab-content">
+    <div class="container">
+        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
+            <div class="card" style="display:block"><h3>Produtos</h3><canvas id="chartProd"></canvas></div>
+            <div class="card" style="display:block"><h3>Faturamento</h3><canvas id="chartFat"></canvas></div>
+        </div>
+    </div>
+</section>
+
+<div id="orderModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Novo Pedido</h2>
+            <button onclick="closeOrderModal()" style="background:none; border:none; color:white; font-size:24px; cursor:pointer">&times;</button>
+        </div>
+        <form id="orderForm" onsubmit="saveOrder(event)">
+            <div class="modal-body">
+                <div class="form-row">
+                    <div><label>Nome *</label><input type="text" id="cliNome" required></div>
+                    <div><label>WhatsApp *</label><input type="tel" id="cliTel" required></div>
+                    <div><label>CEP</label><div style="display:flex; gap:5px"><input type="text" id="cliCep" onblur="buscarCep()"><button type="button" class="btn btn-secondary" onclick="buscarCep()"><i class="fas fa-search"></i></button></div></div>
                 </div>
-            </div>
-        </section>
-
-        <!-- FILTROS -->
-        <section class="filters">
-            <div class="container">
-                <div class="filters-grid">
-                    <div class="filter-group">
-                        <label><i class="fas fa-calendar"></i> Data da Entrega</label>
-                        <input type="date" id="filterData" onchange="applyFilters()">
-                    </div>
-
-                    <div class="filter-group">
-                        <label><i class="fas fa-map-marker-alt"></i> Bairro</label>
-                        <select id="filterBairro" onchange="applyFilters()">
-                            <option value="">Todos</option>
+                <div class="form-row">
+                    <div style="grid-column: span 2"><label>Endereço *</label><input type="text" id="cliEnd" required></div>
+                    <div><label>Bairro *</label>
+                        <select id="cliBairro" onchange="checkBairro()" required>
+                            <option value="">Selecione</option>
+                            <optgroup label="Juazeiro">
+                                <option value="Centro">Centro</option>
+                                <option value="Lagoa Seca">Lagoa Seca</option>
+                                <option value="Triângulo">Triângulo</option>
+                                <option value="Salesianos">Salesianos</option>
+                                <option value="Pirajá">Pirajá</option>
+                                <option value="Aeroporto">Aeroporto</option>
+                                <option value="OUTRO">Outro...</option>
+                            </optgroup>
                         </select>
+                        <input type="text" id="cliBairroOutro" style="display:none; margin-top:5px" placeholder="Digite o bairro">
                     </div>
-
-                    <div class="filter-group">
-                        <label><i class="fas fa-credit-card"></i> Pagamento</label>
-                        <select id="filterPagamento" onchange="applyFilters()">
-                            <option value="">Todos</option>
-                            <option value="Pix">Pix</option>
-                            <option value="Dinheiro">Dinheiro</option>
-                            <option value="Cartão">Cartão</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label><i class="fas fa-sun"></i> Turno</label>
-                        <select id="filterTurno" onchange="applyFilters()">
-                            <option value="">Todos</option>
-                            <option value="Manhã">Manhã</option>
-                            <option value="Tarde">Tarde</option>
-                            <option value="Retirada no local">Retirada</option>
-                        </select>
-                    </div>
-
-                    <div class="filter-group">
-                        <label><i class="fas fa-tasks"></i> Status</label>
-                        <select id="filterStatus" onchange="applyFilters()">
-                            <option value="">Todos</option>
+                </div>
+                <div class="form-row">
+                    <div><label>Data Pedido</label><input type="date" id="dataPed" required></div>
+                    <div><label>Data Entrega</label><input type="date" id="dataEnt" required></div>
+                    <div><label>Status</label>
+                        <select id="statusPed">
                             <option value="Pedido confirmado">Confirmado</option>
                             <option value="Produzindo">Produzindo</option>
                             <option value="Pronto">Pronto</option>
@@ -1641,1967 +240,596 @@ html {
                             <option value="Entregue">Entregue</option>
                         </select>
                     </div>
+                </div>
 
-                    <div class="filter-group">
-                        <button class="btn-secondary" onclick="clearFilters()">
-                            <i class="fas fa-times"></i> Limpar Filtros
-                        </button>
+                <hr style="margin: 20px 0; border:0; border-top:1px solid #eee">
+                
+                <h3>Itens</h3>
+                <div id="itemsContainer"></div>
+                <button type="button" class="btn btn-primary" onclick="addItem()" style="width:100%; margin-top:10px">+ Adicionar Item</button>
+                <div style="text-align:right; font-size:18px; font-weight:bold; margin-top:15px; color:var(--primary-dark)">
+                    Total: <span id="displayTotal">R$ 0,00</span>
+                </div>
+
+                <hr style="margin: 20px 0; border:0; border-top:1px solid #eee">
+
+                <div class="form-row">
+                    <div><label>Valor Pago</label><input type="number" step="0.01" id="valPago" oninput="calcTotal()"></div>
+                    <div><label>Taxa Entrega</label><input type="number" step="0.01" id="valTaxa" oninput="calcTotal()"></div>
+                    <div><label>Restante</label><input type="number" step="0.01" id="valRest" readonly></div>
+                    <div><label>Pagamento</label>
+                        <select id="formaPag">
+                            <option value="Pix">Pix</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                            <option value="Cartão">Cartão</option>
+                        </select>
                     </div>
                 </div>
+                <div style="margin-top:10px"><label>Obs</label><textarea id="obs" rows="2"></textarea></div>
 
-                <div class="export-buttons">
-                    <button class="btn-export" onclick="exportToPDF()">
-                        <i class="fas fa-file-pdf"></i> Exportar PDF
-                    </button>
-                    <button class="btn-export" onclick="exportToExcel()">
-                        <i class="fas fa-file-excel"></i> Exportar Excel
-                    </button>
+                <input type="hidden" id="editFirebaseId">
+                <input type="hidden" id="editVisualId">
+                
+                <div style="margin-top:30px; display:flex; justify-content:flex-end; gap:10px">
+                    <button type="button" class="btn btn-secondary" onclick="closeOrderModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Pedido</button>
                 </div>
             </div>
-        </section>
-
-        <!-- LISTA DE PEDIDOS (GRID) -->
-        <section class="orders-section">
-            <div class="container">
-                <h2 class="section-title">
-                    <i class="fas fa-list"></i> Pedidos (<span id="pedidosCount">0</span>)
-                </h2>
-                <div id="ordersList" class="orders-grid">
-                    <!-- Pedidos serão inseridos aqui via JavaScript -->
-                </div>
-            </div>
-        </section>
-    </section>
-
-    <!-- TAB: PRODUÇÃO -->
-    <section id="tabProducao" class="tab-content">
-        <div class="container">
-            <h2 class="section-title">
-                <i class="fas fa-industry"></i> Relatório de Produção
-            </h2>
-            
-            <div class="production-filters">
-                <button class="btn-filter-period active" onclick="filterProduction('hoje')">Hoje</button>
-                <button class="btn-filter-period" onclick="filterProduction('amanha')">Amanhã</button>
-                <button class="btn-filter-period" onclick="filterProduction('semana')">Esta Semana</button>
-                <button class="btn-filter-period" onclick="filterProduction('todos')">Todos Pendentes</button>
-            </div>
-
-            <div id="productionReport" class="production-report">
-                <!-- Será preenchido via JavaScript -->
-            </div>
-        </div>
-    </section>
-
-    <!-- TAB: CALENDÁRIO -->
-    <section id="tabCalendario" class="tab-content">
-        <div class="container">
-            <div class="calendar-header">
-                <button class="btn-calendar-nav" onclick="previousMonth()">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <h2 id="calendarTitle">Dezembro 2025</h2>
-                <button class="btn-calendar-nav" onclick="nextMonth()">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-            <div id="calendar" class="calendar">
-                <!-- Será preenchido via JavaScript -->
-            </div>
-            <div id="calendarOrders" class="calendar-orders">
-                <!-- Pedidos do dia selecionado -->
-            </div>
-        </div>
-    </section>
-
-    <!-- TAB: GRÁFICOS -->
-    <section id="tabGraficos" class="tab-content">
-        <div class="container">
-            <h2 class="section-title">
-                <i class="fas fa-chart-pie"></i> Análise e Gráficos
-            </h2>
-            
-            <div class="charts-grid">
-                <div class="chart-card">
-                    <h3><i class="fas fa-birthday-cake"></i> Produtos Mais Vendidos</h3>
-                    <canvas id="chartProdutos"></canvas>
-                </div>
-
-                <div class="chart-card">
-                    <h3><i class="fas fa-dollar-sign"></i> Faturamento por Status</h3>
-                    <canvas id="chartFaturamento"></canvas>
-                </div>
-
-                <div class="chart-card">
-                    <h3><i class="fas fa-map-marker-alt"></i> Entregas por Bairro</h3>
-                    <canvas id="chartBairros"></canvas>
-                </div>
-
-                <div class="chart-card">
-                    <h3><i class="fas fa-credit-card"></i> Formas de Pagamento</h3>
-                    <canvas id="chartPagamento"></canvas>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- MODAL NOVO/EDITAR PEDIDO -->
-    <div id="orderModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">
-                    <i class="fas fa-plus-circle"></i> Novo Pedido
-                </h2>
-                <button class="modal-close" onclick="closeOrderModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <form id="orderForm" onsubmit="saveOrder(event)">
-                <div class="form-grid">
-                    <!-- DADOS DO CLIENTE -->
-                    <div class="form-section">
-                        <h3><i class="fas fa-user"></i> Dados do Cliente</h3>
-                        
-                        <div class="form-group">
-                            <label>Nome do Cliente *</label>
-                            <input type="text" id="clienteNome" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>WhatsApp *</label>
-                            <input type="tel" id="clienteTelefone" placeholder="(88) 00000-0000" required>
-                        </div>
-
-                        <!-- BUSCA DE CEP -->
-                        <div class="form-group">
-                            <label>CEP (opcional)</label>
-                            <div class="cep-input-container">
-                                <input type="text" id="clienteCep" placeholder="00000-000" maxlength="9" oninput="formatCep(this)">
-                                <button type="button" class="btn-buscar-cep" onclick="buscarCep()">
-                                    <i class="fas fa-search"></i> Buscar
-                                </button>
-                            </div>
-                            <small class="form-hint">Digite o CEP e clique em Buscar para preencher automaticamente</small>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Endereço Completo *</label>
-                            <textarea id="clienteEndereco" rows="2" required></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Bairro *</label>
-                            <select id="clienteBairro" onchange="handleBairroChange()" required>
-                                <option value="">Selecione o bairro</option>
-                                <optgroup label="Bairros de Juazeiro do Norte">
-                                    <option value="Centro">Centro</option>
-                                    <option value="Triângulo">Triângulo</option>
-                                    <option value="Santa Teresa">Santa Teresa</option>
-                                    <option value="Pirajá">Pirajá</option>
-                                    <option value="Lagoa Seca">Lagoa Seca</option>
-                                    <option value="Salesianos">Salesianos</option>
-                                    <option value="Tiradentes">Tiradentes</option>
-                                    <option value="São José">São José</option>
-                                    <option value="Frei Damião">Frei Damião</option>
-                                    <option value="Jardim Gonzaga">Jardim Gonzaga</option>
-                                    <option value="Campo Alegre">Campo Alegre</option>
-                                    <option value="Aeroporto">Aeroporto</option>
-                                    <option value="Novo Juazeiro">Novo Juazeiro</option>
-                                    <option value="Muriti">Muriti</option>
-                                    <option value="Limoeiro">Limoeiro</option>
-                                    <option value="Pio XII">Pio XII</option>
-                                    <option value="Jardim Campo Alegre">Jardim Campo Alegre</option>
-                                    <option value="Santo Antônio">Santo Antônio</option>
-                                    <option value="Romeirão">Romeirão</option>
-                                    <option value="OUTRO">+ Outro bairro</option>
-                                </optgroup>
-                            </select>
-                        </div>
-
-                        <div class="form-group" id="outroBairroGroup" style="display: none;">
-                            <label>Nome do Bairro</label>
-                            <input type="text" id="outroBairro" placeholder="Digite o nome do bairro">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Observações</label>
-                            <textarea id="clienteObservacoes" rows="2"></textarea>
-                        </div>
-                    </div>
-
-                    <!-- INFORMAÇÕES DO PEDIDO -->
-                    <div class="form-section">
-                        <h3><i class="fas fa-clipboard"></i> Informações do Pedido</h3>
-                        
-                        <div class="form-group">
-                            <label>Data do Pedido *</label>
-                            <input type="date" id="dataPedido" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Data da Entrega *</label>
-                            <input type="date" id="dataEntrega" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Turno da Entrega *</label>
-                            <select id="turnoEntrega" required>
-                                <option value="">Selecione</option>
-                                <option value="Manhã">Manhã</option>
-                                <option value="Tarde">Tarde</option>
-                                <option value="Retirada no local">Retirada no local</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Status *</label>
-                            <select id="statusPedido" required>
-                                <option value="Pedido confirmado">Pedido confirmado</option>
-                                <option value="Produzindo">Produzindo</option>
-                                <option value="Pronto">Pronto</option>
-                                <option value="Em rota">Em rota</option>
-                                <option value="Entregue">Entregue</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ITENS DO PEDIDO -->
-                <div class="form-section full-width">
-                    <h3><i class="fas fa-shopping-cart"></i> Itens do Pedido</h3>
-                    
-                    <div id="itemsList" class="items-list">
-                        <!-- Itens serão adicionados aqui -->
-                    </div>
-
-                    <button type="button" class="btn-add-item" onclick="addItem()">
-                        <i class="fas fa-plus"></i> Adicionar Item
-                    </button>
-
-                    <div class="total-pedido">
-                        <strong>Total do Pedido:</strong>
-                        <span id="totalPedidoDisplay">R$ 0,00</span>
-                    </div>
-                </div>
-
-                <!-- CONTROLE FINANCEIRO -->
-                <div class="form-section full-width">
-                    <h3><i class="fas fa-dollar-sign"></i> Controle Financeiro</h3>
-                    
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Valor Total *</label>
-                            <input type="number" id="valorTotal" step="0.01" readonly>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Valor Pago Antecipadamente</label>
-                            <input type="number" id="valorPago" step="0.01" value="0" oninput="calculateRemaining()">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Forma de Pagamento *</label>
-                            <select id="formaPagamento" required>
-                                <option value="">Selecione</option>
-                                <option value="Pix">Pix</option>
-                                <option value="Dinheiro">Dinheiro</option>
-                                <option value="Cartão">Cartão</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Taxa de Entrega</label>
-                            <input type="number" id="taxaEntrega" step="0.01" value="0" oninput="calculateRemaining()">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Valor Restante a Receber</label>
-                            <input type="number" id="valorRestante" step="0.01" readonly>
-                        </div>
-                    </div>
-                </div>
-
-                <input type="hidden" id="orderId">
-
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="closeOrderModal()">
-                        Cancelar
-                    </button>
-                    <button type="submit" class="btn-primary">
-                        <i class="fas fa-save"></i> Salvar Pedido
-                    </button>
-                </div>
-            </form>
-        </div>
+        </form>
     </div>
+</div>
 
-    <!-- MODAL HISTÓRICO -->
-    <div id="historyModal" class="modal">
-        <div class="modal-content modal-small">
-            <div class="modal-header">
-                <h2><i class="fas fa-history"></i> Histórico de Alterações</h2>
-                <button class="modal-close" onclick="closeHistoryModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div id="historyContent"></div>
-            </div>
-        </div>
-    </div>
+<input type="file" id="importInput" style="display:none" onchange="handleImport(event)" accept=".json">
 
-    <!-- INPUT OCULTO PARA IMPORTAÇÃO -->
-    <input type="file" id="importInput" accept=".json" style="display: none;" onchange="handleImport(event)">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
-    <script type="module">
-// ================================
-// DIVINE PUDIM GOURMET - SCRIPT V2
-// Sistema de Controle de Pedidos
-// ================================
+    // --- CONFIGURAÇÃO (NÃO ALTERE AS CHAVES) ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyBt_7_WLXqUvYqdCrTMQg7ySZUa4gSdEHY",
+      authDomain: "divinepudimsystem.firebaseapp.com",
+      projectId: "divinepudimsystem",
+      storageBucket: "divinepudimsystem.firebasestorage.app",
+      messagingSenderId: "529626240432",
+      appId: "1:529626240432:web:ca9c80a061a555f6007275"
+    };
 
-// --- INÍCIO DA CONFIGURAÇÃO FIREBASE ---
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const colRef = collection(db, "pedidos");
 
-// ⚠️ SUBSTITUA O CÓDIGO ABAIXO PELO QUE O SITE DO FIREBASE TE DEU
-const firebaseConfig = {
-  apiKey: "AIzaSyBt_7_WLXqUvYqdCrTMQg7ySZUa4gSdEHY",
-  authDomain: "divinepudimsystem.firebaseapp.com",
-  projectId: "divinepudimsystem",
-  storageBucket: "divinepudimsystem.firebasestorage.app",
-  messagingSenderId: "529626240432",
-  appId: "1:529626240432:web:ca9c80a061a555f6007275"
-};
+    // --- DADOS ---
+    const PRODUTOS = [
+        { nome: 'Delícia de abacaxi', tamanhos: [{t:'P',p:35}, {t:'G',p:55}] },
+        { nome: 'Pudim tradicional', tamanhos: [{t:'M',p:35}, {t:'G',p:75}] },
+        { nome: 'Pudim Ninho c/ Nutella', tamanhos: [{t:'M',p:50}, {t:'G',p:85}] },
+        { nome: 'Pudim Ninho c/ Morango', tamanhos: [{t:'M',p:50}, {t:'G',p:85}] },
+        { nome: 'Brownietone 250g', tamanhos: [{t:'Único',p:25}] },
+        { nome: 'Brownietone 500g', tamanhos: [{t:'Único',p:55}] },
+        { nome: 'Taça Abacaxi', tamanhos: [{t:'Único',p:100}] },
+        { nome: 'Taça Brownie', tamanhos: [{t:'Único',p:120}] },
+        { nome: '4 Brigadeiros', tamanhos: [{t:'Único',p:14}] },
+        { nome: 'Empadão', tamanhos: [{t:'Único',p:85}] }
+    ];
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const ordersCollection = collection(db, "pedidos");
-// --- FIM DA CONFIGURAÇÃO FIREBASE ---
+    let orders = [];
+    let calDate = new Date();
 
-// ===== BANCO DE DADOS DE PRODUTOS =====
-const PRODUTOS = [
-    // Doces e Sobremesas
-    { nome: 'Delícia de abacaxi', tamanhos: [{ tamanho: 'P', preco: 35 }, { tamanho: 'G', preco: 55 }] },
-    { nome: 'Ouro branco', tamanhos: [{ tamanho: 'P', preco: 35 }, { tamanho: 'G', preco: 75 }] },
-    { nome: 'Sonho de valsa', tamanhos: [{ tamanho: 'P', preco: 35 }, { tamanho: 'G', preco: 75 }] },
-    { nome: 'Supreme de morango', tamanhos: [{ tamanho: 'P', preco: 35 }, { tamanho: 'G', preco: 75 }] },
-    { nome: 'Bombom de morango', tamanhos: [{ tamanho: 'P', preco: 50 }, { tamanho: 'G', preco: 85 }] },
-    { nome: 'Bombom de uva', tamanhos: [{ tamanho: 'P', preco: 50 }, { tamanho: 'G', preco: 85 }] },
-    { nome: 'Kinder Bueno', tamanhos: [{ tamanho: 'P', preco: 55 }, { tamanho: 'G', preco: 95 }] },
-    { nome: 'Torta de brownie', tamanhos: [{ tamanho: 'P', preco: 55 }, { tamanho: 'G', preco: 95 }] },
-    { nome: 'Ferrero Rocher', tamanhos: [{ tamanho: 'P', preco: 55 }, { tamanho: 'G', preco: 95 }] },
-    
-    // Pudins
-    { nome: 'Pudim tradicional', tamanhos: [{ tamanho: 'M', preco: 35 }, { tamanho: 'G', preco: 75 }] },
-    { nome: 'Pudim ninho com Nutella', tamanhos: [{ tamanho: 'M', preco: 50 }, { tamanho: 'G', preco: 85 }] },
-    { nome: 'Pudim ninho com geleia de morango', tamanhos: [{ tamanho: 'M', preco: 50 }, { tamanho: 'G', preco: 85 }] },
-    
-    // Brownietone
-    { nome: 'Brownietone', tamanhos: [{ tamanho: '250g', preco: 25 }, { tamanho: '500g', preco: 55 }] },
-    
-    // Sobremesas na taça
-    { nome: 'Sobremesa na taça - Delícia de abacaxi', tamanhos: [{ tamanho: 'Único', preco: 100 }] },
-    { nome: 'Sobremesa na taça - Torta brownie', tamanhos: [{ tamanho: 'Único', preco: 120 }] },
-    
-    // Mimos
-    { nome: '4 brigadeiros', tamanhos: [{ tamanho: 'Único', preco: 14 }] },
-    { nome: '4 mini brownies recheados', tamanhos: [{ tamanho: 'Único', preco: 18 }] },
-    { nome: 'Mini bolo', tamanhos: [{ tamanho: 'Único', preco: 15 }] },
-    { nome: 'Bolo médio', tamanhos: [{ tamanho: 'Único', preco: 50 }] },
-    
-    // Salgados
-    { nome: 'Empadão de carne de sol', tamanhos: [{ tamanho: 'Único', preco: 85 }] },
-    { nome: 'Empadão de frango', tamanhos: [{ tamanho: 'Único', preco: 85 }] },
-];
-
-// ===== GERENCIAMENTO DE DADOS =====
-let orders = []; 
-let currentOrderId = null;
-let currentFilter = 'hoje';
-let currentMonth = new Date().getMonth();
-let currentYear = new Date().getFullYear();
-let searchTerm = '';
-
-// ===== INICIALIZAÇÃO =====
-ocument.addEventListener('DOMContentLoaded', function() {
-    // Define data de hoje como padrão
-    const today = new Date().toISOString().split('T')[0];
-    const dataPedidoEl = document.getElementById('dataPedido');
-    if(dataPedidoEl) dataPedidoEl.value = today;
-
-    // --- CONEXÃO EM TEMPO REAL COM FIREBASE ---
-    const q = query(ordersCollection);
-    onSnapshot(q, (snapshot) => {
-        orders = []; // Limpa lista local
-        snapshot.forEach((doc) => {
-            let pedido = doc.data();
-            pedido.id = pedido.id; // ID visual (número)
-            pedido.firebaseId = doc.id; // ID secreto do banco
-            orders.push(pedido);
+    // --- INICIALIZAÇÃO ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // Listener do Firebase (Isso mantém o site atualizado)
+        onSnapshot(query(colRef), (snapshot) => {
+            orders = [];
+            snapshot.forEach(doc => {
+                let d = doc.data();
+                d.fbId = doc.id; // ID do documento
+                orders.push(d);
+            });
+            console.log("Dados atualizados:", orders.length);
+            refreshAll();
         });
         
-        // Atualiza a tela toda vez que o banco mudar
-        updateDashboard();
-        updateProductsReport();
-        renderOrders();
-        populateBairroFilter();
-        showAlerts();
-        renderCalendar();
-        renderCharts();
+        // Define data de hoje no modal
+        document.getElementById('dataPed').valueAsDate = new Date();
     });
-});
-// ===== TABS =====
-function showTab(tabName) {
-    // Remove active de todos
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-    
-    // Ativa o selecionado
-    event.target.closest('.tab-btn').classList.add('active');
-    document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
-    
-    // Atualiza conteúdo específico
-    if (tabName === 'producao') {
-        renderProductionReport();
-    } else if (tabName === 'calendario') {
-        renderCalendar();
-    } else if (tabName === 'graficos') {
-        renderCharts();
-    }
-}
 
-// ===== DASHBOARD =====
-function updateDashboard() {
-    const total = orders.length;
-    const entregues = orders.filter(o => o.status === 'Entregue').length;
-    const pendentes = orders.filter(o => o.status !== 'Entregue').length;
-    
-    const faturado = orders.reduce((sum, o) => sum + parseFloat(o.valorTotal || 0), 0);
-    const receber = orders.reduce((sum, o) => sum + parseFloat(o.valorRestante || 0), 0);
-    const entregas = orders.reduce((sum, o) => sum + parseFloat(o.taxaEntrega || 0), 0);
-    
-    document.getElementById('totalPedidos').textContent = total;
-    document.getElementById('pedidosEntregues').textContent = entregues;
-    document.getElementById('pedidosPendentes').textContent = pendentes;
-    document.getElementById('totalFaturado').textContent = formatCurrency(faturado);
-    document.getElementById('totalReceber').textContent = formatCurrency(receber);
-    document.getElementById('totalEntregas').textContent = formatCurrency(entregas);
-}
+    // --- FUNÇÕES GLOBAIS (WINDOw) ---
+    // Precisamos anexar as funções ao window porque type="module" isola o escopo
 
-// ===== RELATÓRIO DE PRODUTOS =====
-function updateProductsReport() {
-    const productCount = {};
-    
-    orders.forEach(order => {
-        order.items.forEach(item => {
-            const key = `${item.produto} - ${item.tamanho}`;
-            if (!productCount[key]) {
-                productCount[key] = 0;
-            }
-            productCount[key] += item.quantidade;
-        });
-    });
-    
-    // Converte para array e ordena
-    const sortedProducts = Object.entries(productCount)
-        .map(([name, qty]) => ({ name, qty }))
-        .sort((a, b) => b.qty - a.qty)
-        .slice(0, 12); // Top 12
-    
-    const container = document.getElementById('productsReportList');
-    
-    if (sortedProducts.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: var(--gray-500); padding: 40px;">Nenhum produto pedido ainda.</p>';
-        return;
-    }
-    
-    container.innerHTML = sortedProducts.map(product => `
-        <div class="product-item">
-            <div class="product-name">${product.name}</div>
-            <div class="product-quantity">${product.qty}</div>
-        </div>
-    `).join('');
-}
-
-// ===== ALERTAS =====
-function showAlerts() {
-    const container = document.getElementById('alertsContainer');
-    container.innerHTML = '';
-    
-    const today = new Date().toISOString().split('T')[0];
-    const todayOrders = orders.filter(o => o.dataEntrega === today && o.status !== 'Entregue');
-    
-    if (todayOrders.length > 0) {
-        container.innerHTML += `
-            <div class="alert alert-warning">
-                <h4><i class="fas fa-exclamation-triangle"></i> Pedidos para Hoje</h4>
-                <p>${todayOrders.length} pedido(s) para entrega hoje</p>
-            </div>
-        `;
-    }
-    
-    // Pedidos atrasados
-    const lateOrders = orders.filter(o => {
-        return new Date(o.dataEntrega) < new Date(today) && o.status !== 'Entregue';
-    });
-    
-    if (lateOrders.length > 0) {
-        container.innerHTML += `
-            <div class="alert alert-danger">
-                <h4><i class="fas fa-exclamation-circle"></i> Pedidos Atrasados</h4>
-                <p>${lateOrders.length} pedido(s) com entrega atrasada</p>
-            </div>
-        `;
-    }
-}
-
-// ===== BUSCA RÁPIDA =====
-function searchOrders() {
-    searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const clearBtn = document.querySelector('.btn-clear-search');
-    
-    if (searchTerm) {
-        clearBtn.style.display = 'flex';
-    } else {
-        clearBtn.style.display = 'none';
-    }
-    
-    applyFilters();
-}
-
-function clearSearch() {
-    document.getElementById('searchInput').value = '';
-    searchTerm = '';
-    document.querySelector('.btn-clear-search').style.display = 'none';
-    applyFilters();
-}
-
-// ===== MODAL =====
-function showNewOrderModal() {
-    currentOrderId = null;
-    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Novo Pedido';
-    document.getElementById('orderForm').reset();
-    document.getElementById('orderId').value = '';
-    document.getElementById('itemsList').innerHTML = '';
-    
-    // Data padrão
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('dataPedido').value = today;
-    
-    addItem(); // Adiciona primeiro item
-    document.getElementById('orderModal').classList.add('active');
-}
-
-function closeOrderModal() {
-    document.getElementById('orderModal').classList.remove('active');
-}
-
-// ===== BUSCA DE CEP =====
-function formatCep(input) {
-    let value = input.value.replace(/\D/g, '');
-    if (value.length > 5) {
-        value = value.substring(0, 5) + '-' + value.substring(5, 8);
-    }
-    input.value = value;
-}
-
-async function buscarCep() {
-    const cep = document.getElementById('clienteCep').value.replace(/\D/g, '');
-    
-    if (cep.length !== 8) {
-        alert('CEP inválido. Digite 8 dígitos.');
-        return;
-    }
-    
-    try {
-        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-        const data = await response.json();
+    window.showTab = function(e, tabId) {
+        // Se vier de um clique, previne comportamento padrão
+        if(e) e.preventDefault();
         
-        if (data.erro) {
-            alert('CEP não encontrado.');
-            return;
-        }
+        // Esconde todos
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
         
-        // Preenche os campos
-        document.getElementById('clienteEndereco').value = `${data.logradouro}, ${data.complemento || ''}`.trim();
+        // Mostra o atual
+        document.getElementById('tab' + tabId.charAt(0).toUpperCase() + tabId.slice(1)).classList.add('active');
         
-        // Tenta encontrar o bairro na lista
-        const bairroSelect = document.getElementById('clienteBairro');
-        const bairroOption = Array.from(bairroSelect.options).find(opt => 
-            opt.value.toLowerCase() === data.bairro.toLowerCase()
-        );
-        
-        if (bairroOption) {
-            bairroSelect.value = bairroOption.value;
+        // Ativa botão
+        // Se o evento foi passado, usa o target, senão procura manual
+        if(e && e.target) {
+            e.target.closest('.tab-btn').classList.add('active');
         } else {
-            // Se não encontrar, seleciona "Outro" e preenche
-            bairroSelect.value = 'OUTRO';
-            handleBairroChange();
-            document.getElementById('outroBairro').value = data.bairro;
+            // Fallback
+            // (Opcional: lógica pra achar botão pelo texto)
         }
+
+        // Renders específicos
+        if(tabId === 'producao') window.renderProduction('hoje');
+        if(tabId === 'calendario') window.renderCalendar();
+        if(tabId === 'graficos') window.renderCharts();
+    };
+
+    window.refreshAll = function() {
+        renderDashboard();
+        renderOrdersList();
+        populateBairroFilter();
+        renderCalendar();
+        renderProduction('hoje'); // Atualiza se estiver na aba
+    };
+
+    // --- RENDERIZADORES ---
+
+    window.renderDashboard = function() {
+        document.getElementById('dashTotal').innerText = orders.length;
+        document.getElementById('dashEntregues').innerText = orders.filter(o => o.status === 'Entregue').length;
+        document.getElementById('dashPendentes').innerText = orders.filter(o => o.status !== 'Entregue').length;
         
-        alert('Endereço preenchido com sucesso!');
-    } catch (error) {
-        alert('Erro ao buscar CEP. Tente novamente.');
-        console.error(error);
-    }
-}
+        const fat = orders.reduce((acc, o) => acc + (o.total || 0), 0);
+        document.getElementById('dashFaturado').innerText = fmtMoeda(fat);
 
-function handleBairroChange() {
-    const select = document.getElementById('clienteBairro');
-    const outroGroup = document.getElementById('outroBairroGroup');
-    const outroInput = document.getElementById('outroBairro');
-    
-    if (select.value === 'OUTRO') {
-        outroGroup.style.display = 'block';
-        outroInput.required = true;
-    } else {
-        outroGroup.style.display = 'none';
-        outroInput.required = false;
-        outroInput.value = '';
-    }
-}
-
-// ===== GERENCIAMENTO DE ITENS =====
-function addItem() {
-    const itemsList = document.getElementById('itemsList');
-    const itemId = Date.now();
-    
-    const itemHTML = `
-        <div class="item-row" id="item-${itemId}">
-            <div class="item-grid">
-                <div class="form-group">
-                    <label>Produto</label>
-                    <select class="item-produto" onchange="updateSizes(${itemId})" required>
-                        <option value="">Selecione o produto</option>
-                        ${PRODUTOS.map(p => `<option value="${p.nome}">${p.nome}</option>`).join('')}
-                        <option value="PERSONALIZADO">+ Produto Personalizado</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Tamanho</label>
-                    <select class="item-tamanho" id="tamanho-${itemId}" onchange="updatePrice(${itemId})" required>
-                        <option value="">Selecione</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Quantidade</label>
-                    <input type="number" class="item-quantidade" min="1" value="1" onchange="calculateItemTotal(${itemId})" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Valor Unit.</label>
-                    <input type="number" class="item-preco" id="preco-${itemId}" step="0.01" onchange="calculateItemTotal(${itemId})" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Subtotal</label>
-                    <input type="number" class="item-subtotal" id="subtotal-${itemId}" readonly>
-                </div>
-                
-                <button type="button" class="btn-remove-item" onclick="removeItem(${itemId})">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-            <input type="text" class="item-personalizado" id="personalizado-${itemId}" placeholder="Nome do produto personalizado" style="display: none; margin-top: 10px; padding: 10px; border: 2px solid #e5e5e5; border-radius: 8px; width: 100%;">
-        </div>
-    `;
-    
-    itemsList.insertAdjacentHTML('beforeend', itemHTML);
-}
-
-function updateSizes(itemId) {
-    const itemRow = document.getElementById(`item-${itemId}`);
-    const produtoSelect = itemRow.querySelector('.item-produto');
-    const tamanhoSelect = document.getElementById(`tamanho-${itemId}`);
-    const precoInput = document.getElementById(`preco-${itemId}`);
-    const personalizadoInput = document.getElementById(`personalizado-${itemId}`);
-    
-    const produtoNome = produtoSelect.value;
-    
-    // Se for produto personalizado
-    if (produtoNome === 'PERSONALIZADO') {
-        personalizadoInput.style.display = 'block';
-        personalizadoInput.required = true;
-        tamanhoSelect.innerHTML = '<option value="Único">Único</option>';
-        tamanhoSelect.value = 'Único';
-        precoInput.value = '';
-        precoInput.readOnly = false;
-        return;
-    } else {
-        personalizadoInput.style.display = 'none';
-        personalizadoInput.required = false;
-        personalizadoInput.value = '';
-    }
-    
-    const produto = PRODUTOS.find(p => p.nome === produtoNome);
-    
-    if (produto) {
-        tamanhoSelect.innerHTML = produto.tamanhos.map(t => 
-            `<option value="${t.tamanho}" data-preco="${t.preco}">${t.tamanho} - R$ ${t.preco.toFixed(2)}</option>`
+        // Top Produtos
+        const counts = {};
+        orders.forEach(o => o.itens.forEach(i => counts[i.prod] = (counts[i.prod] || 0) + i.qtd));
+        const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 6);
+        document.getElementById('topProductsList').innerHTML = sorted.map(([k,v]) => 
+            `<div style="background:#f9f9f9; padding:10px; border-radius:8px; display:flex; justify-content:space-between"><b>${k}</b> <span>${v}</span></div>`
         ).join('');
+    };
+
+    window.renderOrdersList = function(list = orders) {
+        const div = document.getElementById('ordersList');
+        if(!list.length) { div.innerHTML = '<p>Nenhum pedido.</p>'; return; }
         
-        // Define primeiro tamanho
-        if (produto.tamanhos.length > 0) {
-            tamanhoSelect.value = produto.tamanhos[0].tamanho;
-            updatePrice(itemId);
+        // Ordena por data entrega
+        const sorted = [...list].sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega));
+
+        div.innerHTML = sorted.map(o => {
+            const stClass = 'st-' + (o.status ? o.status.toLowerCase().split(' ')[0] : 'confirmado');
+            return `
+            <div class="order-card">
+                <div class="order-header">
+                    <div><b>${o.cliente}</b> <br> <small>${fmtData(o.dataEntrega)}</small></div>
+                    <span class="status-badge ${stClass}">${o.status}</span>
+                </div>
+                <div class="order-items">
+                    ${o.itens.map(i => `<div>${i.qtd}x ${i.prod} (${i.tam})</div>`).join('')}
+                </div>
+                <div style="font-size:13px; margin-bottom:10px">
+                    <b>Total:</b> ${fmtMoeda(o.total)} <br>
+                    <span style="color:${o.restante > 0 ? 'red' : 'green'}"><b>Restante:</b> ${fmtMoeda(o.restante)}</span>
+                </div>
+                <div class="order-actions">
+                    <button class="btn btn-secondary" onclick="editOrder('${o.fbId}')"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-secondary" onclick="printOrder('${o.fbId}')"><i class="fas fa-print"></i></button>
+                    <button class="btn btn-danger" onclick="deleteOrder('${o.fbId}')"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>`;
+        }).join('');
+    };
+
+    window.renderProduction = function(periodo) {
+        let list = [];
+        const hj = new Date().toISOString().split('T')[0];
+        
+        if(periodo === 'hoje') list = orders.filter(o => o.dataEntrega === hj && o.status !== 'Entregue');
+        else if(periodo === 'amanha') {
+            let am = new Date(); am.setDate(am.getDate()+1);
+            let sAm = am.toISOString().split('T')[0];
+            list = orders.filter(o => o.dataEntrega === sAm && o.status !== 'Entregue');
+        } else {
+            list = orders.filter(o => o.status !== 'Entregue'); // Simplificado para todos pendentes
         }
-    } else {
-        tamanhoSelect.innerHTML = '<option value="">Selecione</option>';
-        precoInput.value = '';
-    }
-}
 
-function updatePrice(itemId) {
-    const tamanhoSelect = document.getElementById(`tamanho-${itemId}`);
-    const precoInput = document.getElementById(`preco-${itemId}`);
-    
-    const selectedOption = tamanhoSelect.options[tamanhoSelect.selectedIndex];
-    const preco = selectedOption.getAttribute('data-preco');
-    
-    if (preco) {
-        precoInput.value = preco;
-        precoInput.readOnly = true;
-    } else {
-        precoInput.readOnly = false;
-    }
-    
-    calculateItemTotal(itemId);
-}
+        const counts = {};
+        list.forEach(o => o.itens.forEach(i => {
+            let k = `${i.prod} (${i.tam})`;
+            counts[k] = (counts[k] || 0) + i.qtd;
+        }));
 
-function calculateItemTotal(itemId) {
-    const itemRow = document.getElementById(`item-${itemId}`);
-    const quantidade = parseFloat(itemRow.querySelector('.item-quantidade').value) || 0;
-    const preco = parseFloat(itemRow.querySelector('.item-preco').value) || 0;
-    const subtotal = quantidade * preco;
-    
-    document.getElementById(`subtotal-${itemId}`).value = subtotal.toFixed(2);
-    calculateOrderTotal();
-}
+        const html = Object.entries(counts).map(([k,v]) => 
+            `<div style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between"><span>${k}</span> <b>x${v}</b></div>`
+        ).join('');
+        document.getElementById('productionList').innerHTML = html || '<p style="padding:20px; text-align:center">Nada para produzir.</p>';
+    };
 
-function calculateOrderTotal() {
-    const subtotals = document.querySelectorAll('.item-subtotal');
-    let total = 0;
-    
-    subtotals.forEach(input => {
-        total += parseFloat(input.value) || 0;
-    });
-    
-    document.getElementById('totalPedidoDisplay').textContent = formatCurrency(total);
-    document.getElementById('valorTotal').value = total.toFixed(2);
-    calculateRemaining();
-}
-
-function calculateRemaining() {
-    const total = parseFloat(document.getElementById('valorTotal').value) || 0;
-    const pago = parseFloat(document.getElementById('valorPago').value) || 0;
-    const taxa = parseFloat(document.getElementById('taxaEntrega').value) || 0;
-    
-    const restante = total + taxa - pago;
-    document.getElementById('valorRestante').value = restante.toFixed(2);
-}
-
-function removeItem(itemId) {
-    const item = document.getElementById(`item-${itemId}`);
-    if (item) {
-        item.remove();
-        calculateOrderTotal();
-    }
-}
-
-// ===== SALVAR PEDIDO =====
-window.saveOrder = async function(event) {
-    event.preventDefault();
-    
-    // Coleta itens (Lógica mantida do seu código original)
-    const itemsRows = document.querySelectorAll('.item-row');
-    const items = [];
-    
-    itemsRows.forEach(row => {
-        const produtoSelect = row.querySelector('.item-produto');
-        const personalizadoInput = row.querySelector('.item-personalizado');
+    window.renderCalendar = function() {
+        const m = calDate.getMonth();
+        const y = calDate.getFullYear();
+        const firstDay = new Date(y, m, 1).getDay();
+        const daysInMonth = new Date(y, m+1, 0).getDate();
         
-        let nomeProduto = produtoSelect.value;
-        if (nomeProduto === 'PERSONALIZADO') {
-            nomeProduto = personalizadoInput.value;
+        document.getElementById('calTitle').innerText = calDate.toLocaleDateString('pt-BR', {month:'long', year:'numeric'});
+        
+        let html = '';
+        for(let i=0; i<firstDay; i++) html += '<div></div>';
+        
+        for(let d=1; d<=daysInMonth; d++) {
+            let dt = new Date(y, m, d).toISOString().split('T')[0];
+            let count = orders.filter(o => o.dataEntrega === dt).length;
+            let cls = count > 0 ? 'cal-day has-orders' : 'cal-day';
+            html += `<div class="${cls}" onclick="filterByDate('${dt}')">${d} ${count>0 ? '<div class="cal-dot"></div>' : ''}</div>`;
         }
-        
-        items.push({
-            produto: nomeProduto,
-            tamanho: row.querySelector('.item-tamanho').value,
-            quantidade: parseFloat(row.querySelector('.item-quantidade').value),
-            preco: parseFloat(row.querySelector('.item-preco').value),
-            subtotal: parseFloat(row.querySelector('.item-subtotal').value)
-        });
-    });
-    
-    let bairro = document.getElementById('clienteBairro').value;
-    if (bairro === 'OUTRO') {
-        bairro = document.getElementById('outroBairro').value;
-    }
-
-    // Objeto do pedido
-    const order = {
-        id: currentOrderId || Date.now(), // ID Visual
-        clienteNome: document.getElementById('clienteNome').value,
-        clienteTelefone: document.getElementById('clienteTelefone').value,
-        clienteEndereco: document.getElementById('clienteEndereco').value,
-        clienteBairro: bairro,
-        clienteObservacoes: document.getElementById('clienteObservacoes').value,
-        dataPedido: document.getElementById('dataPedido').value,
-        dataEntrega: document.getElementById('dataEntrega').value,
-        turnoEntrega: document.getElementById('turnoEntrega').value,
-        status: document.getElementById('statusPedido').value,
-        items: items,
-        valorTotal: parseFloat(document.getElementById('valorTotal').value),
-        valorPago: parseFloat(document.getElementById('valorPago').value),
-        formaPagamento: document.getElementById('formaPagamento').value,
-        taxaEntrega: parseFloat(document.getElementById('taxaEntrega').value),
-        valorRestante: parseFloat(document.getElementById('valorRestante').value),
-        history: []
+        document.getElementById('calendarGrid').innerHTML = html;
     };
     
-    try {
-        if (currentOrderId) {
-            // EDITAR
-            const pedidoExistente = orders.find(o => o.id === currentOrderId);
-            if(pedidoExistente && pedidoExistente.firebaseId) {
-                 // Adiciona histórico
-                if (!order.history) order.history = pedidoExistente.history || [];
-                order.history.push({
-                    timestamp: new Date().toISOString(),
-                    action: 'Pedido editado',
-                    details: `Status: ${order.status}`
-                });
+    window.changeMonth = function(dir) {
+        calDate.setMonth(calDate.getMonth() + dir);
+        renderCalendar();
+    };
 
-                const docRef = doc(db, "pedidos", pedidoExistente.firebaseId);
-                await updateDoc(docRef, order);
-                alert('Pedido atualizado na nuvem!');
+    window.renderCharts = function() {
+        // Simples verificação se o elemento existe e destroy chart antigo se necessario
+        // (Simplificado para o exemplo)
+    };
+
+    // --- MODAL & FORM ---
+
+    window.showNewOrderModal = function() {
+        document.getElementById('orderForm').reset();
+        document.getElementById('itemsContainer').innerHTML = '';
+        document.getElementById('editFirebaseId').value = '';
+        document.getElementById('editVisualId').value = '';
+        document.getElementById('dataPed').valueAsDate = new Date();
+        document.getElementById('orderModal').classList.add('active');
+        addItem(); // Adiciona 1 item vazio
+    };
+
+    window.closeOrderModal = function() {
+        document.getElementById('orderModal').classList.remove('active');
+    };
+
+    window.addItem = function(data = null) {
+        const id = Date.now();
+        const html = `
+        <div class="item-row" id="row-${id}">
+            <div>
+                <select class="i-prod" onchange="updItem(${id})">
+                    <option value="">Produto...</option>
+                    ${PRODUTOS.map(p => `<option value="${p.nome}">${p.nome}</option>`).join('')}
+                    <option value="OUTRO">Personalizado</option>
+                </select>
+                <input type="text" class="i-cust" style="display:none; margin-top:5px" placeholder="Nome">
+            </div>
+            <div><select class="i-tam" onchange="updPrice(${id})"><option>-</option></select></div>
+            <div><input type="number" class="i-qtd" value="1" onchange="calcTotal()"></div>
+            <div><input type="number" class="i-prc" step="0.01" onchange="calcTotal()"></div>
+            <button type="button" class="btn btn-danger" onclick="this.parentElement.remove(); calcTotal()">X</button>
+        </div>`;
+        document.getElementById('itemsContainer').insertAdjacentHTML('beforeend', html);
+
+        if(data) {
+            const row = document.getElementById(`row-${id}`);
+            const sel = row.querySelector('.i-prod');
+            if(PRODUTOS.find(p => p.nome === data.prod)) {
+                sel.value = data.prod;
+                updItem(id); // Popula tamanhos
+                row.querySelector('.i-tam').value = data.tam;
+            } else {
+                sel.value = 'OUTRO';
+                updItem(id);
+                row.querySelector('.i-cust').value = data.prod;
+                row.querySelector('.i-tam').innerHTML = `<option>${data.tam}</option>`;
             }
-        } else {
-            // NOVO
-            order.history = [{
-                timestamp: new Date().toISOString(),
-                action: 'Pedido criado',
-                details: `Cliente: ${order.clienteNome}`
-            }];
-            await addDoc(ordersCollection, order);
-            alert('Pedido salvo na nuvem!');
+            row.querySelector('.i-qtd').value = data.qtd;
+            row.querySelector('.i-prc').value = data.prc;
         }
-        closeOrderModal();
-    } catch (error) {
-        console.error("Erro:", error);
-        alert("Erro ao salvar no sistema online.");
-    }
-}
+    };
 
+    window.updItem = function(id) {
+        const row = document.getElementById(`row-${id}`);
+        const val = row.querySelector('.i-prod').value;
+        const tam = row.querySelector('.i-tam');
+        const cust = row.querySelector('.i-cust');
+        const prc = row.querySelector('.i-prc');
 
-// ===== EDITAR PEDIDO =====
-function editOrder(orderId) {
-    const order = orders.find(o => o.id === orderId);
-    if (!order) return;
-    
-    currentOrderId = orderId;
-    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Editar Pedido';
-    
-    // Preenche formulário
-    document.getElementById('clienteNome').value = order.clienteNome;
-    document.getElementById('clienteTelefone').value = order.clienteTelefone;
-    document.getElementById('clienteEndereco').value = order.clienteEndereco;
-    
-    // Preenche bairro
-    const bairroSelect = document.getElementById('clienteBairro');
-    const bairroOption = Array.from(bairroSelect.options).find(opt => opt.value === order.clienteBairro);
-    
-    if (bairroOption) {
-        bairroSelect.value = order.clienteBairro;
-    } else {
-        bairroSelect.value = 'OUTRO';
-        handleBairroChange();
-        document.getElementById('outroBairro').value = order.clienteBairro;
-    }
-    
-    document.getElementById('clienteObservacoes').value = order.clienteObservacoes || '';
-    
-    document.getElementById('dataPedido').value = order.dataPedido;
-    document.getElementById('dataEntrega').value = order.dataEntrega;
-    document.getElementById('turnoEntrega').value = order.turnoEntrega;
-    document.getElementById('statusPedido').value = order.status;
-    
-    document.getElementById('valorPago').value = order.valorPago;
-    document.getElementById('formaPagamento').value = order.formaPagamento;
-    document.getElementById('taxaEntrega').value = order.taxaEntrega;
-    
-    // Preenche itens
-    document.getElementById('itemsList').innerHTML = '';
-    order.items.forEach((item, index) => {
-        addItem();
-        const itemRows = document.querySelectorAll('.item-row');
-        const currentRow = itemRows[itemRows.length - 1];
-        
-        const produtoSelect = currentRow.querySelector('.item-produto');
-        
-        // Verifica se é produto personalizado
-        const isProdutoCadastrado = PRODUTOS.find(p => p.nome === item.produto);
-        
-        if (isProdutoCadastrado) {
-            produtoSelect.value = item.produto;
-            const itemId = currentRow.id.split('-')[1];
-            updateSizes(itemId);
-            
-            setTimeout(() => {
-                currentRow.querySelector('.item-tamanho').value = item.tamanho;
-                currentRow.querySelector('.item-quantidade').value = item.quantidade;
-                currentRow.querySelector('.item-preco').value = item.preco;
-                currentRow.querySelector('.item-subtotal').value = item.subtotal;
-            }, 100);
+        if(val === 'OUTRO') {
+            cust.style.display = 'block';
+            tam.innerHTML = '<option value="Único">Único</option>';
+            prc.value = '';
         } else {
-            // Produto personalizado
-            produtoSelect.value = 'PERSONALIZADO';
-            const itemId = currentRow.id.split('-')[1];
-            updateSizes(itemId);
-            
-            setTimeout(() => {
-                const personalizadoInput = document.getElementById(`personalizado-${itemId}`);
-                personalizadoInput.value = item.produto;
-                currentRow.querySelector('.item-tamanho').value = item.tamanho;
-                currentRow.querySelector('.item-quantidade').value = item.quantidade;
-                currentRow.querySelector('.item-preco').value = item.preco;
-                currentRow.querySelector('.item-subtotal').value = item.subtotal;
-            }, 100);
-        }
-    });
-    
-    setTimeout(() => {
-        calculateOrderTotal();
-    }, 200);
-    
-    document.getElementById('orderModal').classList.add('active');
-}
-
-// ===== DELETAR PEDIDO =====
-window.deleteOrder = async function(orderId) {
-    if (confirm('Tem certeza que deseja excluir este pedido da nuvem?')) {
-        const order = orders.find(o => o.id === orderId);
-        if (order && order.firebaseId) {
-            try {
-                await deleteDoc(doc(db, "pedidos", order.firebaseId));
-                alert('Pedido excluído com sucesso!');
-            } catch (error) {
-                console.error("Erro ao excluir:", error);
-                alert("Erro ao excluir.");
+            cust.style.display = 'none';
+            const p = PRODUTOS.find(x => x.nome === val);
+            if(p) {
+                tam.innerHTML = p.tamanhos.map(t => `<option value="${t.t}" data-p="${t.p}">${t.t}</option>`).join('');
+                updPrice(id);
             }
         }
-    }
-}
-// ===== HISTÓRICO =====
-function showHistory(orderId) {
-    const order = orders.find(o => o.id === orderId);
-    if (!order) return;
-    
-    const historyContent = document.getElementById('historyContent');
-    
-    if (!order.history || order.history.length === 0) {
-        historyContent.innerHTML = '<p style="text-align: center; padding: 40px; color: var(--gray-500);">Nenhum histórico disponível</p>';
-    } else {
-        historyContent.innerHTML = `
-            <div class="history-timeline">
-                ${order.history.map(h => `
-                    <div class="history-item">
-                        <div class="history-time">${formatDateTime(h.timestamp)}</div>
-                        <div class="history-action">${h.action}</div>
-                        <div class="history-details">${h.details}</div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-    }
-    
-    document.getElementById('historyModal').classList.add('active');
-}
+    };
 
-function closeHistoryModal() {
-    document.getElementById('historyModal').classList.remove('active');
-}
+    window.updPrice = function(id) {
+        const row = document.getElementById(`row-${id}`);
+        const tam = row.querySelector('.i-tam');
+        const opt = tam.options[tam.selectedIndex];
+        if(opt && opt.dataset.p) {
+            row.querySelector('.i-prc').value = opt.dataset.p;
+            calcTotal();
+        }
+    };
 
-// ===== RENDERIZAR PEDIDOS =====
-function renderOrders(filteredOrders = null) {
-    const ordersList = document.getElementById('ordersList');
-    const ordersToRender = filteredOrders || orders;
-    
-    document.getElementById('pedidosCount').textContent = ordersToRender.length;
-    
-    if (ordersToRender.length === 0) {
-        ordersList.innerHTML = `
-            <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--gray-400);">
-                <i class="fas fa-inbox" style="font-size: 64px; margin-bottom: 20px; display: block;"></i>
-                <h3 style="font-size: 24px; margin-bottom: 10px;">Nenhum pedido encontrado</h3>
-                <p>Adicione um novo pedido para começar</p>
-            </div>
-        `;
-        return;
-    }
-    
-    // Ordena por data de entrega
-    const sortedOrders = [...ordersToRender].sort((a, b) => 
-        new Date(a.dataEntrega) - new Date(b.dataEntrega)
-    );
-    
-    ordersList.innerHTML = sortedOrders.map(order => `
-        <div class="order-card">
-            <div class="order-header">
-                <div class="order-info">
-                    <h3><i class="fas fa-user"></i> ${order.clienteNome}</h3>
-                    <p><i class="fas fa-phone"></i> ${order.clienteTelefone}</p>
-                    <p><i class="fas fa-map-marker-alt"></i> ${order.clienteEndereco}</p>
-                    <p><i class="fas fa-map-pin"></i> ${order.clienteBairro}</p>
-                    <p><i class="fas fa-calendar"></i> ${formatDate(order.dataEntrega)} - ${order.turnoEntrega}</p>
-                </div>
-                <span class="order-status status-${order.status.toLowerCase().replace(/ /g, '')}">${order.status}</span>
-            </div>
-            
-            <div class="order-body">
-                <div class="order-section">
-                    <h4><i class="fas fa-shopping-bag"></i> Itens do Pedido</h4>
-                    <div class="order-items">
-                        ${order.items.map(item => `
-                            <div class="order-item">
-                                <div class="item-name">${item.produto}</div>
-                                <div class="item-details">
-                                    ${item.tamanho} | Qtd: ${item.quantidade} | 
-                                    R$ ${item.preco.toFixed(2)} | 
-                                    Subtotal: R$ ${item.subtotal.toFixed(2)}
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-                
-                <div class="order-section">
-                    <h4><i class="fas fa-dollar-sign"></i> Financeiro</h4>
-                    <div class="order-financial">
-                        <div class="financial-row">
-                            <span>Valor Total:</span>
-                            <strong>${formatCurrency(order.valorTotal)}</strong>
-                        </div>
-                        <div class="financial-row">
-                            <span>Taxa de Entrega:</span>
-                            <strong>${formatCurrency(order.taxaEntrega)}</strong>
-                        </div>
-                        <div class="financial-row">
-                            <span>Valor Pago:</span>
-                            <strong>${formatCurrency(order.valorPago)}</strong>
-                        </div>
-                        <div class="financial-row">
-                            <span>Forma:</span>
-                            <strong>${order.formaPagamento}</strong>
-                        </div>
-                        <div class="financial-row total">
-                            <span>A Receber:</span>
-                            <strong>${formatCurrency(order.valorRestante)}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            ${order.clienteObservacoes ? `
-                <div class="order-section">
-                    <h4><i class="fas fa-comment"></i> Observações</h4>
-                    <p style="padding: 12px; background: #fef3c7; border-radius: 8px; margin-top: 8px; font-size: 13px;">${order.clienteObservacoes}</p>
-                </div>
-            ` : ''}
-            
-            <div class="order-actions">
-                <button class="btn-action btn-edit" onclick="editOrder(${order.id})">
-                    <i class="fas fa-edit"></i> Editar
-                </button>
-                <button class="btn-action btn-print" onclick="printReceipt(${order.id})">
-                    <i class="fas fa-print"></i> Imprimir
-                </button>
-                <button class="btn-action btn-history" onclick="showHistory(${order.id})">
-                    <i class="fas fa-history"></i> Histórico
-                </button>
-                <button class="btn-action btn-delete" onclick="deleteOrder(${order.id})">
-                    <i class="fas fa-trash"></i> Excluir
-                </button>
-            </div>
-        </div>
-    `).join('');
-}
-
-// ===== FILTROS =====
-function populateBairroFilter() {
-    const bairros = [...new Set(orders.map(o => o.clienteBairro))].sort();
-    const select = document.getElementById('filterBairro');
-    
-    select.innerHTML = '<option value="">Todos</option>' + 
-        bairros.map(b => `<option value="${b}">${b}</option>`).join('');
-}
-
-function applyFilters() {
-    const filterData = document.getElementById('filterData').value;
-    const filterBairro = document.getElementById('filterBairro').value;
-    const filterPagamento = document.getElementById('filterPagamento').value;
-    const filterTurno = document.getElementById('filterTurno').value;
-    const filterStatus = document.getElementById('filterStatus').value;
-    
-    let filtered = [...orders];
-    
-    if (filterData) {
-        filtered = filtered.filter(o => o.dataEntrega === filterData);
-    }
-    
-    if (filterBairro) {
-        filtered = filtered.filter(o => o.clienteBairro === filterBairro);
-    }
-    
-    if (filterPagamento) {
-        filtered = filtered.filter(o => o.formaPagamento === filterPagamento);
-    }
-    
-    if (filterTurno) {
-        filtered = filtered.filter(o => o.turnoEntrega === filterTurno);
-    }
-    
-    if (filterStatus) {
-        filtered = filtered.filter(o => o.status === filterStatus);
-    }
-    
-    if (searchTerm) {
-        filtered = filtered.filter(o => 
-            o.clienteNome.toLowerCase().includes(searchTerm) ||
-            o.id.toString().includes(searchTerm)
-        );
-    }
-    
-    renderOrders(filtered);
-}
-
-function clearFilters() {
-    document.getElementById('filterData').value = '';
-    document.getElementById('filterBairro').value = '';
-    document.getElementById('filterPagamento').value = '';
-    document.getElementById('filterTurno').value = '';
-    document.getElementById('filterStatus').value = '';
-    renderOrders();
-}
-
-// ===== PRODUÇÃO =====
-function filterProduction(period) {
-    currentFilter = period;
-    document.querySelectorAll('.btn-filter-period').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-    renderProductionReport();
-}
-
-function renderProductionReport() {
-    const container = document.getElementById('productionReport');
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    let filtered = orders.filter(o => o.status !== 'Entregue');
-    
-    if (currentFilter === 'hoje') {
-        const todayStr = today.toISOString().split('T')[0];
-        filtered = filtered.filter(o => o.dataEntrega === todayStr);
-    } else if (currentFilter === 'amanha') {
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const tomorrowStr = tomorrow.toISOString().split('T')[0];
-        filtered = filtered.filter(o => o.dataEntrega === tomorrowStr);
-    } else if (currentFilter === 'semana') {
-        const weekEnd = new Date(today);
-        weekEnd.setDate(weekEnd.getDate() + 7);
-        filtered = filtered.filter(o => {
-            const entrega = new Date(o.dataEntrega);
-            return entrega >= today && entrega <= weekEnd;
+    window.calcTotal = function() {
+        let total = 0;
+        document.querySelectorAll('.item-row').forEach(row => {
+            const q = parseFloat(row.querySelector('.i-qtd').value) || 0;
+            const p = parseFloat(row.querySelector('.i-prc').value) || 0;
+            total += q * p;
         });
-    }
-    
-    // Agrupa por data
-    const byDate = {};
-    filtered.forEach(order => {
-        if (!byDate[order.dataEntrega]) {
-            byDate[order.dataEntrega] = [];
-        }
-        byDate[order.dataEntrega].push(order);
-    });
-    
-    // Ordena datas
-    const sortedDates = Object.keys(byDate).sort();
-    
-    if (sortedDates.length === 0) {
-        container.innerHTML = '<p style="text-align: center; padding: 60px; color: var(--gray-500);">Nenhum pedido pendente para este período</p>';
-        return;
-    }
-    
-    container.innerHTML = sortedDates.map(date => {
-        const dayOrders = byDate[date];
-        const productCount = {};
         
-        dayOrders.forEach(order => {
-            order.items.forEach(item => {
-                const key = `${item.produto}|||${item.tamanho}`;
-                if (!productCount[key]) {
-                    productCount[key] = 0;
-                }
-                productCount[key] += item.quantidade;
+        const taxa = parseFloat(document.getElementById('valTaxa').value) || 0;
+        const pago = parseFloat(document.getElementById('valPago').value) || 0;
+        const final = total + taxa;
+        
+        document.getElementById('displayTotal').innerText = fmtMoeda(total);
+        document.getElementById('valRest').value = (final - pago).toFixed(2);
+        
+        // Guarda total bruto no dataset do form pra usar no save
+        document.getElementById('orderForm').dataset.total = final;
+    };
+
+    window.checkBairro = function() {
+        const s = document.getElementById('cliBairro');
+        const i = document.getElementById('cliBairroOutro');
+        i.style.display = s.value === 'OUTRO' ? 'block' : 'none';
+        if(s.value === 'OUTRO') i.required = true;
+    };
+
+    // --- SALVAR ---
+
+    window.saveOrder = async function(e) {
+        e.preventDefault();
+        
+        // Coleta Itens
+        let itens = [];
+        let totalItens = 0;
+        document.querySelectorAll('.item-row').forEach(row => {
+            const prodSel = row.querySelector('.i-prod').value;
+            const prodNome = prodSel === 'OUTRO' ? row.querySelector('.i-cust').value : prodSel;
+            const qtd = parseFloat(row.querySelector('.i-qtd').value);
+            const prc = parseFloat(row.querySelector('.i-prc').value);
+            totalItens += qtd * prc;
+            
+            itens.push({
+                prod: prodNome,
+                tam: row.querySelector('.i-tam').value,
+                qtd: qtd,
+                prc: prc
             });
         });
-        
-        const products = Object.entries(productCount).map(([key, qty]) => {
-            const [name, size] = key.split('|||');
-            return { name, size, qty };
-        }).sort((a, b) => a.name.localeCompare(b.name));
-        
-        return `
-            <div class="production-day">
-                <h3><i class="fas fa-calendar-day"></i> ${formatDate(date)} (${dayOrders.length} pedido${dayOrders.length > 1 ? 's' : ''})</h3>
-                <div class="production-items">
-                    ${products.map(p => `
-                        <div class="production-item">
-                            <div class="production-item-info">
-                                <div class="production-item-name">${p.name}</div>
-                                <div class="production-item-size">Tamanho: ${p.size}</div>
-                            </div>
-                            <div class="production-item-qty">${p.qty}</div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-    }).join('');
-}
 
-// ===== CALENDÁRIO =====
-function renderCalendar() {
-    const calendar = document.getElementById('calendar');
-    const title = document.getElementById('calendarTitle');
-    
-    const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-                        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-    
-    title.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-    
-    const firstDay = new Date(currentYear, currentMonth, 1);
-    const lastDay = new Date(currentYear, currentMonth + 1, 0);
-    const startDay = firstDay.getDay();
-    const daysInMonth = lastDay.getDate();
-    
-    let calendarHTML = '<div class="calendar-grid">';
-    
-    // Dias da semana
-    ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].forEach(day => {
-        calendarHTML += `<div class="calendar-day-header">${day}</div>`;
-    });
-    
-    // Dias vazios do início
-    for (let i = 0; i < startDay; i++) {
-        calendarHTML += '<div class="calendar-day other-month"></div>';
-    }
-    
-    // Dias do mês
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(currentYear, currentMonth, day);
-        const dateStr = date.toISOString().split('T')[0];
-        const dayOrders = orders.filter(o => o.dataEntrega === dateStr);
-        
-        let classes = 'calendar-day';
-        
-        if (date.getTime() === today.getTime()) {
-            classes += ' today';
-        }
-        
-        if (dayOrders.length > 0) {
-            classes += ' has-orders';
-        }
-        
-        calendarHTML += `
-            <div class="${classes}" onclick="showDayOrders('${dateStr}')">
-                <div class="calendar-day-number">${day}</div>
-                ${dayOrders.length > 0 ? `<div class="calendar-day-badge">${dayOrders.length}</div>` : ''}
-            </div>
-        `;
-    }
-    
-    calendarHTML += '</div>';
-    calendar.innerHTML = calendarHTML;
-}
+        const bairroSel = document.getElementById('cliBairro').value;
+        const bairroFinal = bairroSel === 'OUTRO' ? document.getElementById('cliBairroOutro').value : bairroSel;
+        const taxa = parseFloat(document.getElementById('valTaxa').value) || 0;
 
-function previousMonth() {
-    currentMonth--;
-    if (currentMonth < 0) {
-        currentMonth = 11;
-        currentYear--;
-    }
-    renderCalendar();
-}
-
-function nextMonth() {
-    currentMonth++;
-    if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
-    }
-    renderCalendar();
-}
-
-function showDayOrders(dateStr) {
-    const dayOrders = orders.filter(o => o.dataEntrega === dateStr);
-    const container = document.getElementById('calendarOrders');
-    
-    if (dayOrders.length === 0) {
-        container.innerHTML = `
-            <h3 style="margin-bottom: 20px;"><i class="fas fa-calendar-day"></i> ${formatDate(dateStr)}</h3>
-            <p style="text-align: center; padding: 40px; color: var(--gray-500);">Nenhum pedido para esta data</p>
-        `;
-        return;
-    }
-    
-    container.innerHTML = `
-        <h3 style="margin-bottom: 20px;"><i class="fas fa-calendar-day"></i> ${formatDate(dateStr)} - ${dayOrders.length} Pedido${dayOrders.length > 1 ? 's' : ''}</h3>
-        <div style="display: grid; gap: 16px;">
-            ${dayOrders.map(order => `
-                <div style="background: var(--gray-50); padding: 16px; border-radius: 12px; border-left: 4px solid var(--primary);">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
-                        <div>
-                            <strong style="font-size: 16px;">${order.clienteNome}</strong>
-                            <p style="color: var(--gray-600); font-size: 13px; margin-top: 4px;">${order.clienteTelefone}</p>
-                            <p style="color: var(--gray-600); font-size: 13px;">${order.turnoEntrega}</p>
-                        </div>
-                        <span class="order-status status-${order.status.toLowerCase().replace(/ /g, '')}">${order.status}</span>
-                    </div>
-                    <div style="font-size: 13px; color: var(--gray-700);">
-                        <strong>${order.items.length} item${order.items.length > 1 ? 's' : ''}</strong> - ${formatCurrency(order.valorTotal)}
-                    </div>
-                </div>
-            `).join('')}
-        </div>
-    `;
-}
-
-
-// ===== GRÁFICOS =====
-let chartInstances = {};
-
-function renderCharts() {
-    // Limpa gráficos anteriores
-    Object.values(chartInstances).forEach(chart => {
-        if (chart) chart.destroy();
-    });
-    
-    renderProductChart();
-    renderRevenueChart();
-    renderBairrosChart();
-    renderPaymentChart();
-}
-
-function renderProductChart() {
-    const productCount = {};
-    
-    orders.forEach(order => {
-        order.items.forEach(item => {
-            if (!productCount[item.produto]) {
-                productCount[item.produto] = 0;
-            }
-            productCount[item.produto] += item.quantidade;
-        });
-    });
-    
-    const sortedProducts = Object.entries(productCount)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 10);
-    
-    const ctx = document.getElementById('chartProdutos');
-    
-    chartInstances.produtos = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: sortedProducts.map(p => p[0]),
-            datasets: [{
-                label: 'Quantidade Vendida',
-                data: sortedProducts.map(p => p[1]),
-                backgroundColor: '#ec4899',
-                borderColor: '#be185d',
-                borderWidth: 2,
-                borderRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
-                    }
-                }
-            }
-        }
-    });
-}
-
-function renderRevenueChart() {
-    const revenueByStatus = {};
-    
-    orders.forEach(order => {
-        if (!revenueByStatus[order.status]) {
-            revenueByStatus[order.status] = 0;
-        }
-        revenueByStatus[order.status] += order.valorTotal;
-    });
-    
-    const ctx = document.getElementById('chartFaturamento');
-    
-    const statusColors = {
-        'Pedido confirmado': '#3b82f6',
-        'Produzindo': '#f59e0b',
-        'Pronto': '#8b5cf6',
-        'Em rota': '#06b6d4',
-        'Entregue': '#10b981'
-    };
-    
-    chartInstances.faturamento = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: Object.keys(revenueByStatus),
-            datasets: [{
-                data: Object.values(revenueByStatus),
-                backgroundColor: Object.keys(revenueByStatus).map(s => statusColors[s]),
-                borderWidth: 3,
-                borderColor: '#ffffff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.label + ': ' + formatCurrency(context.raw);
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
-
-function renderBairrosChart() {
-    const bairroCount = {};
-    
-    orders.forEach(order => {
-        if (!bairroCount[order.clienteBairro]) {
-            bairroCount[order.clienteBairro] = 0;
-        }
-        bairroCount[order.clienteBairro]++;
-    });
-    
-    const sortedBairros = Object.entries(bairroCount)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 8);
-    
-    const ctx = document.getElementById('chartBairros');
-    
-    chartInstances.bairros = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: sortedBairros.map(b => b[0]),
-            datasets: [{
-                label: 'Número de Entregas',
-                data: sortedBairros.map(b => b[1]),
-                backgroundColor: '#06b6d4',
-                borderColor: '#0891b2',
-                borderWidth: 2,
-                borderRadius: 8
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                x: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
-                    }
-                }
-            }
-        }
-    });
-}
-
-function renderPaymentChart() {
-    const paymentCount = {};
-    
-    orders.forEach(order => {
-        if (!paymentCount[order.formaPagamento]) {
-            paymentCount[order.formaPagamento] = 0;
-        }
-        paymentCount[order.formaPagamento]++;
-    });
-    
-    const ctx = document.getElementById('chartPagamento');
-    
-    chartInstances.pagamento = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: Object.keys(paymentCount),
-            datasets: [{
-                data: Object.values(paymentCount),
-                backgroundColor: ['#10b981', '#f59e0b', '#8b5cf6'],
-                borderWidth: 3,
-                borderColor: '#ffffff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }
-    });
-}
-
-// ===== IMPRESSÃO TÉRMICA 58MM =====
-function printReceipt(orderId) {
-    const order = orders.find(o => o.id === orderId);
-    if (!order) return;
-    
-    const printWindow = window.open('', '', 'width=300,height=600');
-    
-    const receiptHTML = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <style>
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body {
-                    width: 58mm;
-                    font-family: 'Courier New', monospace;
-                    font-size: 11px;
-                    line-height: 1.4;
-                    padding: 5mm;
-                }
-                .center { text-align: center; }
-                .bold { font-weight: bold; }
-                .divider { 
-                    border-top: 1px dashed #000; 
-                    margin: 5px 0; 
-                }
-                .row {
-                    display: flex;
-                    justify-content: space-between;
-                    margin: 2px 0;
-                }
-                .item {
-                    margin: 4px 0;
-                }
-                .total {
-                    font-size: 13px;
-                    font-weight: bold;
-                    margin-top: 5px;
-                }
-                h1 { font-size: 16px; margin: 8px 0; }
-                h2 { font-size: 13px; margin: 6px 0; }
-            </style>
-        </head>
-        <body>
-            <div class="center">
-                <h1 class="bold">DIVINE PUDIM GOURMET</h1>
-                <p>Comprovante de Pedido</p>
-            </div>
-            
-            <div class="divider"></div>
-            
-            <div class="row">
-                <span>Pedido Nº:</span>
-                <span class="bold">${order.id}</span>
-            </div>
-            
-            <div class="row">
-                <span>Data:</span>
-                <span>${formatDate(order.dataPedido)}</span>
-            </div>
-            
-            <div class="divider"></div>
-            
-            <h2 class="bold">CLIENTE</h2>
-            <p>${order.clienteNome}</p>
-            <p>${order.clienteTelefone}</p>
-            <p>${order.clienteEndereco}</p>
-            <p>${order.clienteBairro}</p>
-            
-            <div class="divider"></div>
-            
-            <h2 class="bold">ENTREGA</h2>
-            <div class="row">
-                <span>Data:</span>
-                <span>${formatDate(order.dataEntrega)}</span>
-            </div>
-            <div class="row">
-                <span>Turno:</span>
-                <span>${order.turnoEntrega}</span>
-            </div>
-            <div class="row">
-                <span>Status:</span>
-                <span>${order.status}</span>
-            </div>
-            
-            <div class="divider"></div>
-            
-            <h2 class="bold">ITENS</h2>
-            ${order.items.map(item => `
-                <div class="item">
-                    <div class="bold">${item.produto}</div>
-                    <div class="row">
-                        <span>${item.tamanho} x ${item.quantidade}</span>
-                        <span>R$ ${item.subtotal.toFixed(2)}</span>
-                    </div>
-                </div>
-            `).join('')}
-            
-            <div class="divider"></div>
-            
-            <div class="row">
-                <span>Subtotal:</span>
-                <span>R$ ${order.valorTotal.toFixed(2)}</span>
-            </div>
-            
-            <div class="row">
-                <span>Taxa de Entrega:</span>
-                <span>R$ ${order.taxaEntrega.toFixed(2)}</span>
-            </div>
-            
-            <div class="row">
-                <span>Valor Pago:</span>
-                <span>R$ ${order.valorPago.toFixed(2)}</span>
-            </div>
-            
-            <div class="row">
-                <span>Pagamento:</span>
-                <span>${order.formaPagamento}</span>
-            </div>
-            
-            <div class="divider"></div>
-            
-            <div class="row total">
-                <span>A RECEBER:</span>
-                <span>R$ ${order.valorRestante.toFixed(2)}</span>
-            </div>
-            
-            ${order.clienteObservacoes ? `
-                <div class="divider"></div>
-                <h2 class="bold">OBSERVAÇÕES</h2>
-                <p>${order.clienteObservacoes}</p>
-            ` : ''}
-            
-            <div class="divider"></div>
-            
-            <div class="center" style="margin-top: 10px;">
-                <p>Obrigado pela preferência!</p>
-                <p class="bold">Divine Pudim Gourmet</p>
-            </div>
-        </body>
-        </html>
-    `;
-    
-    printWindow.document.write(receiptHTML);
-    printWindow.document.close();
-    
-    setTimeout(() => {
-        printWindow.print();
-        printWindow.close();
-    }, 500);
-}
-
-// ===== EXPORTAÇÃO PDF =====
-function exportToPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    
-    // Título
-    doc.setFontSize(18);
-    doc.setTextColor(236, 72, 153);
-    doc.text('Divine Pudim Gourmet', 14, 20);
-    
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-    doc.text('Relatório Completo de Pedidos', 14, 28);
-    
-    doc.setFontSize(10);
-    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 14, 35);
-    
-    // Prepara dados
-    const tableData = orders.map(order => [
-        order.id,
-        order.clienteNome,
-        order.clienteTelefone,
-        order.clienteBairro,
-        formatDate(order.dataEntrega),
-        order.status,
-        formatCurrency(order.valorTotal),
-        formatCurrency(order.valorRestante)
-    ]);
-    
-    // Tabela
-    doc.autoTable({
-        startY: 40,
-        head: [['ID', 'Cliente', 'Telefone', 'Bairro', 'Entrega', 'Status', 'Total', 'A Receber']],
-        body: tableData,
-        theme: 'grid',
-        headStyles: { fillColor: [236, 72, 153] },
-        styles: { fontSize: 8 }
-    });
-    
-    // Totais
-    const finalY = doc.lastAutoTable.finalY + 10;
-    doc.setFontSize(11);
-    doc.setFont(undefined, 'bold');
-    
-    const totalFaturado = orders.reduce((sum, o) => sum + o.valorTotal, 0);
-    const totalReceber = orders.reduce((sum, o) => sum + o.valorRestante, 0);
-    
-    doc.text(`Total Faturado: ${formatCurrency(totalFaturado)}`, 14, finalY);
-    doc.text(`Total a Receber: ${formatCurrency(totalReceber)}`, 14, finalY + 7);
-    doc.text(`Total de Pedidos: ${orders.length}`, 14, finalY + 14);
-    
-    doc.save('divine-pudim-relatorio-completo.pdf');
-}
-
-// ===== EXPORTAÇÃO EXCEL =====
-function exportToExcel() {
-    const data = orders.map(order => {
-        // Itens do pedido formatados
-        const itensDetalhados = order.items.map(item => 
-            `${item.produto} (${item.tamanho}) x${item.quantidade} = R$ ${item.subtotal.toFixed(2)}`
-        ).join(' | ');
-        
-        return {
-            'ID': order.id,
-            'Data Pedido': order.dataPedido,
-            'Data Entrega': order.dataEntrega,
-            'Turno': order.turnoEntrega,
-            'Status': order.status,
-            'Cliente': order.clienteNome,
-            'Telefone': order.clienteTelefone,
-            'Endereço': order.clienteEndereco,
-            'Bairro': order.clienteBairro,
-            'Itens': itensDetalhados,
-            'Quantidade Itens': order.items.length,
-            'Valor Total': order.valorTotal,
-            'Valor Pago': order.valorPago,
-            'Taxa Entrega': order.taxaEntrega,
-            'Valor Restante': order.valorRestante,
-            'Forma Pagamento': order.formaPagamento,
-            'Observações': order.clienteObservacoes || ''
+        const obj = {
+            cliente: document.getElementById('cliNome').value,
+            tel: document.getElementById('cliTel').value,
+            cep: document.getElementById('cliCep').value,
+            end: document.getElementById('cliEnd').value,
+            bairro: bairroFinal,
+            dataPedido: document.getElementById('dataPed').value,
+            dataEntrega: document.getElementById('dataEnt').value,
+            status: document.getElementById('statusPed').value,
+            itens: itens,
+            total: totalItens + taxa, // Total com taxa
+            pago: parseFloat(document.getElementById('valPago').value) || 0,
+            taxa: taxa,
+            restante: parseFloat(document.getElementById('valRest').value),
+            pagamento: document.getElementById('formaPag').value,
+            obs: document.getElementById('obs').value
         };
-    });
-    
-    const ws = XLSX.utils.json_to_sheet(data);
-    
-    // Ajusta largura das colunas
-    const colWidths = [
-        { wch: 12 }, // ID
-        { wch: 12 }, // Data Pedido
-        { wch: 12 }, // Data Entrega
-        { wch: 10 }, // Turno
-        { wch: 15 }, // Status
-        { wch: 25 }, // Cliente
-        { wch: 15 }, // Telefone
-        { wch: 40 }, // Endereço
-        { wch: 20 }, // Bairro
-        { wch: 50 }, // Itens
-        { wch: 8 },  // Qtd Itens
-        { wch: 12 }, // Valor Total
-        { wch: 12 }, // Valor Pago
-        { wch: 12 }, // Taxa
-        { wch: 12 }, // Restante
-        { wch: 15 }, // Pagamento
-        { wch: 30 }  // Observações
-    ];
-    ws['!cols'] = colWidths;
-    
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Pedidos');
-    
-    // Adiciona sheet de produtos
-    const productsData = [];
-    const productCount = {};
-    
-    orders.forEach(order => {
-        order.items.forEach(item => {
-            const key = `${item.produto}|||${item.tamanho}`;
-            if (!productCount[key]) {
-                productCount[key] = {
-                    produto: item.produto,
-                    tamanho: item.tamanho,
-                    quantidade: 0,
-                    valorTotal: 0
-                };
-            }
-            productCount[key].quantidade += item.quantidade;
-            productCount[key].valorTotal += item.subtotal;
-        });
-    });
-    
-    Object.values(productCount).forEach(p => {
-        productsData.push({
-            'Produto': p.produto,
-            'Tamanho': p.tamanho,
-            'Quantidade Total': p.quantidade,
-            'Valor Total': p.valorTotal
-        });
-    });
-    
-    const wsProducts = XLSX.utils.json_to_sheet(productsData);
-    XLSX.utils.book_append_sheet(wb, wsProducts, 'Produtos');
-    
-    XLSX.writeFile(wb, 'divine-pudim-relatorio-completo.xlsx');
-}
 
-// ===== BACKUP E IMPORTAÇÃO =====
-function exportBackup() {
-    const dataStr = JSON.stringify(orders, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `divine-pudim-backup-${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
-    
-    URL.revokeObjectURL(url);
-    alert('Backup exportado com sucesso!');
-}
-
-function importBackup() {
-    document.getElementById('importInput').click();
-}
-
-function handleImport(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
         try {
-            const importedOrders = JSON.parse(e.target.result);
-            
-            if (confirm('Deseja SUBSTITUIR os dados atuais ou MESCLAR com os importados?\n\nOK = Mesclar | Cancelar = Substituir')) {
-                // Mesclar
-                importedOrders.forEach(newOrder => {
-                    const exists = orders.find(o => o.id === newOrder.id);
-                    if (!exists) {
-                        orders.push(newOrder);
-                    }
-                });
+            const editId = document.getElementById('editFirebaseId').value;
+            if(editId) {
+                await updateDoc(doc(db, "pedidos", editId), obj);
+                alert('Atualizado!');
             } else {
-                // Substituir
-                orders = importedOrders;
+                obj.idVisual = Date.now();
+                await addDoc(colRef, obj);
+                alert('Salvo!');
             }
-            
-            localStorage.setItem('divinePudimOrders', JSON.stringify(orders));
-            updateDashboard();
-            updateProductsReport();
-            renderOrders();
-            populateBairroFilter();
-            showAlerts();
-            renderCalendar();
-            renderCharts();
-            
-            alert('Dados importados com sucesso!');
-        } catch (error) {
-            alert('Erro ao importar arquivo. Verifique se é um backup válido.');
-            console.error(error);
+            closeOrderModal();
+        } catch(err) {
+            console.error(err);
+            alert('Erro ao salvar. Verifique conexão.');
+        }
+    };
+
+    // --- AÇÕES DO CARD ---
+
+    window.deleteOrder = async function(id) {
+        if(confirm('Excluir pedido?')) {
+            await deleteDoc(doc(db, "pedidos", id));
+        }
+    };
+
+    window.editOrder = function(id) {
+        const o = orders.find(x => x.fbId === id);
+        if(!o) return;
+
+        showNewOrderModal();
+        document.getElementById('editFirebaseId').value = id;
+        
+        // Preenche campos
+        document.getElementById('cliNome').value = o.cliente;
+        document.getElementById('cliTel').value = o.tel;
+        document.getElementById('cliCep').value = o.cep || '';
+        document.getElementById('cliEnd').value = o.end;
+        
+        // Bairro logic
+        const sel = document.getElementById('cliBairro');
+        let opt = Array.from(sel.options).find(op => op.value === o.bairro);
+        if(opt) {
+            sel.value = o.bairro;
+        } else {
+            sel.value = 'OUTRO';
+            checkBairro();
+            document.getElementById('cliBairroOutro').value = o.bairro;
+        }
+
+        document.getElementById('dataPed').value = o.dataPedido;
+        document.getElementById('dataEnt').value = o.dataEntrega;
+        document.getElementById('statusPed').value = o.status;
+        document.getElementById('valPago').value = o.pago;
+        document.getElementById('valTaxa').value = o.taxa || 0;
+        document.getElementById('formaPag').value = o.pagamento;
+        document.getElementById('obs').value = o.obs || '';
+
+        // Itens
+        document.getElementById('itemsContainer').innerHTML = '';
+        o.itens.forEach(i => addItem(i));
+        
+        setTimeout(calcTotal, 100);
+    };
+
+    window.printOrder = function(id) {
+        const o = orders.find(x => x.fbId === id);
+        const w = window.open('', '', 'width=300,height=600');
+        w.document.write(`
+            <style>body{font-family:monospace;font-size:12px} hr{border-top:1px dashed #000}</style>
+            <center><h3>DIVINE PUDIM</h3></center>
+            <hr>
+            <b>Cliente:</b> ${o.cliente}<br>
+            <b>Fone:</b> ${o.tel}<br>
+            <b>End:</b> ${o.end}, ${o.bairro}<br>
+            <b>Entrega:</b> ${fmtData(o.dataEntrega)}
+            <hr>
+            ${o.itens.map(i => `${i.qtd}x ${i.prod}<br>&nbsp;&nbsp;(${i.tam}) = R$ ${(i.prc*i.qtd).toFixed(2)}`).join('<br>')}
+            <hr>
+            Tx Entrega: ${fmtMoeda(o.taxa||0)}<br>
+            <b>Total: ${fmtMoeda(o.total)}</b><br>
+            Pago: ${fmtMoeda(o.pago)}<br>
+            <b>Restante: ${fmtMoeda(o.restante)}</b>
+            <hr>
+            <center>Obrigado!</center>
+        `);
+        w.print();
+    };
+
+    // --- FILTROS E BUSCA ---
+    window.searchOrders = function() { applyFilters(); };
+    window.clearFilters = function() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('filterData').value = '';
+        document.getElementById('filterBairro').value = '';
+        document.getElementById('filterStatus').value = '';
+        applyFilters();
+    };
+
+    window.applyFilters = function() {
+        const term = document.getElementById('searchInput').value.toLowerCase();
+        const date = document.getElementById('filterData').value;
+        const bairro = document.getElementById('filterBairro').value;
+        const status = document.getElementById('filterStatus').value;
+
+        const filtered = orders.filter(o => {
+            let ok = true;
+            if(term && !o.cliente.toLowerCase().includes(term)) ok = false;
+            if(date && o.dataEntrega !== date) ok = false;
+            if(bairro && o.bairro !== bairro) ok = false;
+            if(status && o.status !== status) ok = false;
+            return ok;
+        });
+        renderOrdersList(filtered);
+    };
+    
+    window.populateBairroFilter = function() {
+        const b = [...new Set(orders.map(o => o.bairro))].sort();
+        document.getElementById('filterBairro').innerHTML = '<option value="">Todos</option>' + b.map(x => `<option>${x}</option>`).join('');
+    };
+    
+    window.filterByDate = function(dt) {
+        showTab(null, 'pedidos');
+        document.getElementById('filterData').value = dt;
+        applyFilters();
+    };
+
+    // --- UTILS ---
+    window.fmtMoeda = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+    window.fmtData = d => d.split('-').reverse().join('/');
+    
+    window.buscarCep = async function() {
+        let cep = document.getElementById('cliCep').value.replace(/\D/g,'');
+        if(cep.length === 8) {
+            let r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+            let d = await r.json();
+            if(!d.erro) {
+                document.getElementById('cliEnd').value = d.logradouro;
+                // Tenta achar bairro
+                // (Simplificado)
+            }
         }
     };
     
-    reader.readAsText(file);
-    event.target.value = ''; // Limpa input
-}
+    window.exportBackup = function() {
+        const b = new Blob([JSON.stringify(orders)], {type:'application/json'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(b);
+        a.download = 'backup.json';
+        a.click();
+    };
+    
+    window.handleImport = function(e) {
+        const f = e.target.files[0];
+        if(!f) return;
+        const r = new FileReader();
+        r.onload = async (ev) => {
+            try {
+                const arr = JSON.parse(ev.target.result);
+                if(confirm(`Importar ${arr.length} pedidos?`)) {
+                    for(let o of arr) { delete o.fbId; await addDoc(colRef, o); }
+                    alert('Concluído!');
+                }
+            } catch(x) { alert('Erro arquivo invalido'); }
+        };
+        r.readAsText(f);
+    };
 
-// ===== UTILITÁRIOS =====
-function formatCurrency(value) {
-    return new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-    }).format(value);
-}
+    // --- PDF / EXCEL (Placeholders funcionais) ---
+    window.exportToPDF = function() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.text("Relatório de Pedidos", 10, 10);
+        
+        let data = orders.map(o => [o.cliente, fmtData(o.dataEntrega), o.status, fmtMoeda(o.total)]);
+        doc.autoTable({
+            head: [['Cliente', 'Entrega', 'Status', 'Total']],
+            body: data,
+            startY: 20
+        });
+        doc.save("pedidos.pdf");
+    };
+    
+    window.exportToExcel = function() {
+        const ws = XLSX.utils.json_to_sheet(orders.map(o => ({
+            Cliente: o.cliente,
+            Entrega: o.dataEntrega,
+            Status: o.status,
+            Total: o.total,
+            Restante: o.restante
+        })));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Pedidos");
+        XLSX.writeFile(wb, "pedidos.xlsx");
+    };
 
-function formatDate(dateString) {
-    const date = new Date(dateString + 'T00:00:00');
-    return date.toLocaleDateString('pt-BR');
-}
-
-function formatDateTime(isoString) {
-    const date = new Date(isoString);
-    return date.toLocaleString('pt-BR');
-}
-
-// --- EXPOR FUNÇÕES PARA O HTML ---
-window.showTab = showTab;
-window.updateDashboard = updateDashboard;
-window.searchOrders = searchOrders;
-window.clearSearch = clearSearch;
-window.showNewOrderModal = showNewOrderModal;
-window.closeOrderModal = closeOrderModal;
-window.formatCep = formatCep;
-window.buscarCep = buscarCep;
-window.handleBairroChange = handleBairroChange;
-window.addItem = addItem;
-window.updateSizes = updateSizes;
-window.updatePrice = updatePrice;
-window.calculateItemTotal = calculateItemTotal;
-window.removeItem = removeItem;
-window.editOrder = editOrder; // Use a original ou ajuste se necessário
-window.showHistory = showHistory;
-window.closeHistoryModal = closeHistoryModal;
-window.applyFilters = applyFilters;
-window.clearFilters = clearFilters;
-window.filterProduction = filterProduction;
-window.previousMonth = previousMonth;
-window.nextMonth = nextMonth;
-window.showDayOrders = showDayOrders;
-window.printReceipt = printReceipt;
-window.exportToPDF = exportToPDF;
-window.exportToExcel = exportToExcel;
-window.exportBackup = exportBackup; // Backup manual do array atual
-window.importBackup = importBackup;
-window.handleImport = handleImport;
-
-    </script>
+</script>
 </body>
 </html>
