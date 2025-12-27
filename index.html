@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema Online</title>
+    <title>Divine Pudim Gourmet - Sistema</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
@@ -47,7 +47,8 @@
 
         /* CARDS & GRID */
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .card { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 15px; }
+        .card { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); display: flex; flex-direction: column; justify-content: center; }
+        .card-row { display: flex; align-items: center; gap: 15px; }
         .card-icon { width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; flex-shrink: 0; }
         .card h3 { font-size: 20px; font-weight: 700; margin-bottom: 5px; }
         .card p { font-size: 14px; color: var(--gray-600); }
@@ -74,23 +75,43 @@
         /* MODAL */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
         .modal.active { display: flex; }
-        .modal-content { background: white; border-radius: 16px; width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-content { background: white; border-radius: 16px; width: 100%; max-width: 950px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .modal-header { background: var(--primary); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 16px 16px 0 0; }
         .modal-body { padding: 30px; }
         
-        /* FORM */
+        /* FORM & INPUT GROUP (R$) */
         .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        .item-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 10px; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
-        @media(max-width: 700px) { .item-row { grid-template-columns: 1fr; border: 1px solid #ddd; padding: 10px; border-radius: 8px; } }
+        
+        .input-group { position: relative; }
+        .input-group span { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--gray-600); font-weight: bold; }
+        .input-group input { padding-left: 35px; }
 
-        /* EXTRAS & PRINT */
-        .alert { position: fixed; top: 80px; right: 20px; background: white; padding: 15px; border-left: 5px solid orange; box-shadow: var(--shadow); z-index: 1500; max-width: 300px; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; background: white; padding: 20px; border-radius: 12px; }
-        .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--gray-50); border-radius: 8px; cursor: pointer; position: relative; }
-        .cal-day:hover { background: var(--primary-light); }
-        .cal-day.has-orders { background: #fef3c7; font-weight: bold; }
-        .cal-dot { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; position: absolute; bottom: 5px; }
+        /* TABELA DE ITENS NO MODAL */
+        .items-header { 
+            display: grid; 
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; 
+            gap: 10px; 
+            font-weight: bold; 
+            color: var(--gray-600); 
+            margin-bottom: 5px; 
+            padding: 0 10px;
+            font-size: 14px;
+        }
+        .item-row { 
+            display: grid; 
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; 
+            gap: 10px; 
+            align-items: center; 
+            margin-bottom: 10px; 
+            padding-bottom: 10px; 
+            border-bottom: 1px solid #eee; 
+        }
+        @media(max-width: 700px) { 
+            .items-header { display: none; }
+            .item-row { grid-template-columns: 1fr; border: 1px solid #ddd; padding: 10px; border-radius: 8px; } 
+        }
 
+        /* PRINT */
         @media print {
             body * { visibility: hidden; }
             #printArea, #printArea * { visibility: visible; }
@@ -103,7 +124,7 @@
 <header class="header">
     <div class="container">
         <div class="header-content">
-            <div class="logo"><i class="fas fa-birthday-cake"></i> Divine Pudim</div>
+            <div class="logo"><i class="fas fa-birthday-cake"></i> Divine Pudim Gourmet</div>
             <div class="header-actions">
                 <button class="btn btn-header" onclick="exportBackup()"><i class="fas fa-download"></i> Backup</button>
                 <button class="btn btn-header" onclick="document.getElementById('importInput').click()"><i class="fas fa-upload"></i> Importar</button>
@@ -120,8 +141,6 @@
         <div class="tabs-buttons">
             <button class="tab-btn active" onclick="showTab(event, 'dashboard')"><i class="fas fa-chart-line"></i> Dashboard</button>
             <button class="tab-btn" onclick="showTab(event, 'pedidos')"><i class="fas fa-list"></i> Pedidos</button>
-            <button class="tab-btn" onclick="showTab(event, 'producao')"><i class="fas fa-industry"></i> Produção</button>
-            <button class="tab-btn" onclick="showTab(event, 'calendario')"><i class="fas fa-calendar"></i> Calendário</button>
             <button class="tab-btn" onclick="showTab(event, 'graficos')"><i class="fas fa-chart-pie"></i> Gráficos</button>
         </div>
     </div>
@@ -130,16 +149,16 @@
 <section id="tabDashboard" class="tab-content active">
     <div class="container">
         <div class="dashboard-grid">
-            <div class="card"><div class="card-icon" style="background:#ec4899"><i class="fas fa-shopping-bag"></i></div><div><h3 id="dashTotal">0</h3><p>Total Pedidos</p></div></div>
-            <div class="card"><div class="card-icon" style="background:#8b5cf6"><i class="fas fa-dollar-sign"></i></div><div><h3 id="dashFaturado">R$ 0,00</h3><p>Total Faturado</p></div></div>
-            <div class="card"><div class="card-icon" style="background:#10b981"><i class="fas fa-check-double"></i></div><div><h3 id="dashRecebido">R$ 0,00</h3><p>Valor Recebido</p></div></div>
-            <div class="card"><div class="card-icon" style="background:#f59e0b"><i class="fas fa-hand-holding-usd"></i></div><div><h3 id="dashReceber">R$ 0,00</h3><p>A Receber</p></div></div>
-            <div class="card"><div class="card-icon" style="background:#06b6d4"><i class="fas fa-motorcycle"></i></div><div><h3 id="dashTaxas">R$ 0,00</h3><p>Taxas Entrega</p></div></div>
+            <div class="card"><div class="card-row"><div class="card-icon" style="background:#ec4899"><i class="fas fa-shopping-bag"></i></div><div><h3 id="dashTotal">0</h3><p>Total Pedidos</p></div></div></div>
+            <div class="card"><div class="card-row"><div class="card-icon" style="background:#8b5cf6"><i class="fas fa-dollar-sign"></i></div><div><h3 id="dashFaturado">R$ 0,00</h3><p>Total Faturado</p></div></div></div>
+            <div class="card"><div class="card-row"><div class="card-icon" style="background:#10b981"><i class="fas fa-check-double"></i></div><div><h3 id="dashRecebido">R$ 0,00</h3><p>Valor Recebido</p></div></div></div>
+            <div class="card"><div class="card-row"><div class="card-icon" style="background:#f59e0b"><i class="fas fa-hand-holding-usd"></i></div><div><h3 id="dashReceber">R$ 0,00</h3><p>A Receber</p></div></div></div>
+            <div class="card"><div class="card-row"><div class="card-icon" style="background:#06b6d4"><i class="fas fa-motorcycle"></i></div><div><h3 id="dashTaxas">R$ 0,00</h3><p>Taxas Entrega</p></div></div></div>
         </div>
         
         <div class="card" style="display: block;">
-            <h3><i class="fas fa-trophy"></i> Top Produtos</h3>
-            <div id="topProductsList" style="margin-top:15px; display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:10px;"></div>
+            <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px;"><i class="fas fa-trophy"></i> Top Produtos (Por Tamanho)</h3>
+            <div id="topProductsList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:10px;"></div>
         </div>
     </div>
 </section>
@@ -172,36 +191,11 @@
     </div>
 </section>
 
-<section id="tabProducao" class="tab-content">
-    <div class="container">
-        <div class="card" style="display:block">
-            <div style="margin-bottom:20px; display:flex; gap:10px;">
-                <button class="btn btn-secondary" onclick="renderProduction('hoje')">Hoje</button>
-                <button class="btn btn-secondary" onclick="renderProduction('amanha')">Amanhã</button>
-                <button class="btn btn-secondary" onclick="renderProduction('semana')">Semana</button>
-            </div>
-            <div id="productionList"></div>
-        </div>
-    </div>
-</section>
-
-<section id="tabCalendario" class="tab-content">
-    <div class="container">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <button class="btn btn-secondary" onclick="changeMonth(-1)"><</button>
-            <h2 id="calTitle">Mês</h2>
-            <button class="btn btn-secondary" onclick="changeMonth(1)">></button>
-        </div>
-        <div id="calendarGrid" class="calendar-grid"></div>
-        <div id="calOrders" style="margin-top:20px;"></div>
-    </div>
-</section>
-
 <section id="tabGraficos" class="tab-content">
     <div class="container">
         <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
             <div class="card" style="display:block; min-height:300px">
-                <h3>Produtos</h3>
+                <h3>Produtos (Por Tamanho)</h3>
                 <div style="height:250px; position:relative;">
                     <canvas id="chartProd"></canvas>
                 </div>
@@ -268,8 +262,18 @@
 
                 <hr style="margin: 20px 0; border:0; border-top:1px solid #eee">
                 
-                <h3>Itens</h3>
+                <h3>Itens do Pedido</h3>
+                <div class="items-header">
+                    <div>Produto</div>
+                    <div>Tamanho</div>
+                    <div>Qtd</div>
+                    <div>V. Unit</div>
+                    <div>V. Total</div>
+                    <div></div>
+                </div>
+
                 <div id="itemsContainer"></div>
+                
                 <button type="button" class="btn btn-primary" onclick="addItem()" style="width:100%; margin-top:10px">+ Adicionar Item</button>
                 <div style="text-align:right; font-size:18px; font-weight:bold; margin-top:15px; color:var(--primary-dark)">
                     Total: <span id="displayTotal">R$ 0,00</span>
@@ -278,9 +282,27 @@
                 <hr style="margin: 20px 0; border:0; border-top:1px solid #eee">
 
                 <div class="form-row">
-                    <div><label>Valor Pago</label><input type="number" step="0.01" id="valPago" oninput="calcTotal()"></div>
-                    <div><label>Taxa Entrega</label><input type="number" step="0.01" id="valTaxa" oninput="calcTotal()"></div>
-                    <div><label>Restante</label><input type="text" id="valRest" readonly></div>
+                    <div>
+                        <label>Valor Pago</label>
+                        <div class="input-group">
+                            <span>R$</span>
+                            <input type="number" step="0.01" id="valPago" oninput="calcTotal()">
+                        </div>
+                    </div>
+                    <div>
+                        <label>Taxa Entrega</label>
+                        <div class="input-group">
+                            <span>R$</span>
+                            <input type="number" step="0.01" id="valTaxa" oninput="calcTotal()">
+                        </div>
+                    </div>
+                    <div>
+                        <label>Restante</label>
+                        <div class="input-group">
+                            <span>R$</span>
+                            <input type="text" id="valRest" readonly>
+                        </div>
+                    </div>
                     <div><label>Pagamento</label>
                         <select id="formaPag">
                             <option value="Pix">Pix</option>
@@ -312,6 +334,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+    // --- CONFIGURAÇÃO FIREBASE ---
     const firebaseConfig = {
       apiKey: "AIzaSyBt_7_WLXqUvYqdCrTMQg7ySZUa4gSdEHY",
       authDomain: "divinepudimsystem.firebaseapp.com",
@@ -351,12 +374,11 @@
     ];
 
     let orders = [];
-    let calDate = new Date();
     let charts = { prod: null, fat: null };
 
     // --- INICIALIZAÇÃO ---
     document.addEventListener('DOMContentLoaded', () => {
-        // Popula Bairros no Modal
+        // Popula Bairros
         const bList = document.getElementById('cliBairro');
         BAIRROS.forEach(b => {
             let opt = document.createElement('option');
@@ -379,7 +401,7 @@
         document.getElementById('dataPed').valueAsDate = new Date();
     });
 
-    // --- FUNÇÕES GLOBAIS ---
+    // --- FUNÇÕES DE NAVEGAÇÃO E RENDERIZAÇÃO ---
     window.showTab = function(e, tabId) {
         if(e) e.preventDefault();
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -387,23 +409,20 @@
         document.getElementById('tab' + tabId.charAt(0).toUpperCase() + tabId.slice(1)).classList.add('active');
         if(e && e.target) e.target.closest('.tab-btn').classList.add('active');
         
-        // Renderiza abas específicas
-        if(tabId === 'producao') window.renderProduction('hoje');
-        if(tabId === 'calendario') window.renderCalendar();
         if(tabId === 'graficos') window.renderCharts();
     };
 
     window.refreshAll = function() {
         renderDashboard();
         renderOrdersList();
-        renderCalendar();
         populateBairroFilter();
     };
 
+    // --- DASHBOARD ATUALIZADO ---
     window.renderDashboard = function() {
         document.getElementById('dashTotal').innerText = orders.length;
         
-        // Cálculos Financeiros
+        // Cálculos
         const fat = orders.reduce((acc, o) => acc + (o.total || 0), 0);
         const recebido = orders.reduce((acc, o) => acc + (o.pago || 0), 0);
         const taxas = orders.reduce((acc, o) => acc + (o.taxa || 0), 0);
@@ -414,27 +433,37 @@
         document.getElementById('dashTaxas').innerText = fmtMoeda(taxas);
         document.getElementById('dashReceber').innerText = fmtMoeda(aReceber);
 
+        // Top Produtos (Por Tamanho)
         const counts = {};
-        orders.forEach(o => o.itens.forEach(i => counts[i.prod] = (counts[i.prod] || 0) + i.qtd));
-        const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 6);
+        orders.forEach(o => o.itens.forEach(i => {
+            // Chave única: Nome + Tamanho
+            let key = `${i.prod} - ${i.tam}`;
+            counts[key] = (counts[key] || 0) + i.qtd;
+        }));
+        
+        const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+        
         document.getElementById('topProductsList').innerHTML = sorted.map(([k,v]) => 
-            `<div style="background:#f9f9f9; padding:10px; border-radius:8px; display:flex; justify-content:space-between"><b>${k}</b> <span>${v}</span></div>`
+            `<div style="background:#f9f9f9; padding:12px; border-radius:8px; display:flex; justify-content:space-between; border-left:4px solid var(--primary)">
+                <b>${k}</b> 
+                <span style="background:var(--primary); color:white; padding:2px 8px; border-radius:10px; font-size:12px">${v} un</span>
+            </div>`
         ).join('');
     };
 
+    // --- LISTA DE PEDIDOS ---
     window.renderOrdersList = function(list = orders) {
         const div = document.getElementById('ordersList');
-        if(!list.length) { div.innerHTML = '<p>Nenhum pedido.</p>'; return; }
+        if(!list.length) { div.innerHTML = '<p>Nenhum pedido encontrado.</p>'; return; }
         
         const sorted = [...list].sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega));
 
         div.innerHTML = sorted.map((o, index) => {
-            const numPedido = (index + 1).toString().padStart(3, '0'); // Numeração #001, #002...
+            const numPedido = (index + 1).toString().padStart(3, '0');
             const stClass = 'st-' + (o.status ? o.status.toLowerCase().split(' ')[0] : 'confirmado');
             
-            // Formatando itens com valor em reais
             const itensHtml = o.itens.map(i => {
-                return `<div>${i.qtd}x ${i.prod} (${i.tam}) - ${fmtMoeda(i.prc * i.qtd)}</div>`;
+                return `<div>${i.qtd}x ${i.prod} (${i.tam}) - <span style="color:#666">${fmtMoeda(i.prc * i.qtd)}</span></div>`;
             }).join('');
 
             return `
@@ -446,9 +475,10 @@
                 <div class="order-items">
                     ${itensHtml}
                 </div>
-                <div style="font-size:13px; margin-bottom:10px">
-                    <b>Total:</b> ${fmtMoeda(o.total)} <br>
-                    <span style="color:${o.restante > 0 ? 'red' : 'green'}"><b>Restante:</b> ${fmtMoeda(o.restante)}</span>
+                <div style="font-size:13px; margin-bottom:10px; border-top:1px dashed #ddd; padding-top:5px">
+                    <div style="display:flex; justify-content:space-between"><span>Taxa:</span> <span>${fmtMoeda(o.taxa)}</span></div>
+                    <div style="display:flex; justify-content:space-between; font-weight:bold"><span>Total:</span> <span>${fmtMoeda(o.total)}</span></div>
+                    <div style="display:flex; justify-content:space-between; color:${o.restante > 0 ? 'red' : 'green'}"><span>Restante:</span> <span>${fmtMoeda(o.restante)}</span></div>
                 </div>
                 <div class="order-actions">
                     <button class="btn btn-secondary" onclick="editOrder('${o.fbId}')"><i class="fas fa-edit"></i></button>
@@ -459,18 +489,20 @@
         }).join('');
     };
 
-    // --- GRÁFICOS (FIX) ---
+    // --- GRÁFICOS (Por Tamanho) ---
     window.renderCharts = function() {
         const ctxProd = document.getElementById('chartProd');
         const ctxFat = document.getElementById('chartFat');
 
-        // Destrói gráficos antigos para não sobrepor
         if(charts.prod) charts.prod.destroy();
         if(charts.fat) charts.fat.destroy();
 
-        // Dados Produtos
+        // Dados Produtos (Nome + Tamanho)
         const counts = {};
-        orders.forEach(o => o.itens.forEach(i => counts[i.prod] = (counts[i.prod] || 0) + i.qtd));
+        orders.forEach(o => o.itens.forEach(i => {
+            let key = `${i.prod} (${i.tam})`;
+            counts[key] = (counts[key] || 0) + i.qtd;
+        }));
         
         charts.prod = new Chart(ctxProd, {
             type: 'bar',
@@ -481,7 +513,6 @@
             options: { responsive: true, maintainAspectRatio: false }
         });
 
-        // Dados Faturamento por Status
         const statusFat = {};
         orders.forEach(o => statusFat[o.status] = (statusFat[o.status] || 0) + o.total);
 
@@ -495,7 +526,7 @@
         });
     };
 
-    // --- LÓGICA RETIRADA E TURNOS ---
+    // --- FORMULÁRIO ---
     window.checkTurno = function() {
         const turno = document.getElementById('turnoEntrega').value;
         const addrArea = document.getElementById('addressArea');
@@ -519,7 +550,6 @@
         else i.required = false;
     };
 
-    // --- SALVAR PEDIDO ---
     window.saveOrder = async function(e) {
         e.preventDefault();
         
@@ -588,74 +618,22 @@
         }
     };
 
-    // --- IMPRESSÃO 58MM ---
-    window.printOrder = function(id, numPedido) {
-        const o = orders.find(x => x.fbId === id);
-        const w = window.open('', '', 'width=300,height=600');
-        w.document.write(`
-            <html>
-            <head>
-                <style>
-                    body { font-family: 'Courier New', monospace; font-size: 12px; margin: 0; padding: 5px; width: 58mm; }
-                    .center { text-align: center; }
-                    .line { border-bottom: 1px dashed #000; margin: 5px 0; }
-                    .row { display: flex; justify-content: space-between; }
-                    .bold { font-weight: bold; }
-                </style>
-            </head>
-            <body>
-                <div class="center bold">DIVINE PUDIM GOURMET</div>
-                <div class="center">Pedido #${numPedido}</div>
-                <div class="line"></div>
-                <div><b>Cli:</b> ${o.cliente}</div>
-                <div><b>Tel:</b> ${o.tel}</div>
-                <div><b>End:</b> ${o.end}</div>
-                <div><b>Bairro:</b> ${o.bairro}</div>
-                <div><b>Entrega:</b> ${fmtData(o.dataEntrega)} (${o.turno})</div>
-                <div class="line"></div>
-                <div class="bold">ITENS:</div>
-                ${o.itens.map(i => `<div>${i.qtd}x ${i.prod} (${i.tam})<br><div style="text-align:right">${fmtMoeda(i.prc*i.qtd)}</div></div>`).join('')}
-                <div class="line"></div>
-                <div class="row"><span>Taxa:</span> <span>${fmtMoeda(o.taxa)}</span></div>
-                <div class="row bold" style="font-size:14px"><span>TOTAL:</span> <span>${fmtMoeda(o.total)}</span></div>
-                <div class="row"><span>Pago:</span> <span>${fmtMoeda(o.pago)}</span></div>
-                <div class="row bold"><span>RESTANTE:</span> <span>${fmtMoeda(o.restante)}</span></div>
-                <div class="line"></div>
-                <div class="center">Obrigado pela preferência!</div>
-            </body>
-            </html>
-        `);
-        setTimeout(() => { w.print(); w.close(); }, 500);
-    };
-
-    // --- OUTRAS FUNÇÕES ---
-    window.showNewOrderModal = function() {
-        document.getElementById('orderForm').reset();
-        document.getElementById('itemsContainer').innerHTML = '';
-        document.getElementById('editFirebaseId').value = '';
-        document.getElementById('dataPed').valueAsDate = new Date();
-        document.getElementById('orderModal').classList.add('active');
-        checkTurno(); // Reseta visibilidade endereço
-        addItem(); 
-    };
-
-    window.closeOrderModal = function() { document.getElementById('orderModal').classList.remove('active'); };
-
     window.addItem = function(data = null) {
         const id = Date.now();
         const html = `
         <div class="item-row" id="row-${id}">
             <div>
                 <select class="i-prod" onchange="updItem(${id})">
-                    <option value="">Produto...</option>
+                    <option value="">Selecione...</option>
                     ${PRODUTOS.map(p => `<option value="${p.nome}">${p.nome}</option>`).join('')}
                     <option value="OUTRO">Personalizado</option>
                 </select>
-                <input type="text" class="i-cust" style="display:none; margin-top:5px" placeholder="Nome">
+                <input type="text" class="i-cust" style="display:none; margin-top:5px; width:100%" placeholder="Nome do produto">
             </div>
             <div><select class="i-tam" onchange="updPrice(${id})"><option>-</option></select></div>
-            <div><input type="number" class="i-qtd" value="1" onchange="calcTotal()"></div>
-            <div><input type="number" class="i-prc" step="0.01" onchange="calcTotal()"></div>
+            <div><input type="number" class="i-qtd" value="1" onchange="calcTotal()" style="width:60px"></div>
+            <div><input type="number" class="i-prc" step="0.01" onchange="calcTotal()" style="width:80px"></div>
+            <div class="i-total" style="font-weight:bold; color:#666">R$ 0,00</div>
             <button type="button" class="btn btn-danger" onclick="this.parentElement.remove(); calcTotal()">X</button>
         </div>`;
         document.getElementById('itemsContainer').insertAdjacentHTML('beforeend', html);
@@ -714,7 +692,9 @@
         document.querySelectorAll('.item-row').forEach(row => {
             const q = parseFloat(row.querySelector('.i-qtd').value) || 0;
             const p = parseFloat(row.querySelector('.i-prc').value) || 0;
-            total += q * p;
+            const sub = q * p;
+            row.querySelector('.i-total').innerText = fmtMoeda(sub);
+            total += sub;
         });
         
         const taxa = parseFloat(document.getElementById('valTaxa').value) || 0;
@@ -725,10 +705,21 @@
         document.getElementById('valRest').value = fmtMoeda(final - pago);
     };
 
+    // --- OUTROS ---
+    window.showNewOrderModal = function() {
+        document.getElementById('orderForm').reset();
+        document.getElementById('itemsContainer').innerHTML = '';
+        document.getElementById('editFirebaseId').value = '';
+        document.getElementById('dataPed').valueAsDate = new Date();
+        document.getElementById('orderModal').classList.add('active');
+        checkTurno(); 
+        addItem(); 
+    };
+
+    window.closeOrderModal = function() { document.getElementById('orderModal').classList.remove('active'); };
+
     window.deleteOrder = async function(id) {
-        if(confirm('Excluir pedido? A numeração será reajustada.')) {
-            await deleteDoc(doc(db, "pedidos", id));
-        }
+        if(confirm('Excluir pedido? A numeração será reajustada.')) await deleteDoc(doc(db, "pedidos", id));
     };
 
     window.editOrder = function(id) {
@@ -745,9 +736,8 @@
             document.getElementById('cliCep').value = o.cep || '';
             document.getElementById('cliEnd').value = o.end;
             const sel = document.getElementById('cliBairro');
-            if([...sel.options].some(op => op.value === o.bairro)) {
-                sel.value = o.bairro;
-            } else {
+            if([...sel.options].some(op => op.value === o.bairro)) sel.value = o.bairro;
+            else {
                 sel.value = 'OUTRO';
                 checkBairro();
                 document.getElementById('cliBairroOutro').value = o.bairro;
@@ -767,19 +757,45 @@
         setTimeout(calcTotal, 100);
     };
 
+    window.printOrder = function(id, numPedido) {
+        const o = orders.find(x => x.fbId === id);
+        const w = window.open('', '', 'width=300,height=600');
+        w.document.write(`
+            <html><head><style>
+                body { font-family: 'Courier New', monospace; font-size: 12px; margin: 0; padding: 5px; width: 58mm; }
+                .center { text-align: center; }
+                .line { border-bottom: 1px dashed #000; margin: 5px 0; }
+                .row { display: flex; justify-content: space-between; }
+                .bold { font-weight: bold; }
+            </style></head><body>
+                <div class="center bold">DIVINE PUDIM GOURMET</div>
+                <div class="center">Pedido #${numPedido}</div>
+                <div class="line"></div>
+                <div><b>Cli:</b> ${o.cliente}</div>
+                <div><b>Tel:</b> ${o.tel}</div>
+                <div><b>End:</b> ${o.end}</div>
+                <div><b>Bairro:</b> ${o.bairro}</div>
+                <div><b>Entrega:</b> ${fmtData(o.dataEntrega)} (${o.turno})</div>
+                <div class="line"></div>
+                <div class="bold">ITENS:</div>
+                ${o.itens.map(i => `<div>${i.qtd}x ${i.prod} (${i.tam})<br><div style="text-align:right">${fmtMoeda(i.prc*i.qtd)}</div></div>`).join('')}
+                <div class="line"></div>
+                <div class="row"><span>Taxa:</span> <span>${fmtMoeda(o.taxa)}</span></div>
+                <div class="row bold" style="font-size:14px"><span>TOTAL:</span> <span>${fmtMoeda(o.total)}</span></div>
+                <div class="row"><span>Pago:</span> <span>${fmtMoeda(o.pago)}</span></div>
+                <div class="row bold"><span>RESTANTE:</span> <span>${fmtMoeda(o.restante)}</span></div>
+                <div class="line"></div>
+                <div class="center">Obrigado pela preferência!</div>
+            </body></html>
+        `);
+        setTimeout(() => { w.print(); w.close(); }, 500);
+    };
+
     window.fmtMoeda = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
     window.fmtData = d => d.split('-').reverse().join('/');
     
-    // Filtros e Calendário omitidos para brevidade (mantêm a lógica anterior)
-    window.renderProduction = function(periodo) { /* Lógica mantida */ };
-    window.renderCalendar = function() { /* Lógica mantida */ };
-    window.changeMonth = function(dir) { calDate.setMonth(calDate.getMonth() + dir); renderCalendar(); };
+    // Filtros e Util
     window.searchOrders = function() { applyFilters(); };
-    window.applyFilters = function() { /* Lógica mantida */ };
-    window.populateBairroFilter = function() {
-        const b = [...new Set(orders.map(o => o.bairro))].sort();
-        document.getElementById('filterBairro').innerHTML = '<option value="">Todos</option>' + b.map(x => `<option>${x}</option>`).join('');
-    };
     window.clearFilters = function() {
         document.getElementById('searchInput').value = '';
         document.getElementById('filterData').value = '';
@@ -787,7 +803,58 @@
         document.getElementById('filterStatus').value = '';
         applyFilters();
     };
+    window.applyFilters = function() {
+        const term = document.getElementById('searchInput').value.toLowerCase();
+        const date = document.getElementById('filterData').value;
+        const bairro = document.getElementById('filterBairro').value;
+        const status = document.getElementById('filterStatus').value;
 
+        const filtered = orders.filter(o => {
+            let ok = true;
+            if(term && !o.cliente.toLowerCase().includes(term)) ok = false;
+            if(date && o.dataEntrega !== date) ok = false;
+            if(bairro && o.bairro !== bairro) ok = false;
+            if(status && o.status !== status) ok = false;
+            return ok;
+        });
+        renderOrdersList(filtered);
+    };
+    window.populateBairroFilter = function() {
+        const b = [...new Set(orders.map(o => o.bairro))].sort();
+        document.getElementById('filterBairro').innerHTML = '<option value="">Todos</option>' + b.map(x => `<option>${x}</option>`).join('');
+    };
+    window.buscarCep = async function() {
+        let cep = document.getElementById('cliCep').value.replace(/\D/g,'');
+        if(cep.length === 8) {
+            let r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+            let d = await r.json();
+            if(!d.erro) document.getElementById('cliEnd').value = d.logradouro;
+        }
+    };
+    window.exportBackup = function() {
+        const b = new Blob([JSON.stringify(orders)], {type:'application/json'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(b);
+        a.download = 'backup.json';
+        a.click();
+    };
+    window.handleImport = function(e) {
+        const f = e.target.files[0];
+        if(!f) return;
+        const r = new FileReader();
+        r.onload = async (ev) => {
+            try {
+                const arr = JSON.parse(ev.target.result);
+                if(confirm(`Importar ${arr.length} pedidos?`)) {
+                    for(let o of arr) { delete o.fbId; await addDoc(colRef, o); }
+                    alert('Concluído!');
+                }
+            } catch(x) { alert('Erro arquivo invalido'); }
+        };
+        r.readAsText(f);
+    };
+    window.exportToPDF = function() { /* Placeholder */ };
+    window.exportToExcel = function() { /* Placeholder */ };
 </script>
 </body>
 </html>
