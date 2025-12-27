@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V4</title>
+    <title>Divine Pudim Gourmet - Sistema V5</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
@@ -73,7 +73,7 @@
         .card h3 { font-size: 20px; font-weight: 700; margin-bottom: 5px; }
         .card p { font-size: 14px; color: var(--gray-600); }
 
-        /* PEDIDOS CARD (ATUALIZADO) */
+        /* PEDIDOS CARD */
         .search-bar, .filters { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 20px; }
         .filters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
         input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-family: inherit; }
@@ -84,12 +84,8 @@
         .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
         .order-items { background: var(--gray-50); padding: 10px; border-radius: 6px; margin: 10px 0; font-size: 14px; }
         
-        /* Nova área de detalhes no card */
-        .order-details-card {
-            background: #fff; border: 1px solid #eee; border-radius: 6px; padding: 10px; margin-bottom: 10px; font-size: 13px; color: #555;
-        }
+        .order-details-card { background: #fff; border: 1px solid #eee; border-radius: 6px; padding: 10px; margin-bottom: 10px; font-size: 13px; color: #555; }
         .order-details-card i { color: var(--primary); width: 15px; text-align: center; margin-right: 5px; }
-
         .order-actions { margin-top: auto; display: flex; gap: 5px; padding-top: 10px; }
 
         /* STATUS COLORS */
@@ -189,6 +185,13 @@
                 <div class="filters-grid">
                     <div><label>Data</label><input type="date" id="filterData" onchange="applyFilters()"></div>
                     <div><label>Bairro</label><select id="filterBairro" onchange="applyFilters()"><option value="">Todos</option></select></div>
+                    <div><label>Tipo Entrega</label>
+                        <select id="filterTipo" onchange="applyFilters()">
+                            <option value="">Todos</option>
+                            <option value="Delivery">Delivery</option>
+                            <option value="Retirada no local">Retirada</option>
+                        </select>
+                    </div>
                     <div><label>Status</label><select id="filterStatus" onchange="applyFilters()">
                         <option value="">Todos</option>
                         <option value="Pedido confirmado">Confirmado</option>
@@ -424,14 +427,13 @@
 
     window.saveOrder = async function(e) {
         e.preventDefault();
-        let itens = []; let totalItens = 0;
+        let itens = []; 
         document.querySelectorAll('.item-row').forEach(row => {
             const prodSel = row.querySelector('.i-prod').value;
             let prodNome = prodSel === 'OUTRO' ? row.querySelector('.i-cust').value : prodSel;
             const custField = row.querySelector('.i-cust');
             if (custField.style.display !== 'none' && prodSel !== 'OUTRO') { prodNome += ` (${custField.value})`; }
             const qtd = parseFloat(row.querySelector('.i-qtd').value); const prc = parseFloat(row.querySelector('.i-prc').value);
-            totalItens += qtd * prc;
             itens.push({ prod: prodNome, tam: row.querySelector('.i-tam').value, qtd: qtd, prc: prc });
         });
 
@@ -452,7 +454,10 @@
 
         const taxa = parseFloat(document.getElementById('valTaxa').value) || 0;
         const pago = parseFloat(document.getElementById('valPago').value) || 0;
-        const totalFinal = totalItens + taxa;
+        
+        // RECALCULA TOTAL NO SALVAMENTO PARA GARANTIR
+        let sumItens = itens.reduce((acc, i) => acc + (i.qtd * i.prc), 0);
+        const totalFinal = sumItens + taxa;
         const restante = totalFinal - pago;
 
         const obj = {
@@ -486,7 +491,6 @@
             if([...sel.options].some(op => op.value === o.bairro)) sel.value = o.bairro; else { sel.value = 'OUTRO'; checkBairro(); document.getElementById('cliBairroOutro').value = o.bairro; }
             document.getElementById('turnoEntrega').value = (o.turno === 'Manhã' || o.turno === 'Tarde') ? o.turno : '';
         } else {
-            // Tenta extrair hora
             if(o.turno.includes('às')) { document.getElementById('horarioRetirada').value = o.turno.split('às')[1].trim(); }
         }
 
@@ -637,10 +641,26 @@
         if(data) {
             const row = document.getElementById(`row-${id}`); const sel = row.querySelector('.i-prod');
             let baseName = data.prod; let flavor = '';
-            if (data.prod.includes('(')) { const parts = data.prod.match(/(.*) \((.*)\)/); if(parts && PRODUTOS.find(p => p.nome === parts[1])) { baseName = parts[1]; flavor = parts[2]; } }
-            if(PRODUTOS.find(p => p.nome === baseName)) { sel.value = baseName; updItem(id); row.querySelector('.i-tam').value = data.tam; if(flavor) row.querySelector('.i-cust').value = flavor; }
-            else { sel.value = 'OUTRO'; updItem(id); row.querySelector('.i-cust').value = data.prod; row.querySelector('.i-tam').innerHTML = `<option>${data.tam}</option>`; }
-            row.querySelector('.i-qtd').value = data.qtd; row.querySelector('.i-prc').value = data.prc;
+            // Match para "Produto (Sabor)"
+            const match = data.prod.match(/^(.*)\s\((.*)\)$/);
+            if (match && PRODUTOS.find(p => p.nome === match[1])) {
+               baseName = match[1];
+               flavor = match[2];
+            }
+
+            if(PRODUTOS.find(p => p.nome === baseName)) { 
+                sel.value = baseName; 
+                updItem(id); 
+                row.querySelector('.i-tam').value = data.tam; 
+                if(flavor) row.querySelector('.i-cust').value = flavor; 
+            } else { 
+                sel.value = 'OUTRO'; 
+                updItem(id); 
+                row.querySelector('.i-cust').value = data.prod; 
+                row.querySelector('.i-tam').innerHTML = `<option>${data.tam}</option>`; 
+            }
+            row.querySelector('.i-qtd').value = data.qtd; 
+            row.querySelector('.i-prc').value = data.prc;
         }
     };
     window.updItem = function(id) {
@@ -649,11 +669,27 @@
         else { if (requerSabor) { cust.style.display = 'block'; cust.placeholder = "Sabor"; } else { cust.style.display = 'none'; } const p = PRODUTOS.find(x => x.nome === val); if(p) { tam.innerHTML = p.tamanhos.map(t => `<option value="${t.t}" data-p="${t.p}">${t.t}</option>`).join(''); updPrice(id); } }
     };
     window.updPrice = function(id) { const row = document.getElementById(`row-${id}`); const tam = row.querySelector('.i-tam'); const opt = tam.options[tam.selectedIndex]; if(opt && opt.dataset.p) { row.querySelector('.i-prc').value = opt.dataset.p; calcTotal(); } };
+    
+    // CORREÇÃO: CALCULO TOTAL COM TAXA
     window.calcTotal = function() {
-        let total = 0; document.querySelectorAll('.item-row').forEach(row => { const q = parseFloat(row.querySelector('.i-qtd').value) || 0; const p = parseFloat(row.querySelector('.i-prc').value) || 0; const sub = q * p; row.querySelector('.i-total').innerText = fmtMoeda(sub); total += sub; });
-        const taxa = parseFloat(document.getElementById('valTaxa').value) || 0; const pago = parseFloat(document.getElementById('valPago').value) || 0;
-        document.getElementById('displayTotal').innerText = fmtMoeda(total); document.getElementById('valRest').value = fmtMoeda(total + taxa - pago);
+        let itemsTotal = 0; 
+        document.querySelectorAll('.item-row').forEach(row => { 
+            const q = parseFloat(row.querySelector('.i-qtd').value) || 0; 
+            const p = parseFloat(row.querySelector('.i-prc').value) || 0; 
+            const sub = q * p; 
+            row.querySelector('.i-total').innerText = fmtMoeda(sub); 
+            itemsTotal += sub; 
+        });
+        const taxa = parseFloat(document.getElementById('valTaxa').value) || 0; 
+        const pago = parseFloat(document.getElementById('valPago').value) || 0;
+        
+        // TOTAL = ITENS + TAXA
+        const finalTotal = itemsTotal + taxa;
+        
+        document.getElementById('displayTotal').innerText = fmtMoeda(finalTotal); 
+        document.getElementById('valRest').value = fmtMoeda(finalTotal - pago);
     };
+
     window.buscarCep = async function() {
         let cep = document.getElementById('cliCep').value.replace(/\D/g,'');
         if(cep.length === 8) {
@@ -669,10 +705,25 @@
     window.fmtMoeda = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
     window.fmtData = d => d.split('-').reverse().join('/');
     window.searchOrders = function() { applyFilters(); };
-    window.clearFilters = function() { document.getElementById('searchInput').value = ''; document.getElementById('filterData').value = ''; document.getElementById('filterBairro').value = ''; document.getElementById('filterStatus').value = ''; applyFilters(); };
+    window.clearFilters = function() { document.getElementById('searchInput').value = ''; document.getElementById('filterData').value = ''; document.getElementById('filterBairro').value = ''; document.getElementById('filterStatus').value = ''; document.getElementById('filterTipo').value = ''; applyFilters(); };
+    
     window.applyFilters = function() {
-        const term = document.getElementById('searchInput').value.toLowerCase(); const date = document.getElementById('filterData').value; const bairro = document.getElementById('filterBairro').value; const status = document.getElementById('filterStatus').value;
-        const filtered = orders.filter(o => { let ok = true; if(term && !o.cliente.toLowerCase().includes(term)) ok = false; if(date && o.dataEntrega !== date) ok = false; if(bairro && o.bairro !== bairro) ok = false; if(status && o.status !== status) ok = false; return ok; }); renderOrdersList(filtered);
+        const term = document.getElementById('searchInput').value.toLowerCase(); 
+        const date = document.getElementById('filterData').value; 
+        const bairro = document.getElementById('filterBairro').value; 
+        const status = document.getElementById('filterStatus').value;
+        const tipo = document.getElementById('filterTipo').value;
+
+        const filtered = orders.filter(o => { 
+            let ok = true; 
+            if(term && !o.cliente.toLowerCase().includes(term)) ok = false; 
+            if(date && o.dataEntrega !== date) ok = false; 
+            if(bairro && o.bairro !== bairro) ok = false; 
+            if(status && o.status !== status) ok = false; 
+            if(tipo && tipo !== 'Todos' && o.tipoEntrega !== tipo) ok = false;
+            return ok; 
+        }); 
+        renderOrdersList(filtered);
     };
     window.populateBairroFilter = function() { const b = [...new Set(orders.map(o => o.bairro))].sort(); document.getElementById('filterBairro').innerHTML = '<option value="">Todos</option>' + b.map(x => `<option>${x}</option>`).join(''); };
     window.exportBackup = function() { const b = new Blob([JSON.stringify(orders)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'backup.json'; a.click(); };
