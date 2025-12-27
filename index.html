@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V10</title>
+    <title>Divine Pudim Gourmet - Sistema V11</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
@@ -56,11 +56,12 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* CARDS GERAIS */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .card { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); display: flex; flex-direction: column; justify-content: center; }
         .card-row { display: flex; align-items: center; gap: 15px; }
         .card-icon { width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; flex-shrink: 0; }
-        .card h3 { font-size: 20px; font-weight: 700; margin-bottom: 5px; }
+        .card h3 { font-size: 24px; font-weight: 700; margin-bottom: 0px; }
+        .card p { margin-top: 5px; font-size: 14px; color: #666; }
 
         /* PEDIDOS E FILTROS */
         .search-bar, .filters { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 20px; }
@@ -125,7 +126,7 @@
         .btn-card { flex: 1; justify-content: center; background: white; border: 1px solid #ddd; font-size: 12px; color: #555; padding:8px; border-radius:6px; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:5px; }
         .btn-card:hover { background: var(--primary-light); color: var(--primary-dark); border-color: var(--primary-light); }
 
-        /* CORES ATUALIZADAS */
+        /* CORES SOLICITADAS PARA STATUS */
         .card-confirmado { --card-color: #111827; } /* PRETO */
         .card-produzindo { --card-color: #facc15; } /* AMARELO */
         .card-pronto { --card-color: #3b82f6; }     /* AZUL */
@@ -197,13 +198,22 @@
 
     <section id="tabDashboard" class="tab-content active">
         <div class="container">
-            <div class="dashboard-grid">
-                <div class="card"><div class="card-row"><div class="card-icon" style="background:#ec4899"><i class="fas fa-shopping-bag"></i></div><div><h3 id="dashTotal">0</h3><p>Total Pedidos</p></div></div></div>
-                <div class="card"><div class="card-row"><div class="card-icon" style="background:#8b5cf6"><i class="fas fa-dollar-sign"></i></div><div><h3 id="dashFaturado">R$ 0,00</h3><p>Faturamento Total</p></div></div></div>
-                <div class="card"><div class="card-row"><div class="card-icon" style="background:#10b981"><i class="fas fa-check-double"></i></div><div><h3 id="dashRecebido">R$ 0,00</h3><p>Valor Recebido (Pago)</p></div></div></div>
-                <div class="card"><div class="card-row"><div class="card-icon" style="background:#f59e0b"><i class="fas fa-hand-holding-usd"></i></div><div><h3 id="dashReceber">R$ 0,00</h3><p>A Receber (Restante)</p></div></div></div>
-                <div class="card"><div class="card-row"><div class="card-icon" style="background:#06b6d4"><i class="fas fa-motorcycle"></i></div><div><h3 id="dashTaxas">R$ 0,00</h3><p>Taxas Entrega</p></div></div></div>
+            
+            <div class="dashboard-grid" style="margin-bottom: 10px;">
+                <div class="card"><div class="card-row"><div class="card-icon" style="background:var(--primary)"><i class="fas fa-list"></i></div><div><h3 id="dashTotal">0</h3><p>Total Geral</p></div></div></div>
+                <div class="card"><div class="card-row"><div class="card-icon" style="background:#facc15"><i class="fas fa-fire"></i></div><div><h3 id="dashProduzindo">0</h3><p>Produzindo</p></div></div></div>
+                <div class="card"><div class="card-row"><div class="card-icon" style="background:#3b82f6"><i class="fas fa-check"></i></div><div><h3 id="dashPronto">0</h3><p>Prontos</p></div></div></div>
+                <div class="card"><div class="card-row"><div class="card-icon" style="background:#ec4899"><i class="fas fa-motorcycle"></i></div><div><h3 id="dashRota">0</h3><p>Em Rota</p></div></div></div>
+                <div class="card"><div class="card-row"><div class="card-icon" style="background:#22c55e"><i class="fas fa-flag-checkered"></i></div><div><h3 id="dashEntregue">0</h3><p>Entregues</p></div></div></div>
             </div>
+
+            <div class="dashboard-grid">
+                <div class="card"><div class="card-row"><div class="card-icon" style="background:#8b5cf6"><i class="fas fa-dollar-sign"></i></div><div><h3 id="dashFaturado">R$ 0,00</h3><p>Faturado (Total)</p></div></div></div>
+                <div class="card"><div class="card-row"><div class="card-icon" style="background:#10b981"><i class="fas fa-hand-holding-usd"></i></div><div><h3 id="dashRecebido">R$ 0,00</h3><p>Recebido</p></div></div></div>
+                <div class="card"><div class="card-row"><div class="card-icon" style="background:#ef4444"><i class="fas fa-money-bill-wave"></i></div><div><h3 id="dashReceber">R$ 0,00</h3><p>A Receber</p></div></div></div>
+                <div class="card"><div class="card-row"><div class="card-icon" style="background:#06b6d4"><i class="fas fa-road"></i></div><div><h3 id="dashTaxas">R$ 0,00</h3><p>Taxas Entrega</p></div></div></div>
+            </div>
+
             <div class="card" style="display: block;">
                 <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px;"><i class="fas fa-box-open"></i> Quantidade de produtos pedidos</h3>
                 <div id="topProductsList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:10px;"></div>
@@ -831,7 +841,7 @@
             paymentBox = `<div style="border:2px solid #000; padding:5px; margin-top:10px; font-weight:bold; font-size:14px">TOTAL A PAGAR: ${fmtMoeda(o.total)}<br>(${o.formaPagRestante})</div>`;
         }
 
-        w.document.write(`<html><head><style>body { font-family: 'Courier New', monospace; font-size: 12px; margin: 0; padding: 5px; width: 58mm; } .center { text-align: center; } .line { border-bottom: 1px dashed #000; margin: 8px 0; } .row { display: flex; justify-content: space-between; } .bold { font-weight: bold; } .big { font-size: 14px; }</style></head><body><div class="center bold big">DIVINE PUDIM GOURMET</div><div class="center">88 98824-4346</div><div class="line"></div><div class="center bold big">PEDIDO #${numPedido}</div><div class="center bold">${headerEnd}</div><div class="center">${fmtData(o.dataEntrega)} - ${o.turno}</div><div class="line"></div><div class="bold">CLIENTE:</div><div>${o.cliente}</div><div>${o.tel}</div><div class="line"></div>${bodyEnd}<div class="line"></div><div class="bold">ITENS:</div>${o.itens.map(i=>`<div style="margin-bottom:3px">${i.qtd}x ${i.prod} (${i.tam})<br><div style="text-align:right">${fmtMoeda(i.prc*i.qtd)}</div></div>`).join('')}<div class="line"></div><div class="row"><span>Taxa:</span> <span>${fmtMoeda(o.taxa)}</span></div><div class="row bold big"><span>TOTAL:</span> <span>${fmtMoeda(o.total)}</span></div><div class="row"><span>Pago:</span> <span>${fmtMoeda(o.pago)}</span></div><div class="center">${paymentBox}</div><div class="line"></div><div class="center bold">Obrigada pela preferência e esperamos adoçar seu dia mais vezes 😄✨</div></body></html>`); setTimeout(() => { w.print(); w.close(); }, 500);
+        w.document.write(`<html><head><style>body { font-family: 'Courier New', monospace; font-size: 12px; margin: 0; padding: 5px; width: 58mm; } .center { text-align: center; } .line { border-bottom: 1px dashed #000; margin: 8px 0; } .row { display: flex; justify-content: space-between; } .bold { font-weight: bold; } .big { font-size: 14px; }</style></head><body><div class="center bold big">DIVINE PUDIM GOURMET</div><div class="center">88 98824-4346</div><div class="line"></div><div class="center bold big">PEDIDO #${numPedido}</div><div class="center bold">${headerEnd}</div><div class="center">${fmtData(o.dataEntrega)} - ${o.turno}</div><div class="line"></div><div class="bold">CLIENTE:</div><div>${o.cliente}</div><div>${o.tel}</div><div class="line"></div>${bodyEnd}<div class="line"></div><div class="bold">ITENS:</div>${o.itens.map(i=>`<div style="margin-bottom:3px">${i.qtd}x ${i.prod} (${i.tam})<br><div style="text-align:right">${fmtMoeda(i.prc*i.qtd)}</div></div>`).join('')}<div class="line"></div><div class="row"><span>Taxa:</span> <span>${fmtMoeda(o.taxa)}</span></div><div class="row bold big"><span>TOTAL:</span> <span>${fmtMoeda(o.total)}</span></div><div class="row"><span>Pago:</span> <span>${fmtMoeda(o.pago)}</span></div><div class="row bold"><span>FALTA:</span> <span>${fmtMoeda(o.restante)}</span></div><div class="center">${paymentBox}</div><div class="line"></div><div class="center bold">Obrigada pela preferência e esperamos adoçar seu dia mais vezes 😄✨</div></body></html>`); setTimeout(() => { w.print(); w.close(); }, 500);
     };
     
     window.populateBairroFilter = function() { const b = [...new Set(orders.map(o => o.bairro))].sort(); document.getElementById('filterBairro').innerHTML = '<option value="">Todos</option>' + b.map(x => `<option>${x}</option>`).join(''); };
@@ -840,7 +850,19 @@
     window.exportToPDF = function() { const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); doc.setFontSize(18); doc.text("Relatório de Pedidos - Divine Pudim Gourmet", 14, 20); doc.setFontSize(10); doc.text("Gerado em: " + new Date().toLocaleString(), 14, 28); const tableColumn = ["Entregue Em", "Cliente/Contato", "Endereço Completo", "Itens", "Total", "Pago", "Falta"]; const tableRows = []; orders.sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega)).forEach(o => { const itemsStr = o.itens.map(i => `${i.qtd}x ${i.prod} (${i.tam})`).join('\n'); const endStr = o.tipoEntrega === 'Retirada no local' ? 'RETIRADA' : `${o.end}\n${o.bairro}\nObs: ${o.obs || '-'}`; tableRows.push([`${fmtData(o.dataEntrega)}\n${o.turno}`, `${o.cliente}\n${o.tel}`, endStr, itemsStr, fmtMoeda(o.total), fmtMoeda(o.pago), fmtMoeda(o.restante)]); }); doc.autoTable({ head: [tableColumn], body: tableRows, startY: 35, theme: 'grid', styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' }, columnStyles: { 0: {cellWidth:25}, 1:{cellWidth:35}, 2:{cellWidth:60}, 3:{cellWidth:70}, 4:{cellWidth:20, halign:'right'}, 5:{cellWidth:20, halign:'right'}, 6:{cellWidth:20, halign:'right'} } }); doc.save(`Relatorio_${new Date().toISOString().split('T')[0]}.pdf`); };
     window.exportToExcel = function() { const wb = XLSX.utils.book_new(); const data = orders.map(o => ({ "Data Entrega": fmtData(o.dataEntrega), "Tipo": o.tipoEntrega, "Turno": o.turno, "Status": o.status, "Cliente": o.cliente, "Telefone": o.tel, "Endereço": o.end, "Bairro": o.bairro, "Obs": o.obs, "Itens": o.itens.map(i => `${i.qtd}x ${i.prod}`).join('; '), "Total": o.total, "Pago": o.pago, "Restante": o.restante })); const ws = XLSX.utils.json_to_sheet(data); ws['!cols'] = [{wch:12}, {wch:15}, {wch:15}, {wch:15}, {wch:25}, {wch:15}, {wch:40}, {wch:15}, {wch:20}, {wch:50}]; XLSX.utils.book_append_sheet(wb, ws, "Pedidos"); XLSX.writeFile(wb, `Relatorio_${new Date().toISOString().split('T')[0]}.xlsx`); };
     window.renderCharts = function() { const ctxProd = document.getElementById('chartProd'); const ctxFat = document.getElementById('chartFat'); if(charts.prod) charts.prod.destroy(); if(charts.fat) charts.fat.destroy(); const counts = {}; orders.forEach(o => o.itens.forEach(i => { let key = `${i.prod} (${i.tam})`; counts[key] = (counts[key] || 0) + i.qtd; })); charts.prod = new Chart(ctxProd, { type: 'bar', data: { labels: Object.keys(counts), datasets: [{ label: 'Qtd', data: Object.values(counts), backgroundColor: '#ec4899' }] }, options: { responsive: true, maintainAspectRatio: false } }); const statusFat = {}; orders.forEach(o => statusFat[o.status] = (statusFat[o.status] || 0) + o.total); charts.fat = new Chart(ctxFat, { type: 'doughnut', data: { labels: Object.keys(statusFat), datasets: [{ data: Object.values(statusFat), backgroundColor: ['#3b82f6','#f59e0b','#8b5cf6','#06b6d4','#10b981'] }] }, options: { responsive: true, maintainAspectRatio: false } }); };
-    window.renderDashboard = function() { document.getElementById('dashTotal').innerText = orders.length; const fat = orders.reduce((acc, o) => acc + (o.total || 0), 0); const recebido = orders.reduce((acc, o) => acc + (o.pago || 0), 0); const taxas = orders.reduce((acc, o) => acc + (o.taxa || 0), 0); const aReceber = orders.reduce((acc, o) => acc + (o.restante || 0), 0); document.getElementById('dashFaturado').innerText = fmtMoeda(fat); document.getElementById('dashRecebido').innerText = fmtMoeda(recebido); document.getElementById('dashTaxas').innerText = fmtMoeda(taxas); document.getElementById('dashReceber').innerText = fmtMoeda(aReceber); const counts = {}; orders.forEach(o => o.itens.forEach(i => { let key = `${i.prod} - ${i.tam}`; counts[key] = (counts[key] || 0) + i.qtd; })); const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]); document.getElementById('topProductsList').innerHTML = sorted.map(([k,v]) => `<div style="background:#f9f9f9; padding:12px; border-radius:8px; display:flex; justify-content:space-between; border-left:4px solid var(--primary)"><b>${k}</b><span style="background:var(--primary); color:white; padding:2px 8px; border-radius:10px; font-size:12px">${v} un</span></div>`).join(''); };
+    window.renderDashboard = function() { document.getElementById('dashTotal').innerText = orders.length; const fat = orders.reduce((acc, o) => acc + (o.total || 0), 0); const recebido = orders.reduce((acc, o) => acc + (o.pago || 0), 0); const taxas = orders.reduce((acc, o) => acc + (o.taxa || 0), 0); const aReceber = orders.reduce((acc, o) => acc + (o.restante || 0), 0); document.getElementById('dashFaturado').innerText = fmtMoeda(fat); document.getElementById('dashRecebido').innerText = fmtMoeda(recebido); document.getElementById('dashTaxas').innerText = fmtMoeda(taxas); document.getElementById('dashReceber').innerText = fmtMoeda(aReceber); const counts = {}; orders.forEach(o => o.itens.forEach(i => { let key = `${i.prod} - ${i.tam}`; counts[key] = (counts[key] || 0) + i.qtd; })); const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]); document.getElementById('topProductsList').innerHTML = sorted.map(([k,v]) => `<div style="background:#f9f9f9; padding:12px; border-radius:8px; display:flex; justify-content:space-between; border-left:4px solid var(--primary)"><b>${k}</b><span style="background:var(--primary); color:white; padding:2px 8px; border-radius:10px; font-size:12px">${v} un</span></div>`).join('');
+    // DASHBOARD COUNTERS
+    const countProduzindo = orders.filter(o => o.status === 'Produzindo').length;
+    const countPronto = orders.filter(o => o.status === 'Pronto').length;
+    const countRota = orders.filter(o => o.status === 'Em rota').length;
+    const countEntregue = orders.filter(o => o.status === 'Entregue').length;
+    
+    // Add counters to DOM (if elements exist, V11 logic combined)
+    if(document.getElementById('dashProduzindo')) document.getElementById('dashProduzindo').innerText = countProduzindo;
+    if(document.getElementById('dashPronto')) document.getElementById('dashPronto').innerText = countPronto;
+    if(document.getElementById('dashRota')) document.getElementById('dashRota').innerText = countRota;
+    if(document.getElementById('dashEntregue')) document.getElementById('dashEntregue').innerText = countEntregue;
+    };
 </script>
 </body>
 </html>
