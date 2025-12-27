@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V11</title>
+    <title>Divine Pudim Gourmet - Sistema V12</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
@@ -126,11 +126,11 @@
         .btn-card { flex: 1; justify-content: center; background: white; border: 1px solid #ddd; font-size: 12px; color: #555; padding:8px; border-radius:6px; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:5px; }
         .btn-card:hover { background: var(--primary-light); color: var(--primary-dark); border-color: var(--primary-light); }
 
-        /* CORES ATUALIZADAS */
+        /* CORES ATUALIZADAS (V12) */
         .card-confirmado { --card-color: #111827; } /* PRETO */
         .card-produzindo { --card-color: #facc15; } /* AMARELO */
         .card-pronto { --card-color: #3b82f6; }     /* AZUL */
-        .card-rota { --card-color: #ec4899; }       /* ROSA */
+        .card-rota { --card-color: #4b5563; }       /* CINZA ESCURO (Novo) */
         .card-entregue { --card-color: #22c55e; }   /* VERDE */
 
         /* MODAL */
@@ -203,7 +203,7 @@
                 <div class="card"><div class="card-row"><div class="card-icon" style="background:var(--primary)"><i class="fas fa-list"></i></div><div><h3 id="dashTotal">0</h3><p>Total Geral</p></div></div></div>
                 <div class="card"><div class="card-row"><div class="card-icon" style="background:#facc15"><i class="fas fa-fire"></i></div><div><h3 id="dashProduzindo">0</h3><p>Produzindo</p></div></div></div>
                 <div class="card"><div class="card-row"><div class="card-icon" style="background:#3b82f6"><i class="fas fa-check"></i></div><div><h3 id="dashPronto">0</h3><p>Prontos</p></div></div></div>
-                <div class="card"><div class="card-row"><div class="card-icon" style="background:#ec4899"><i class="fas fa-motorcycle"></i></div><div><h3 id="dashRota">0</h3><p>Em Rota</p></div></div></div>
+                <div class="card"><div class="card-row"><div class="card-icon" style="background:#4b5563"><i class="fas fa-motorcycle"></i></div><div><h3 id="dashRota">0</h3><p>Em Rota</p></div></div></div>
                 <div class="card"><div class="card-row"><div class="card-icon" style="background:#22c55e"><i class="fas fa-flag-checkered"></i></div><div><h3 id="dashEntregue">0</h3><p>Entregues</p></div></div></div>
             </div>
 
@@ -265,7 +265,7 @@
         <div class="container">
             <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
                 <div class="card" style="display:block; min-height:350px"><h3>Produtos</h3><div style="height:300px; position:relative;"><canvas id="chartProd"></canvas></div></div>
-                <div class="card" style="display:block; min-height:350px"><h3>Faturamento</h3><div style="height:300px; position:relative;"><canvas id="chartFat"></canvas></div></div>
+                <div class="card" style="display:block; min-height:350px"><h3>Financeiro (A Receber vs Recebido)</h3><div style="height:300px; position:relative;"><canvas id="chartFat"></canvas></div></div>
             </div>
         </div>
     </section>
@@ -474,6 +474,10 @@
         onSnapshot(query(colRef), (snapshot) => {
             orders = [];
             snapshot.forEach(doc => { let d = doc.data(); d.fbId = doc.id; orders.push(d); });
+            // CALCULA NUMERAÇÃO FIXA BASEADA NA DATA
+            orders.sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega));
+            orders.forEach((o, i) => o.displayId = (i + 1).toString().padStart(3, '0'));
+            
             refreshAll();
         });
         document.getElementById('dataPed').valueAsDate = new Date();
@@ -742,11 +746,10 @@
         const divRestante = document.getElementById('divFormaRestante');
         const valRestante = finalTotal - pago;
         
-        // Se Restante for 0 ou menor (Pago Total)
         if (valRestante <= 0.01) {
-            divRestante.style.display = 'none'; // Esconde campo de forma de pagamento restante
+            divRestante.style.display = 'none'; 
         } else {
-            divRestante.style.display = 'block'; // Mostra
+            divRestante.style.display = 'block'; 
         }
 
         document.getElementById('displayTotal').innerText = fmtMoeda(finalTotal); 
@@ -759,7 +762,7 @@
         const sorted = [...list].sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega));
 
         div.innerHTML = sorted.map((o, index) => {
-            const numPedido = (index + 1).toString().padStart(3, '0');
+            const numPedido = o.displayId; // Usando ID fixo calculado
             const statusClass = 'card-' + (o.status ? o.status.toLowerCase().split(' ')[0] : 'confirmado');
             
             const itensHtml = o.itens.map(i => `<div class="item-line"><span>${i.qtd}x ${i.prod} (${i.tam})</span> <span>${fmtMoeda(i.prc*i.qtd)}</span></div>`).join('');
@@ -770,7 +773,7 @@
 
             const opts = ['Pedido confirmado','Produzindo','Pronto','Em rota','Entregue'].map(s => `<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('');
 
-            // --- LÓGICA DE EXIBIÇÃO NO CARD (PAGO TOTAL OU RESTANTE) ---
+            // --- LÓGICA DE EXIBIÇÃO NO CARD ---
             let pagInfo = '';
             
             if (o.restante <= 0.01) {
@@ -842,14 +845,14 @@
         const filtered = orders.filter(o => { let ok = true; if(term && !o.cliente.toLowerCase().includes(term)) ok = false; if(date && o.dataEntrega !== date) ok = false; if(bairro && o.bairro !== bairro) ok = false; if(status && o.status !== status) ok = false; if(tipo && tipo !== 'Todas' && o.tipoEntrega !== tipo) ok = false; if(turno && turno !== 'Todos' && o.turno !== turno && !o.turno.includes(turno)) ok = false; return ok; }); renderOrdersList(filtered);
     };
     
-    // PRINT LOGIC COM CAIXA DE DESTAQUE INTELIGENTE
+    // PRINT LOGIC
     window.printOrder = function(id, numPedido) {
         const o = orders.find(x => x.fbId === id); const w = window.open('', '', 'width=300,height=600');
         let headerEnd = ""; let bodyEnd = "";
         
         if (o.tipoEntrega === 'Delivery' || !o.turno.includes('Retirada')) { headerEnd = "DELIVERY"; bodyEnd = `<div class="bold">ENDEREÇO:</div><div>${o.end}</div><div>${o.bairro}</div>${o.obs ? `<div style="margin-top:5px"><b>Ref:</b> ${o.obs}</div>` : ''}`; } else { headerEnd = "RETIRADA"; bodyEnd = `<div class="center bold">CLIENTE VAI RETIRAR</div>`; }
         
-        // Lógica da caixa de pagamento
+        // Caixa de pagamento INTELIGENTE
         let paymentBox = '';
         if(o.restante <= 0.01) {
             paymentBox = `<div style="border:3px solid #000; padding:10px; margin-top:10px; font-weight:bold; font-size:18px">PAGO TOTAL</div>`;
@@ -867,13 +870,70 @@
     window.handleImport = function(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = async (ev) => { try { const arr = JSON.parse(ev.target.result); if(confirm(`Importar ${arr.length} pedidos?`)) { for(let o of arr) { delete o.fbId; await addDoc(colRef, o); } alert('Concluído!'); } } catch(x) { alert('Erro arquivo invalido'); } }; r.readAsText(f); };
     window.exportToPDF = function() { const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); doc.setFontSize(18); doc.text("Relatório de Pedidos - Divine Pudim Gourmet", 14, 20); doc.setFontSize(10); doc.text("Gerado em: " + new Date().toLocaleString(), 14, 28); const tableColumn = ["Entregue Em", "Cliente/Contato", "Endereço Completo", "Itens", "Total", "Pago", "Falta"]; const tableRows = []; orders.sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega)).forEach(o => { const itemsStr = o.itens.map(i => `${i.qtd}x ${i.prod} (${i.tam})`).join('\n'); const endStr = o.tipoEntrega === 'Retirada no local' ? 'RETIRADA' : `${o.end}\n${o.bairro}\nObs: ${o.obs || '-'}`; tableRows.push([`${fmtData(o.dataEntrega)}\n${o.turno}`, `${o.cliente}\n${o.tel}`, endStr, itemsStr, fmtMoeda(o.total), fmtMoeda(o.pago), fmtMoeda(o.restante)]); }); doc.autoTable({ head: [tableColumn], body: tableRows, startY: 35, theme: 'grid', styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' }, columnStyles: { 0: {cellWidth:25}, 1:{cellWidth:35}, 2:{cellWidth:60}, 3:{cellWidth:70}, 4:{cellWidth:20, halign:'right'}, 5:{cellWidth:20, halign:'right'}, 6:{cellWidth:20, halign:'right'} } }); doc.save(`Relatorio_${new Date().toISOString().split('T')[0]}.pdf`); };
     window.exportToExcel = function() { const wb = XLSX.utils.book_new(); const data = orders.map(o => ({ "Data Entrega": fmtData(o.dataEntrega), "Tipo": o.tipoEntrega, "Turno": o.turno, "Status": o.status, "Cliente": o.cliente, "Telefone": o.tel, "Endereço": o.end, "Bairro": o.bairro, "Obs": o.obs, "Itens": o.itens.map(i => `${i.qtd}x ${i.prod}`).join('; '), "Total": o.total, "Pago": o.pago, "Restante": o.restante })); const ws = XLSX.utils.json_to_sheet(data); ws['!cols'] = [{wch:12}, {wch:15}, {wch:15}, {wch:15}, {wch:25}, {wch:15}, {wch:40}, {wch:15}, {wch:20}, {wch:50}]; XLSX.utils.book_append_sheet(wb, ws, "Pedidos"); XLSX.writeFile(wb, `Relatorio_${new Date().toISOString().split('T')[0]}.xlsx`); };
-    window.renderCharts = function() { const ctxProd = document.getElementById('chartProd'); const ctxFat = document.getElementById('chartFat'); if(charts.prod) charts.prod.destroy(); if(charts.fat) charts.fat.destroy(); const counts = {}; orders.forEach(o => o.itens.forEach(i => { let key = `${i.prod} (${i.tam})`; counts[key] = (counts[key] || 0) + i.qtd; })); charts.prod = new Chart(ctxProd, { type: 'bar', data: { labels: Object.keys(counts), datasets: [{ label: 'Qtd', data: Object.values(counts), backgroundColor: '#ec4899' }] }, options: { responsive: true, maintainAspectRatio: false } }); const statusFat = {}; orders.forEach(o => statusFat[o.status] = (statusFat[o.status] || 0) + o.total); charts.fat = new Chart(ctxFat, { type: 'doughnut', data: { labels: Object.keys(statusFat), datasets: [{ data: Object.values(statusFat), backgroundColor: ['#3b82f6','#f59e0b','#8b5cf6','#06b6d4','#10b981'] }] }, options: { responsive: true, maintainAspectRatio: false } }); };
-    window.renderDashboard = function() { document.getElementById('dashTotal').innerText = orders.length; const fat = orders.reduce((acc, o) => acc + (o.total || 0), 0); const recebido = orders.reduce((acc, o) => acc + (o.pago || 0), 0); const taxas = orders.reduce((acc, o) => acc + (o.taxa || 0), 0); const aReceber = orders.reduce((acc, o) => acc + (o.restante || 0), 0); document.getElementById('dashFaturado').innerText = fmtMoeda(fat); document.getElementById('dashRecebido').innerText = fmtMoeda(recebido); document.getElementById('dashTaxas').innerText = fmtMoeda(taxas); document.getElementById('dashReceber').innerText = fmtMoeda(aReceber); const counts = {}; orders.forEach(o => o.itens.forEach(i => { let key = `${i.prod} - ${i.tam}`; counts[key] = (counts[key] || 0) + i.qtd; })); const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]); document.getElementById('topProductsList').innerHTML = sorted.map(([k,v]) => `<div style="background:#f9f9f9; padding:12px; border-radius:8px; display:flex; justify-content:space-between; border-left:4px solid var(--primary)"><b>${k}</b><span style="background:var(--primary); color:white; padding:2px 8px; border-radius:10px; font-size:12px">${v} un</span></div>`).join('');
+    
+    // --- GRÁFICOS (Financeiro: A RECEBER vs RECEBIDO) ---
+    window.renderCharts = function() { 
+        const ctxProd = document.getElementById('chartProd'); 
+        const ctxFat = document.getElementById('chartFat'); 
+        if(charts.prod) charts.prod.destroy(); 
+        if(charts.fat) charts.fat.destroy(); 
+        
+        // Chart Produtos
+        const counts = {}; orders.forEach(o => o.itens.forEach(i => { let key = `${i.prod} (${i.tam})`; counts[key] = (counts[key] || 0) + i.qtd; })); 
+        charts.prod = new Chart(ctxProd, { type: 'bar', data: { labels: Object.keys(counts), datasets: [{ label: 'Qtd', data: Object.values(counts), backgroundColor: '#ec4899' }] }, options: { responsive: true, maintainAspectRatio: false } }); 
+        
+        // Chart Financeiro (Recebido vs A Receber)
+        const received = orders.reduce((acc, o) => acc + (o.pago || 0), 0);
+        const pending = orders.reduce((acc, o) => acc + (o.restante || 0), 0);
+        
+        charts.fat = new Chart(ctxFat, { 
+            type: 'doughnut', 
+            data: { 
+                labels: ['Valor Recebido', 'A Receber'], 
+                datasets: [{ 
+                    data: [received, pending], 
+                    backgroundColor: ['#10b981', '#ef4444'] // Verde e Vermelho
+                }] 
+            }, 
+            options: { 
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) { label += ': '; }
+                                if (context.parsed !== null) { label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed); }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            } 
+        }); 
+    };
+    
     // DASHBOARD COUNTERS (V11)
-    if(document.getElementById('dashProduzindo')) document.getElementById('dashProduzindo').innerText = orders.filter(o => o.status === 'Produzindo').length;
-    if(document.getElementById('dashPronto')) document.getElementById('dashPronto').innerText = orders.filter(o => o.status === 'Pronto').length;
-    if(document.getElementById('dashRota')) document.getElementById('dashRota').innerText = orders.filter(o => o.status === 'Em rota').length;
-    if(document.getElementById('dashEntregue')) document.getElementById('dashEntregue').innerText = orders.filter(o => o.status === 'Entregue').length;
+    window.renderDashboard = function() { 
+        document.getElementById('dashTotal').innerText = orders.length; 
+        const fat = orders.reduce((acc, o) => acc + (o.total || 0), 0); 
+        const recebido = orders.reduce((acc, o) => acc + (o.pago || 0), 0); 
+        const taxas = orders.reduce((acc, o) => acc + (o.taxa || 0), 0); 
+        const aReceber = orders.reduce((acc, o) => acc + (o.restante || 0), 0); 
+        document.getElementById('dashFaturado').innerText = fmtMoeda(fat); 
+        document.getElementById('dashRecebido').innerText = fmtMoeda(recebido); 
+        document.getElementById('dashTaxas').innerText = fmtMoeda(taxas); 
+        document.getElementById('dashReceber').innerText = fmtMoeda(aReceber); 
+        
+        // Update new counters
+        document.getElementById('dashProduzindo').innerText = orders.filter(o => o.status === 'Produzindo').length;
+        document.getElementById('dashPronto').innerText = orders.filter(o => o.status === 'Pronto').length;
+        document.getElementById('dashRota').innerText = orders.filter(o => o.status === 'Em rota').length;
+        document.getElementById('dashEntregue').innerText = orders.filter(o => o.status === 'Entregue').length;
+
+        const counts = {}; orders.forEach(o => o.itens.forEach(i => { let key = `${i.prod} - ${i.tam}`; counts[key] = (counts[key] || 0) + i.qtd; })); 
+        const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]); 
+        document.getElementById('topProductsList').innerHTML = sorted.map(([k,v]) => `<div style="background:#f9f9f9; padding:12px; border-radius:8px; display:flex; justify-content:space-between; border-left:4px solid var(--primary)"><b>${k}</b><span style="background:var(--primary); color:white; padding:2px 8px; border-radius:10px; font-size:12px">${v} un</span></div>`).join(''); 
     };
 </script>
 </body>
