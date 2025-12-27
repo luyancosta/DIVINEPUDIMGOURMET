@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V9</title>
+    <title>Divine Pudim Gourmet - Sistema V10</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
     <style>
-        /* ================= ESTILOS GERAIS (VISUAL CLÁSSICO ROSA) ================= */
+        /* ================= ESTILOS GERAIS ================= */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --primary: #ec4899; --primary-dark: #be185d; --primary-light: #fdf2f8;
@@ -18,7 +18,6 @@
             --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
             --transition: all 0.3s ease;
         }
-        /* Fundo Rosa Original Degradê */
         body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fbcfe8 100%); color: var(--gray-800); min-height: 100vh; }
         .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
         
@@ -70,7 +69,7 @@
         
         .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
 
-        /* ================= ESTILO DO CARD DO PEDIDO (PERSONALIZADO) ================= */
+        /* ================= CARD DO PEDIDO ================= */
         .order-card { 
             background: white; 
             border-radius: 16px; 
@@ -84,13 +83,13 @@
         }
         .order-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         
-        /* FAIXA LATERAL MAIS GROSSA (12px) */
+        /* FAIXA LATERAL (12px) */
         .order-card::before {
             content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 12px;
             background: var(--card-color, var(--primary)); 
         }
 
-        .order-header { padding: 15px 15px 15px 25px; /* Padding extra esquerda por causa da barra */ border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; background: #fafafa; }
+        .order-header { padding: 15px 15px 15px 25px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; background: #fafafa; }
         .order-id { font-weight: 800; font-size: 16px; color: var(--gray-800); }
         .order-date { font-size: 12px; color: var(--gray-600); }
         
@@ -105,7 +104,20 @@
         
         .finance-box { margin-top: 10px; font-size: 13px; }
         .finance-row { display: flex; justify-content: space-between; margin-bottom: 3px; color: #666; }
-        .finance-total { font-weight: 800; font-size: 15px; color: var(--gray-800); margin-top: 5px; border-top: 1px solid #eee; padding-top: 5px; }
+        
+        /* DESTAQUE DE PAGAMENTO NO CARD */
+        .payment-highlight {
+            background: #fef2f2;
+            border: 1px solid #fee2e2;
+            color: #b91c1c;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
         
         .status-select { padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: bold; border: 1px solid #ddd; cursor: pointer; outline: none; }
         
@@ -113,12 +125,12 @@
         .btn-card { flex: 1; justify-content: center; background: white; border: 1px solid #ddd; font-size: 12px; color: #555; padding:8px; border-radius:6px; cursor:pointer; font-weight:600; display:flex; align-items:center; gap:5px; }
         .btn-card:hover { background: var(--primary-light); color: var(--primary-dark); border-color: var(--primary-light); }
 
-        /* CORES SOLICITADAS PARA STATUS */
-        .card-confirmado { --card-color: #ec4899; } /* Rosa */
-        .card-produzindo { --card-color: #facc15; } /* Amarelo */
-        .card-pronto { --card-color: #3b82f6; }     /* Azul */
-        .card-rota { --card-color: #a855f7; }       /* Roxo */
-        .card-entregue { --card-color: #22c55e; }   /* Verde */
+        /* CORES ATUALIZADAS */
+        .card-confirmado { --card-color: #111827; } /* PRETO */
+        .card-produzindo { --card-color: #facc15; } /* AMARELO */
+        .card-pronto { --card-color: #3b82f6; }     /* AZUL */
+        .card-rota { --card-color: #ec4899; }       /* ROSA */
+        .card-entregue { --card-color: #22c55e; }   /* VERDE */
 
         /* MODAL */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
@@ -344,7 +356,7 @@
                     <div style="grid-column: span 2">
                         <label id="lblFormaRestante">Forma de Pagamento (Valor Total)</label>
                         <select id="formaPagRestante">
-                            <option value="">Selecione a forma de pagamento...</option>
+                            <option value="">Selecione...</option>
                             <option value="Pix">Pix</option>
                             <option value="Dinheiro">Dinheiro</option>
                             <option value="Cartão">Cartão</option>
@@ -736,14 +748,14 @@
 
             const opts = ['Pedido confirmado','Produzindo','Pronto','Em rota','Entregue'].map(s => `<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('');
 
-            // Lógica de exibição do pagamento no CARD
+            // Lógica de exibição do pagamento no CARD (DESTAQUE VERMELHO)
             let pagInfo = '';
             if (o.pago > 0) {
                 // Tem sinal
-                pagInfo = `<div class="finance-row"><span>Restante (${o.formaPagRestante || '?'}):</span> <span style="color:#ef4444; font-weight:bold">${fmtMoeda(o.restante)}</span></div>`;
+                pagInfo = `<div class="payment-highlight"><span>Restante:</span> <span>${o.formaPagRestante || '?'}</span></div>`;
             } else {
                 // Sem sinal
-                pagInfo = `<div class="finance-row"><span>Total (${o.formaPagRestante || '?'}):</span> <span style="color:#ef4444; font-weight:bold">${fmtMoeda(o.restante)}</span></div>`;
+                pagInfo = `<div class="payment-highlight"><span>Total:</span> <span>${o.formaPagRestante || '?'}</span></div>`;
             }
 
             return `
@@ -763,9 +775,12 @@
                         ${o.obs ? `<div class="client-detail" style="color:#e11d48;font-style:italic"><i class="fas fa-comment"></i> ${o.obs}</div>` : ''}
                     </div>
                     <div class="items-box">${itensHtml}</div>
+                    ${pagInfo}
                     <div class="finance-box">
-                        ${pagInfo}
-                        ${o.pago > 0 ? `<div class="finance-row"><span>Pago (Adiantado):</span> <span style="color:#10b981">${fmtMoeda(o.pago)}</span></div>` : ''}
+                        ${o.pago > 0 ? `<div class="finance-row"><span>Pago (Sinal):</span> <span style="color:#10b981">${fmtMoeda(o.pago)}</span></div>` : ''}
+                        <div class="finance-total" style="display:flex;justify-content:space-between;color:${o.restante>0?'#ef4444':'#10b981'}">
+                            <span>A PAGAR:</span> <span>${fmtMoeda(o.restante)}</span>
+                        </div>
                     </div>
                 </div>
                 <div class="order-footer">
@@ -800,12 +815,25 @@
         const term = document.getElementById('searchInput').value.toLowerCase(); const date = document.getElementById('filterData').value; const bairro = document.getElementById('filterBairro').value; const status = document.getElementById('filterStatus').value; const tipo = document.getElementById('filterTipo').value; const turno = document.getElementById('filterTurno').value;
         const filtered = orders.filter(o => { let ok = true; if(term && !o.cliente.toLowerCase().includes(term)) ok = false; if(date && o.dataEntrega !== date) ok = false; if(bairro && o.bairro !== bairro) ok = false; if(status && o.status !== status) ok = false; if(tipo && tipo !== 'Todas' && o.tipoEntrega !== tipo) ok = false; if(turno && turno !== 'Todos' && o.turno !== turno && !o.turno.includes(turno)) ok = false; return ok; }); renderOrdersList(filtered);
     };
+    
+    // PRINT LOGIC COM CAIXA DE DESTAQUE
     window.printOrder = function(id, numPedido) {
         const o = orders.find(x => x.fbId === id); const w = window.open('', '', 'width=300,height=600');
         let headerEnd = ""; let bodyEnd = "";
+        
         if (o.tipoEntrega === 'Delivery' || !o.turno.includes('Retirada')) { headerEnd = "DELIVERY"; bodyEnd = `<div class="bold">ENDEREÇO:</div><div>${o.end}</div><div>${o.bairro}</div>${o.obs ? `<div style="margin-top:5px"><b>Ref:</b> ${o.obs}</div>` : ''}`; } else { headerEnd = "RETIRADA"; bodyEnd = `<div class="center bold">CLIENTE VAI RETIRAR</div>`; }
-        w.document.write(`<html><head><style>body { font-family: 'Courier New', monospace; font-size: 12px; margin: 0; padding: 5px; width: 58mm; } .center { text-align: center; } .line { border-bottom: 1px dashed #000; margin: 8px 0; } .row { display: flex; justify-content: space-between; } .bold { font-weight: bold; } .big { font-size: 14px; }</style></head><body><div class="center bold big">DIVINE PUDIM GOURMET</div><div class="center">88 98824-4346</div><div class="line"></div><div class="center bold big">PEDIDO #${numPedido}</div><div class="center bold">${headerEnd}</div><div class="center">${fmtData(o.dataEntrega)} - ${o.turno}</div><div class="line"></div><div class="bold">CLIENTE:</div><div>${o.cliente}</div><div>${o.tel}</div><div class="line"></div>${bodyEnd}<div class="line"></div><div class="bold">ITENS:</div>${o.itens.map(i=>`<div style="margin-bottom:3px">${i.qtd}x ${i.prod} (${i.tam})<br><div style="text-align:right">${fmtMoeda(i.prc*i.qtd)}</div></div>`).join('')}<div class="line"></div><div class="row"><span>Taxa:</span> <span>${fmtMoeda(o.taxa)}</span></div><div class="row bold big"><span>TOTAL:</span> <span>${fmtMoeda(o.total)}</span></div><div class="row"><span>Pago:</span> <span>${fmtMoeda(o.pago)}</span></div><div class="row bold"><span>FALTA:</span> <span>${fmtMoeda(o.restante)}</span></div><div class="line"></div><div class="center bold">Obrigada pela preferência e esperamos adoçar seu dia mais vezes 😄✨</div></body></html>`); setTimeout(() => { w.print(); w.close(); }, 500);
+        
+        // Lógica da caixa de pagamento
+        let paymentBox = '';
+        if(o.pago > 0) {
+            paymentBox = `<div style="border:2px solid #000; padding:5px; margin-top:10px; font-weight:bold; font-size:14px">RESTANTE: ${fmtMoeda(o.restante)}<br>(${o.formaPagRestante})</div>`;
+        } else {
+            paymentBox = `<div style="border:2px solid #000; padding:5px; margin-top:10px; font-weight:bold; font-size:14px">TOTAL A PAGAR: ${fmtMoeda(o.total)}<br>(${o.formaPagRestante})</div>`;
+        }
+
+        w.document.write(`<html><head><style>body { font-family: 'Courier New', monospace; font-size: 12px; margin: 0; padding: 5px; width: 58mm; } .center { text-align: center; } .line { border-bottom: 1px dashed #000; margin: 8px 0; } .row { display: flex; justify-content: space-between; } .bold { font-weight: bold; } .big { font-size: 14px; }</style></head><body><div class="center bold big">DIVINE PUDIM GOURMET</div><div class="center">88 98824-4346</div><div class="line"></div><div class="center bold big">PEDIDO #${numPedido}</div><div class="center bold">${headerEnd}</div><div class="center">${fmtData(o.dataEntrega)} - ${o.turno}</div><div class="line"></div><div class="bold">CLIENTE:</div><div>${o.cliente}</div><div>${o.tel}</div><div class="line"></div>${bodyEnd}<div class="line"></div><div class="bold">ITENS:</div>${o.itens.map(i=>`<div style="margin-bottom:3px">${i.qtd}x ${i.prod} (${i.tam})<br><div style="text-align:right">${fmtMoeda(i.prc*i.qtd)}</div></div>`).join('')}<div class="line"></div><div class="row"><span>Taxa:</span> <span>${fmtMoeda(o.taxa)}</span></div><div class="row bold big"><span>TOTAL:</span> <span>${fmtMoeda(o.total)}</span></div><div class="row"><span>Pago:</span> <span>${fmtMoeda(o.pago)}</span></div><div class="center">${paymentBox}</div><div class="line"></div><div class="center bold">Obrigada pela preferência e esperamos adoçar seu dia mais vezes 😄✨</div></body></html>`); setTimeout(() => { w.print(); w.close(); }, 500);
     };
+    
     window.populateBairroFilter = function() { const b = [...new Set(orders.map(o => o.bairro))].sort(); document.getElementById('filterBairro').innerHTML = '<option value="">Todos</option>' + b.map(x => `<option>${x}</option>`).join(''); };
     window.exportBackup = function() { const b = new Blob([JSON.stringify(orders)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'backup.json'; a.click(); };
     window.handleImport = function(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = async (ev) => { try { const arr = JSON.parse(ev.target.result); if(confirm(`Importar ${arr.length} pedidos?`)) { for(let o of arr) { delete o.fbId; await addDoc(colRef, o); } alert('Concluído!'); } } catch(x) { alert('Erro arquivo invalido'); } }; r.readAsText(f); };
