@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema</title>
+    <title>Divine Pudim Gourmet - Sistema V4</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
@@ -37,7 +37,7 @@
         .btn-login { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-login:hover { background: var(--primary-dark); transform: translateY(-2px); }
 
-        /* CONTEÚDO DO APP (ESCONDIDO INICIALMENTE) */
+        /* CONTEÚDO DO APP */
         #appContent { display: none; padding-bottom: 40px; }
 
         /* HEADER */
@@ -73,7 +73,7 @@
         .card h3 { font-size: 20px; font-weight: 700; margin-bottom: 5px; }
         .card p { font-size: 14px; color: var(--gray-600); }
 
-        /* PEDIDOS */
+        /* PEDIDOS CARD (ATUALIZADO) */
         .search-bar, .filters { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 20px; }
         .filters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
         input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-family: inherit; }
@@ -83,6 +83,13 @@
         .order-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
         .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
         .order-items { background: var(--gray-50); padding: 10px; border-radius: 6px; margin: 10px 0; font-size: 14px; }
+        
+        /* Nova área de detalhes no card */
+        .order-details-card {
+            background: #fff; border: 1px solid #eee; border-radius: 6px; padding: 10px; margin-bottom: 10px; font-size: 13px; color: #555;
+        }
+        .order-details-card i { color: var(--primary); width: 15px; text-align: center; margin-right: 5px; }
+
         .order-actions { margin-top: auto; display: flex; gap: 5px; padding-top: 10px; }
 
         /* STATUS COLORS */
@@ -99,49 +106,21 @@
         .modal-header { background: var(--primary); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 16px 16px 0 0; }
         .modal-body { padding: 30px; }
         
-        /* FORM & INPUT GROUP (R$) */
         .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        
         .input-group { position: relative; }
         .input-group span { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--gray-600); font-weight: bold; }
         .input-group input { padding-left: 35px; }
 
-        /* TABELA DE ITENS NO MODAL */
-        .items-header { 
-            display: grid; 
-            grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; 
-            gap: 10px; 
-            font-weight: bold; 
-            color: var(--gray-600); 
-            margin-bottom: 5px; 
-            padding: 0 10px;
-            font-size: 14px;
-        }
-        .item-row { 
-            display: grid; 
-            grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; 
-            gap: 10px; 
-            align-items: center; 
-            margin-bottom: 10px; 
-            padding-bottom: 10px; 
-            border-bottom: 1px solid #eee; 
-        }
+        /* ITEMS MODAL */
+        .items-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; gap: 10px; font-weight: bold; color: var(--gray-600); margin-bottom: 5px; padding: 0 10px; font-size: 14px; }
+        .item-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; gap: 10px; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
 
-        /* RESPONSIVIDADE ESPECÍFICA */
         @media(max-width: 768px) { 
             .header-content { flex-direction: column; text-align: center; }
             .header-actions { justify-content: center; }
             .items-header { display: none; }
             .item-row { grid-template-columns: 1fr; border: 1px solid #ddd; padding: 15px; border-radius: 10px; background: #fafafa; } 
             .item-row > div { margin-bottom: 5px; }
-            .modal-content { width: 100%; height: 100%; border-radius: 0; max-height: 100vh; }
-        }
-
-        /* PRINT */
-        @media print {
-            body * { visibility: hidden; }
-            #printArea, #printArea * { visibility: visible; }
-            #printArea { position: absolute; left: 0; top: 0; width: 58mm; padding: 0; margin: 0; font-size: 12px; font-family: monospace; }
         }
     </style>
 </head>
@@ -169,7 +148,7 @@
                     <button class="btn btn-header" onclick="exportBackup()"><i class="fas fa-download"></i> Backup</button>
                     <button class="btn btn-header" onclick="document.getElementById('importInput').click()"><i class="fas fa-upload"></i> Importar</button>
                     <button class="btn btn-primary" onclick="showNewOrderModal()"><i class="fas fa-plus"></i> Novo Pedido</button>
-                    <button class="btn btn-danger" onclick="location.reload()" title="Sair"><i class="fas fa-sign-out-alt"></i></button>
+                    <button class="btn btn-danger" onclick="location.reload()"><i class="fas fa-sign-out-alt"></i></button>
                 </div>
             </div>
         </div>
@@ -196,7 +175,6 @@
                 <div class="card"><div class="card-row"><div class="card-icon" style="background:#f59e0b"><i class="fas fa-hand-holding-usd"></i></div><div><h3 id="dashReceber">R$ 0,00</h3><p>A Receber</p></div></div></div>
                 <div class="card"><div class="card-row"><div class="card-icon" style="background:#06b6d4"><i class="fas fa-motorcycle"></i></div><div><h3 id="dashTaxas">R$ 0,00</h3><p>Taxas Entrega</p></div></div></div>
             </div>
-            
             <div class="card" style="display: block;">
                 <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px;"><i class="fas fa-box-open"></i> Quantidade de produtos pedidos</h3>
                 <div id="topProductsList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:10px;"></div>
@@ -206,9 +184,7 @@
 
     <section id="tabPedidos" class="tab-content">
         <div class="container">
-            <div class="search-bar">
-                <input type="text" id="searchInput" placeholder="Buscar cliente..." oninput="searchOrders()">
-            </div>
+            <div class="search-bar"><input type="text" id="searchInput" placeholder="Buscar cliente..." oninput="searchOrders()"></div>
             <div class="filters">
                 <div class="filters-grid">
                     <div><label>Data</label><input type="date" id="filterData" onchange="applyFilters()"></div>
@@ -235,23 +211,15 @@
     <section id="tabGraficos" class="tab-content">
         <div class="container">
             <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
-                <div class="card" style="display:block; min-height:350px">
-                    <h3>Produtos (Por Tamanho)</h3>
-                    <div style="height:300px; position:relative;">
-                        <canvas id="chartProd"></canvas>
-                    </div>
-                </div>
-                <div class="card" style="display:block; min-height:350px">
-                    <h3>Faturamento</h3>
-                    <div style="height:300px; position:relative;">
-                        <canvas id="chartFat"></canvas>
-                    </div>
-                </div>
+                <div class="card" style="display:block; min-height:350px"><h3>Produtos</h3><div style="height:300px; position:relative;"><canvas id="chartProd"></canvas></div></div>
+                <div class="card" style="display:block; min-height:350px"><h3>Faturamento</h3><div style="height:300px; position:relative;"><canvas id="chartFat"></canvas></div></div>
             </div>
         </div>
     </section>
 
-</div> <div id="orderModal" class="modal">
+</div>
+
+<div id="orderModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
             <h2>Novo Pedido</h2>
@@ -262,35 +230,38 @@
                 <div class="form-row">
                     <div><label>Nome *</label><input type="text" id="cliNome" required></div>
                     <div><label>WhatsApp *</label><input type="tel" id="cliTel" required></div>
-                    <div><label>Turno *</label>
-                        <select id="turnoEntrega" onchange="checkTurno()" required>
+                    <div><label>Forma de Entrega *</label>
+                        <select id="tipoEntrega" onchange="checkTipoEntrega()" required>
                             <option value="">Selecione</option>
-                            <option value="Manhã">Manhã</option>
-                            <option value="Tarde">Tarde</option>
+                            <option value="Delivery">Delivery</option>
                             <option value="Retirada no local">Retirada no local</option>
                         </select>
                     </div>
                 </div>
-                
-                <div id="addressArea">
+
+                <div id="deliveryFields" style="display:none; background:#f9f9f9; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #eee;">
+                    <h4 style="margin-bottom:10px; color:var(--primary)">Dados de Entrega</h4>
                     <div class="form-row">
-                        <div>
-                            <label>CEP</label>
-                            <div style="display:flex; gap:5px">
-                                <input type="text" id="cliCep" onblur="buscarCep()" placeholder="00000-000">
-                                <button type="button" class="btn btn-secondary" onclick="buscarCep()"><i class="fas fa-search"></i></button>
-                            </div>
-                        </div>
+                        <div><label>CEP</label><div style="display:flex; gap:5px"><input type="text" id="cliCep" onblur="buscarCep()"><button type="button" class="btn btn-secondary" onclick="buscarCep()"><i class="fas fa-search"></i></button></div></div>
                         <div style="grid-column: span 1"><label>Endereço *</label><input type="text" id="cliEnd"></div>
                         <div><label>Número (Nº)</label><input type="text" id="cliNumero"></div>
                     </div>
                     <div class="form-row">
-                        <div><label>Bairro *</label>
-                            <select id="cliBairro" onchange="checkBairro()">
+                        <div><label>Bairro *</label><select id="cliBairro" onchange="checkBairro()"><option value="">Selecione</option></select><input type="text" id="cliBairroOutro" style="display:none; margin-top:5px" placeholder="Digite o bairro"></div>
+                        <div><label>Turno da Entrega *</label>
+                            <select id="turnoEntrega">
                                 <option value="">Selecione</option>
-                                </select>
-                            <input type="text" id="cliBairroOutro" style="display:none; margin-top:5px" placeholder="Digite o bairro">
+                                <option value="Manhã">Manhã</option>
+                                <option value="Tarde">Tarde</option>
+                            </select>
                         </div>
+                    </div>
+                </div>
+
+                <div id="retiradaFields" style="display:none; background:#f9f9f9; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #eee;">
+                    <h4 style="margin-bottom:10px; color:var(--primary)">Dados de Retirada</h4>
+                    <div class="form-row">
+                        <div><label>Horário da Retirada (Opcional)</label><input type="time" id="horarioRetirada"></div>
                     </div>
                 </div>
 
@@ -309,42 +280,22 @@
                 </div>
 
                 <hr style="margin: 20px 0; border:0; border-top:1px solid #eee">
-                
-                <h3>Itens do Pedido</h3>
-                <div class="items-header">
-                    <div>Produto</div>
-                    <div>Tamanho</div>
-                    <div>Qtd</div>
-                    <div>V. Unit</div>
-                    <div>V. Total</div>
-                    <div></div>
-                </div>
-
+                <h3>Itens</h3>
+                <div class="items-header"><div>Produto</div><div>Tamanho</div><div>Qtd</div><div>V. Unit</div><div>V. Total</div><div></div></div>
                 <div id="itemsContainer"></div>
-                
                 <button type="button" class="btn btn-primary" onclick="addItem()" style="width:100%; margin-top:10px">+ Adicionar Item</button>
-                <div style="text-align:right; font-size:18px; font-weight:bold; margin-top:15px; color:var(--primary-dark)">
-                    Total: <span id="displayTotal">R$ 0,00</span>
-                </div>
+                <div style="text-align:right; font-size:18px; font-weight:bold; margin-top:15px; color:var(--primary-dark)">Total: <span id="displayTotal">R$ 0,00</span></div>
 
                 <hr style="margin: 20px 0; border:0; border-top:1px solid #eee">
-
                 <div class="form-row">
-                    <div><label>Valor Pago</label><div class="input-group"><span>R$</span><input type="number" step="0.01" id="valPago" oninput="calcTotal()"></div></div>
+                    <div><label>Pago</label><div class="input-group"><span>R$</span><input type="number" step="0.01" id="valPago" oninput="calcTotal()"></div></div>
                     <div><label>Taxa Entrega</label><div class="input-group"><span>R$</span><input type="number" step="0.01" id="valTaxa" oninput="calcTotal()"></div></div>
                     <div><label>Restante</label><div class="input-group"><span>R$</span><input type="text" id="valRest" readonly></div></div>
-                    <div><label>Pagamento</label>
-                        <select id="formaPag">
-                            <option value="Pix">Pix</option>
-                            <option value="Dinheiro">Dinheiro</option>
-                            <option value="Cartão">Cartão</option>
-                        </select>
-                    </div>
+                    <div><label>Pagamento</label><select id="formaPag"><option value="Pix">Pix</option><option value="Dinheiro">Dinheiro</option><option value="Cartão">Cartão</option></select></div>
                 </div>
-                <div style="margin-top:10px"><label>Observação (Ponto de Referência)</label><textarea id="obs" rows="2" placeholder="Ex: Casa azul, próximo ao mercado..."></textarea></div>
+                <div style="margin-top:10px"><label>Observação (Ponto de Referência)</label><textarea id="obs" rows="2"></textarea></div>
 
                 <input type="hidden" id="editFirebaseId">
-                
                 <div style="margin-top:30px; display:flex; justify-content:flex-end; gap:10px">
                     <button type="button" class="btn btn-secondary" onclick="closeOrderModal()">Cancelar</button>
                     <button type="submit" class="btn btn-primary">Salvar Pedido</button>
@@ -364,7 +315,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // --- CONFIGURAÇÃO FIREBASE ---
     const firebaseConfig = {
       apiKey: "AIzaSyBt_7_WLXqUvYqdCrTMQg7ySZUa4gSdEHY",
       authDomain: "divinepudimsystem.firebaseapp.com",
@@ -378,7 +328,6 @@
     const db = getFirestore(app);
     const colRef = collection(db, "pedidos");
 
-    // --- DADOS ---
     const PRODUTOS = [
         { nome: 'Delícia de abacaxi', tamanhos: [{t:'P',p:35}, {t:'G',p:55}] },
         { nome: 'Ouro branco', tamanhos: [{t:'P',p:35}, {t:'G',p:75}] },
@@ -426,95 +375,153 @@
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContent').style.display = 'block';
             initApp();
-        } else {
-            alert('Usuário ou senha incorretos!');
-        }
+        } else { alert('Acesso negado.'); }
     };
 
-    // --- INICIALIZAÇÃO ---
     function initApp() {
-        // Popula Bairros
         const bList = document.getElementById('cliBairro');
-        if(bList.options.length <= 1) { // Evita duplicar se relogar
+        if(bList.options.length <= 1) {
             BAIRROS.forEach(b => {
                 let opt = document.createElement('option');
-                opt.value = b;
-                opt.textContent = b;
-                bList.appendChild(opt);
+                opt.value = b; opt.textContent = b; bList.appendChild(opt);
             });
         }
-
         onSnapshot(query(colRef), (snapshot) => {
             orders = [];
-            snapshot.forEach(doc => {
-                let d = doc.data();
-                d.fbId = doc.id;
-                orders.push(d);
-            });
+            snapshot.forEach(doc => { let d = doc.data(); d.fbId = doc.id; orders.push(d); });
             refreshAll();
         });
-        
         document.getElementById('dataPed').valueAsDate = new Date();
     }
 
-    // --- NAVEGAÇÃO ---
-    window.showTab = function(e, tabId) {
-        if(e) e.preventDefault();
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-        document.getElementById('tab' + tabId.charAt(0).toUpperCase() + tabId.slice(1)).classList.add('active');
-        if(e && e.target) e.target.closest('.tab-btn').classList.add('active');
-        if(tabId === 'graficos') window.renderCharts();
+    // --- LOGICA FORMA ENTREGA ---
+    window.checkTipoEntrega = function() {
+        const tipo = document.getElementById('tipoEntrega').value;
+        const divDel = document.getElementById('deliveryFields');
+        const divRet = document.getElementById('retiradaFields');
+        
+        if (tipo === 'Delivery') {
+            divDel.style.display = 'block'; divRet.style.display = 'none';
+            document.getElementById('cliEnd').required = true;
+            document.getElementById('cliBairro').required = true;
+            document.getElementById('turnoEntrega').required = true;
+        } else if (tipo === 'Retirada no local') {
+            divDel.style.display = 'none'; divRet.style.display = 'block';
+            document.getElementById('cliEnd').required = false;
+            document.getElementById('cliBairro').required = false;
+            document.getElementById('turnoEntrega').required = false;
+        } else {
+            divDel.style.display = 'none'; divRet.style.display = 'none';
+        }
     };
 
-    window.refreshAll = function() {
-        renderDashboard();
-        renderOrdersList();
-        populateBairroFilter();
+    window.checkBairro = function() {
+        const s = document.getElementById('cliBairro');
+        const i = document.getElementById('cliBairroOutro');
+        i.style.display = s.value === 'OUTRO' ? 'block' : 'none';
+        if(s.value === 'OUTRO') i.required = true; else i.required = false;
     };
 
-    // --- DASHBOARD ---
-    window.renderDashboard = function() {
-        document.getElementById('dashTotal').innerText = orders.length;
-        const fat = orders.reduce((acc, o) => acc + (o.total || 0), 0);
-        const recebido = orders.reduce((acc, o) => acc + (o.pago || 0), 0);
-        const taxas = orders.reduce((acc, o) => acc + (o.taxa || 0), 0);
-        const aReceber = orders.reduce((acc, o) => acc + (o.restante || 0), 0);
-        document.getElementById('dashFaturado').innerText = fmtMoeda(fat);
-        document.getElementById('dashRecebido').innerText = fmtMoeda(recebido);
-        document.getElementById('dashTaxas').innerText = fmtMoeda(taxas);
-        document.getElementById('dashReceber').innerText = fmtMoeda(aReceber);
+    window.saveOrder = async function(e) {
+        e.preventDefault();
+        let itens = []; let totalItens = 0;
+        document.querySelectorAll('.item-row').forEach(row => {
+            const prodSel = row.querySelector('.i-prod').value;
+            let prodNome = prodSel === 'OUTRO' ? row.querySelector('.i-cust').value : prodSel;
+            const custField = row.querySelector('.i-cust');
+            if (custField.style.display !== 'none' && prodSel !== 'OUTRO') { prodNome += ` (${custField.value})`; }
+            const qtd = parseFloat(row.querySelector('.i-qtd').value); const prc = parseFloat(row.querySelector('.i-prc').value);
+            totalItens += qtd * prc;
+            itens.push({ prod: prodNome, tam: row.querySelector('.i-tam').value, qtd: qtd, prc: prc });
+        });
 
-        // Top Produtos
-        const counts = {};
-        orders.forEach(o => o.itens.forEach(i => {
-            let key = `${i.prod} - ${i.tam}`;
-            counts[key] = (counts[key] || 0) + i.qtd;
-        }));
-        const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]);
-        document.getElementById('topProductsList').innerHTML = sorted.map(([k,v]) => 
-            `<div style="background:#f9f9f9; padding:12px; border-radius:8px; display:flex; justify-content:space-between; border-left:4px solid var(--primary)"><b>${k}</b><span style="background:var(--primary); color:white; padding:2px 8px; border-radius:10px; font-size:12px">${v} un</span></div>`
-        ).join('');
+        const tipo = document.getElementById('tipoEntrega').value;
+        let bairroFinal = '-'; let endFinal = '-'; let turnoFinal = '-'; let horarioRet = '';
+
+        if(tipo === 'Delivery') {
+            const bairroSel = document.getElementById('cliBairro').value;
+            bairroFinal = bairroSel === 'OUTRO' ? document.getElementById('cliBairroOutro').value : bairroSel;
+            const num = document.getElementById('cliNumero').value;
+            endFinal = document.getElementById('cliEnd').value + (num ? `, Nº ${num}` : '');
+            turnoFinal = document.getElementById('turnoEntrega').value;
+        } else {
+            endFinal = 'Retirada na Loja';
+            horarioRet = document.getElementById('horarioRetirada').value;
+            if(horarioRet) turnoFinal = `Retirada às ${horarioRet}`; else turnoFinal = 'Retirada';
+        }
+
+        const taxa = parseFloat(document.getElementById('valTaxa').value) || 0;
+        const pago = parseFloat(document.getElementById('valPago').value) || 0;
+        const totalFinal = totalItens + taxa;
+        const restante = totalFinal - pago;
+
+        const obj = {
+            cliente: document.getElementById('cliNome').value, tel: document.getElementById('cliTel').value, cep: document.getElementById('cliCep').value,
+            end: endFinal, bairro: bairroFinal, tipoEntrega: tipo, turno: turnoFinal,
+            dataPedido: document.getElementById('dataPed').value, dataEntrega: document.getElementById('dataEnt').value,
+            status: document.getElementById('statusPed').value, itens: itens, total: totalFinal, pago: pago, taxa: taxa, restante: restante,
+            pagamento: document.getElementById('formaPag').value, obs: document.getElementById('obs').value
+        };
+
+        try {
+            const editId = document.getElementById('editFirebaseId').value;
+            if(editId) { await updateDoc(doc(db, "pedidos", editId), obj); alert('Atualizado!'); }
+            else { await addDoc(colRef, obj); alert('Salvo!'); }
+            closeOrderModal();
+        } catch(err) { console.error(err); alert('Erro ao salvar.'); }
     };
 
-    // --- LISTA PEDIDOS ---
+    window.editOrder = function(id) {
+        const o = orders.find(x => x.fbId === id); if(!o) return; showNewOrderModal();
+        document.getElementById('editFirebaseId').value = id;
+        document.getElementById('cliNome').value = o.cliente;
+        document.getElementById('cliTel').value = o.tel;
+        document.getElementById('tipoEntrega').value = o.tipoEntrega || (o.turno.includes('Retirada') ? 'Retirada no local' : 'Delivery');
+        checkTipoEntrega();
+
+        if(o.tipoEntrega === 'Delivery' || !o.turno.includes('Retirada')) {
+            document.getElementById('cliCep').value = o.cep || '';
+            if(o.end && o.end.includes(', Nº')) { const parts = o.end.split(', Nº'); document.getElementById('cliEnd').value = parts[0].trim(); document.getElementById('cliNumero').value = parts[1].trim(); } else { document.getElementById('cliEnd').value = o.end; }
+            const sel = document.getElementById('cliBairro');
+            if([...sel.options].some(op => op.value === o.bairro)) sel.value = o.bairro; else { sel.value = 'OUTRO'; checkBairro(); document.getElementById('cliBairroOutro').value = o.bairro; }
+            document.getElementById('turnoEntrega').value = (o.turno === 'Manhã' || o.turno === 'Tarde') ? o.turno : '';
+        } else {
+            // Tenta extrair hora
+            if(o.turno.includes('às')) { document.getElementById('horarioRetirada').value = o.turno.split('às')[1].trim(); }
+        }
+
+        document.getElementById('dataPed').value = o.dataPedido; document.getElementById('dataEnt').value = o.dataEntrega; document.getElementById('statusPed').value = o.status;
+        document.getElementById('valPago').value = o.pago; document.getElementById('valTaxa').value = o.taxa || 0; document.getElementById('formaPag').value = o.pagamento; document.getElementById('obs').value = o.obs || '';
+        document.getElementById('itemsContainer').innerHTML = ''; o.itens.forEach(i => addItem(i)); setTimeout(calcTotal, 100);
+    };
+
+    // --- RENDER LIST ---
     window.renderOrdersList = function(list = orders) {
         const div = document.getElementById('ordersList');
         if(!list.length) { div.innerHTML = '<p>Nenhum pedido encontrado.</p>'; return; }
-        
         const sorted = [...list].sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega));
 
         div.innerHTML = sorted.map((o, index) => {
             const numPedido = (index + 1).toString().padStart(3, '0');
             const stClass = 'st-' + (o.status ? o.status.toLowerCase().split(' ')[0] : 'confirmado');
             const itensHtml = o.itens.map(i => `<div>${i.qtd}x ${i.prod} (${i.tam}) - <span style="color:#666">${fmtMoeda(i.prc * i.qtd)}</span></div>`).join('');
+            
+            // Construção do endereço no card
+            let addressInfo = '';
+            if(o.tipoEntrega === 'Delivery' || (o.turno && !o.turno.includes('Retirada'))) {
+                addressInfo = `<div><i class="fas fa-map-marker-alt"></i> ${o.end}, ${o.bairro}</div>`;
+            } else {
+                addressInfo = `<div><i class="fas fa-store"></i> Retirada na Loja</div>`;
+            }
+            if(o.obs) addressInfo += `<div><i class="fas fa-comment"></i> ${o.obs}</div>`;
 
             return `
             <div class="order-card">
                 <div class="order-header">
-                    <div><b>#${numPedido} - ${o.cliente}</b> <br> <small>${fmtData(o.dataEntrega)} • ${o.turno || '-'}</small></div>
+                    <div><b>#${numPedido} - ${o.cliente}</b> <br> <small>${fmtData(o.dataEntrega)} • ${o.turno}</small></div>
                     <span class="status-badge ${stClass}">${o.status}</span>
                 </div>
+                <div class="order-details-card">${addressInfo}</div>
                 <div class="order-items">${itensHtml}</div>
                 <div style="font-size:13px; margin-bottom:10px; border-top:1px dashed #ddd; padding-top:5px">
                     <div style="display:flex; justify-content:space-between"><span>Taxa:</span> <span>${fmtMoeda(o.taxa)}</span></div>
@@ -535,185 +542,91 @@
         const o = orders.find(x => x.fbId === id);
         const w = window.open('', '', 'width=300,height=600');
         
-        let enderecoCompleto = o.turno === 'Retirada no local' 
-            ? 'Retirada na Loja' 
-            : `${o.end}<br>${o.bairro}`;
+        let headerEnd = "";
+        let bodyEnd = "";
+        
+        if (o.tipoEntrega === 'Delivery' || !o.turno.includes('Retirada')) {
+            headerEnd = "DELIVERY";
+            bodyEnd = `
+                <div class="bold">ENDEREÇO:</div>
+                <div>${o.end}</div>
+                <div>${o.bairro}</div>
+                ${o.obs ? `<div style="margin-top:5px"><b>Ref:</b> ${o.obs}</div>` : ''}
+            `;
+        } else {
+            headerEnd = "RETIRADA";
+            bodyEnd = `<div class="center bold">CLIENTE VAI RETIRAR</div>`;
+        }
 
         w.document.write(`
             <html><head><style>
                 body { font-family: 'Courier New', monospace; font-size: 12px; margin: 0; padding: 5px; width: 58mm; }
-                .center { text-align: center; }
-                .line { border-bottom: 1px dashed #000; margin: 8px 0; }
-                .row { display: flex; justify-content: space-between; }
-                .bold { font-weight: bold; }
-                .big { font-size: 14px; }
+                .center { text-align: center; } .line { border-bottom: 1px dashed #000; margin: 8px 0; }
+                .row { display: flex; justify-content: space-between; } .bold { font-weight: bold; } .big { font-size: 14px; }
             </style></head><body>
                 <div class="center bold big">DIVINE PUDIM GOURMET</div>
                 <div class="center">88 98824-4346</div>
                 <div class="line"></div>
                 <div class="center bold big">PEDIDO #${numPedido}</div>
+                <div class="center bold">${headerEnd}</div>
                 <div class="center">${fmtData(o.dataEntrega)} - ${o.turno}</div>
                 <div class="line"></div>
-                
-                <div class="bold">CLIENTE:</div>
-                <div>${o.cliente}</div>
-                <div>${o.tel}</div>
-                
+                <div class="bold">CLIENTE:</div><div>${o.cliente}</div><div>${o.tel}</div>
                 <div class="line"></div>
-                <div class="bold">ENDEREÇO:</div>
-                <div>${enderecoCompleto}</div>
-                ${o.obs ? `<div style="margin-top:5px"><b>Obs:</b> ${o.obs}</div>` : ''}
-
+                ${bodyEnd}
                 <div class="line"></div>
                 <div class="bold">ITENS:</div>
                 ${o.itens.map(i=>`<div style="margin-bottom:3px">${i.qtd}x ${i.prod} (${i.tam})<br><div style="text-align:right">${fmtMoeda(i.prc*i.qtd)}</div></div>`).join('')}
-                
                 <div class="line"></div>
-                <div class="row"><span>Subtotal:</span> <span>${fmtMoeda(o.total - o.taxa)}</span></div>
-                <div class="row"><span>Taxa Entrega:</span> <span>${fmtMoeda(o.taxa)}</span></div>
-                <div class="row bold big" style="margin-top:5px"><span>TOTAL:</span> <span>${fmtMoeda(o.total)}</span></div>
-                <div class="row"><span>Valor Pago:</span> <span>${fmtMoeda(o.pago)}</span></div>
-                <div class="row bold"><span>A PAGAR:</span> <span>${fmtMoeda(o.restante)}</span></div>
+                <div class="row"><span>Taxa:</span> <span>${fmtMoeda(o.taxa)}</span></div>
+                <div class="row bold big"><span>TOTAL:</span> <span>${fmtMoeda(o.total)}</span></div>
+                <div class="row"><span>Pago:</span> <span>${fmtMoeda(o.pago)}</span></div>
+                <div class="row bold"><span>FALTA:</span> <span>${fmtMoeda(o.restante)}</span></div>
                 <div class="line"></div>
                 <div class="center bold">Obrigado pela preferência!</div>
-                <br>
             </body></html>
         `);
         setTimeout(() => { w.print(); w.close(); }, 500);
     };
 
-    // --- RELATÓRIOS ---
-    window.exportToPDF = function() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('l', 'mm', 'a4'); 
-
-        doc.setFontSize(18);
-        doc.text("Relatório de Pedidos - Divine Pudim Gourmet", 14, 20);
-        doc.setFontSize(10);
-        doc.text("Gerado em: " + new Date().toLocaleString(), 14, 28);
-
-        const tableColumn = ["Entregue Em", "Cliente/Contato", "Endereço Completo", "Itens", "Total", "Pago", "Falta"];
-        const tableRows = [];
-
-        orders.sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega)).forEach(o => {
-            const itemsStr = o.itens.map(i => `${i.qtd}x ${i.prod} (${i.tam})`).join('\n');
-            const endStr = o.turno === 'Retirada no local' ? 'RETIRADA' : `${o.end}\n${o.bairro}\nObs: ${o.obs || '-'}`;
-            const row = [`${fmtData(o.dataEntrega)}\n${o.turno}`, `${o.cliente}\n${o.tel}`, endStr, itemsStr, fmtMoeda(o.total), fmtMoeda(o.pago), fmtMoeda(o.restante)];
-            tableRows.push(row);
-        });
-
-        doc.autoTable({
-            head: [tableColumn],
-            body: tableRows,
-            startY: 35,
-            theme: 'grid',
-            styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
-            columnStyles: { 0: {cellWidth:25}, 1:{cellWidth:35}, 2:{cellWidth:60}, 3:{cellWidth:70}, 4:{cellWidth:20, halign:'right'}, 5:{cellWidth:20, halign:'right'}, 6:{cellWidth:20, halign:'right'} }
-        });
-        doc.save(`Relatorio_DivinePudim_${new Date().toISOString().split('T')[0]}.pdf`);
+    // --- STANDARD FUNCTIONS ---
+    window.showTab = function(e, tabId) {
+        if(e) e.preventDefault();
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab' + tabId.charAt(0).toUpperCase() + tabId.slice(1)).classList.add('active');
+        if(e && e.target) e.target.closest('.tab-btn').classList.add('active');
+        if(tabId === 'graficos') window.renderCharts();
     };
-
-    window.exportToExcel = function() {
-        const wb = XLSX.utils.book_new();
-        const data = orders.map(o => ({
-            "Data Entrega": fmtData(o.dataEntrega), "Turno": o.turno, "Status": o.status,
-            "Cliente": o.cliente, "Telefone": o.tel, "Endereço": o.turno === 'Retirada no local' ? 'RETIRADA' : o.end,
-            "Bairro": o.bairro, "Obs/Ref": o.obs, "Itens": o.itens.map(i => `${i.qtd}x ${i.prod} (${i.tam})`).join('; '),
-            "Taxa Entrega": o.taxa, "Valor Total": o.total, "Valor Pago": o.pago, "Restante": o.restante, "Forma Pagamento": o.pagamento
-        }));
-        const ws = XLSX.utils.json_to_sheet(data);
-        ws['!cols'] = [{wch:12}, {wch:10}, {wch:15}, {wch:25}, {wch:15}, {wch:40}, {wch:15}, {wch:20}, {wch:50}];
-        XLSX.utils.book_append_sheet(wb, ws, "Pedidos");
-        XLSX.writeFile(wb, `Relatorio_DivinePudim_${new Date().toISOString().split('T')[0]}.xlsx`);
-    };
-
-    // --- GRÁFICOS ---
-    window.renderCharts = function() {
-        const ctxProd = document.getElementById('chartProd');
-        const ctxFat = document.getElementById('chartFat');
-        if(charts.prod) charts.prod.destroy();
-        if(charts.fat) charts.fat.destroy();
-
+    window.refreshAll = function() { renderDashboard(); renderOrdersList(); populateBairroFilter(); };
+    window.renderDashboard = function() {
+        document.getElementById('dashTotal').innerText = orders.length;
+        const fat = orders.reduce((acc, o) => acc + (o.total || 0), 0);
+        const recebido = orders.reduce((acc, o) => acc + (o.pago || 0), 0);
+        const taxas = orders.reduce((acc, o) => acc + (o.taxa || 0), 0);
+        const aReceber = orders.reduce((acc, o) => acc + (o.restante || 0), 0);
+        document.getElementById('dashFaturado').innerText = fmtMoeda(fat);
+        document.getElementById('dashRecebido').innerText = fmtMoeda(recebido);
+        document.getElementById('dashTaxas').innerText = fmtMoeda(taxas);
+        document.getElementById('dashReceber').innerText = fmtMoeda(aReceber);
         const counts = {};
-        orders.forEach(o => o.itens.forEach(i => {
-            let key = `${i.prod} (${i.tam})`;
-            counts[key] = (counts[key] || 0) + i.qtd;
-        }));
-        charts.prod = new Chart(ctxProd, { type: 'bar', data: { labels: Object.keys(counts), datasets: [{ label: 'Qtd Vendida', data: Object.values(counts), backgroundColor: '#ec4899' }] }, options: { responsive: true, maintainAspectRatio: false } });
-
-        const statusFat = {};
-        orders.forEach(o => statusFat[o.status] = (statusFat[o.status] || 0) + o.total);
+        orders.forEach(o => o.itens.forEach(i => { let key = `${i.prod} - ${i.tam}`; counts[key] = (counts[key] || 0) + i.qtd; }));
+        const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+        document.getElementById('topProductsList').innerHTML = sorted.map(([k,v]) => `<div style="background:#f9f9f9; padding:12px; border-radius:8px; display:flex; justify-content:space-between; border-left:4px solid var(--primary)"><b>${k}</b><span style="background:var(--primary); color:white; padding:2px 8px; border-radius:10px; font-size:12px">${v} un</span></div>`).join('');
+    };
+    window.renderCharts = function() {
+        const ctxProd = document.getElementById('chartProd'); const ctxFat = document.getElementById('chartFat');
+        if(charts.prod) charts.prod.destroy(); if(charts.fat) charts.fat.destroy();
+        const counts = {}; orders.forEach(o => o.itens.forEach(i => { let key = `${i.prod} (${i.tam})`; counts[key] = (counts[key] || 0) + i.qtd; }));
+        charts.prod = new Chart(ctxProd, { type: 'bar', data: { labels: Object.keys(counts), datasets: [{ label: 'Qtd', data: Object.values(counts), backgroundColor: '#ec4899' }] }, options: { responsive: true, maintainAspectRatio: false } });
+        const statusFat = {}; orders.forEach(o => statusFat[o.status] = (statusFat[o.status] || 0) + o.total);
         charts.fat = new Chart(ctxFat, { type: 'doughnut', data: { labels: Object.keys(statusFat), datasets: [{ data: Object.values(statusFat), backgroundColor: ['#3b82f6','#f59e0b','#8b5cf6','#06b6d4','#10b981'] }] }, options: { responsive: true, maintainAspectRatio: false } });
-    };
-
-    // --- FORMULÁRIO E LÓGICA ---
-    window.checkTurno = function() {
-        const turno = document.getElementById('turnoEntrega').value;
-        const addrArea = document.getElementById('addressArea');
-        const inputs = addrArea.querySelectorAll('input, select');
-        if(turno === 'Retirada no local') { addrArea.style.display = 'none'; inputs.forEach(i => i.required = false); }
-        else { addrArea.style.display = 'block'; document.getElementById('cliEnd').required = true; document.getElementById('cliBairro').required = true; }
-    };
-    window.checkBairro = function() {
-        const s = document.getElementById('cliBairro');
-        const i = document.getElementById('cliBairroOutro');
-        i.style.display = s.value === 'OUTRO' ? 'block' : 'none';
-        if(s.value === 'OUTRO') i.required = true; else i.required = false;
-    };
-    window.saveOrder = async function(e) {
-        e.preventDefault();
-        let itens = [];
-        let totalItens = 0;
-        document.querySelectorAll('.item-row').forEach(row => {
-            const prodSel = row.querySelector('.i-prod').value;
-            let prodNome = prodSel === 'OUTRO' ? row.querySelector('.i-cust').value : prodSel;
-            const custField = row.querySelector('.i-cust');
-            if (custField.style.display !== 'none' && prodSel !== 'OUTRO') { prodNome += ` (${custField.value})`; }
-            const qtd = parseFloat(row.querySelector('.i-qtd').value);
-            const prc = parseFloat(row.querySelector('.i-prc').value);
-            totalItens += qtd * prc;
-            itens.push({ prod: prodNome, tam: row.querySelector('.i-tam').value, qtd: qtd, prc: prc });
-        });
-        const turno = document.getElementById('turnoEntrega').value;
-        let bairroFinal = ''; let endFinal = '';
-        if(turno !== 'Retirada no local') {
-            const bairroSel = document.getElementById('cliBairro').value;
-            bairroFinal = bairroSel === 'OUTRO' ? document.getElementById('cliBairroOutro').value : bairroSel;
-            const num = document.getElementById('cliNumero').value;
-            endFinal = document.getElementById('cliEnd').value + (num ? `, Nº ${num}` : '');
-        } else { bairroFinal = '-'; endFinal = 'Retirada na Loja'; }
-        
-        const taxa = parseFloat(document.getElementById('valTaxa').value) || 0;
-        const pago = parseFloat(document.getElementById('valPago').value) || 0;
-        const totalFinal = totalItens + taxa;
-        const restante = totalFinal - pago;
-
-        const obj = {
-            cliente: document.getElementById('cliNome').value, tel: document.getElementById('cliTel').value, cep: document.getElementById('cliCep').value,
-            end: endFinal, bairro: bairroFinal, turno: turno, dataPedido: document.getElementById('dataPed').value, dataEntrega: document.getElementById('dataEnt').value,
-            status: document.getElementById('statusPed').value, itens: itens, total: totalFinal, pago: pago, taxa: taxa, restante: restante,
-            pagamento: document.getElementById('formaPag').value, obs: document.getElementById('obs').value
-        };
-
-        try {
-            const editId = document.getElementById('editFirebaseId').value;
-            if(editId) { await updateDoc(doc(db, "pedidos", editId), obj); alert('Atualizado!'); }
-            else { await addDoc(colRef, obj); alert('Salvo!'); }
-            closeOrderModal();
-        } catch(err) { console.error(err); alert('Erro ao salvar.'); }
     };
     window.addItem = function(data = null) {
         const id = Date.now();
         const html = `
         <div class="item-row" id="row-${id}">
-            <div>
-                <select class="i-prod" onchange="updItem(${id})">
-                    <option value="">Selecione...</option>
-                    ${PRODUTOS.map(p => `<option value="${p.nome}" ${p.requerSabor ? 'data-sabor="1"' : ''}>${p.nome}</option>`).join('')}
-                    <option value="OUTRO">Outro Produto (Manual)</option>
-                </select>
-                <input type="text" class="i-cust" style="display:none; margin-top:5px; width:100%" placeholder="Digite aqui...">
-            </div>
+            <div><select class="i-prod" onchange="updItem(${id})"><option value="">Selecione...</option>${PRODUTOS.map(p => `<option value="${p.nome}" ${p.requerSabor ? 'data-sabor="1"' : ''}>${p.nome}</option>`).join('')}<option value="OUTRO">Outro (Manual)</option></select><input type="text" class="i-cust" style="display:none; margin-top:5px; width:100%" placeholder="Digite aqui..."></div>
             <div><select class="i-tam" onchange="updPrice(${id})"><option>-</option></select></div>
             <div><input type="number" class="i-qtd" value="1" onchange="calcTotal()" style="width:60px"></div>
             <div><input type="number" class="i-prc" step="0.01" onchange="calcTotal()" style="width:80px"></div>
@@ -722,8 +635,7 @@
         </div>`;
         document.getElementById('itemsContainer').insertAdjacentHTML('beforeend', html);
         if(data) {
-            const row = document.getElementById(`row-${id}`);
-            const sel = row.querySelector('.i-prod');
+            const row = document.getElementById(`row-${id}`); const sel = row.querySelector('.i-prod');
             let baseName = data.prod; let flavor = '';
             if (data.prod.includes('(')) { const parts = data.prod.match(/(.*) \((.*)\)/); if(parts && PRODUTOS.find(p => p.nome === parts[1])) { baseName = parts[1]; flavor = parts[2]; } }
             if(PRODUTOS.find(p => p.nome === baseName)) { sel.value = baseName; updItem(id); row.querySelector('.i-tam').value = data.tam; if(flavor) row.querySelector('.i-cust').value = flavor; }
@@ -732,70 +644,56 @@
         }
     };
     window.updItem = function(id) {
-        const row = document.getElementById(`row-${id}`);
-        const sel = row.querySelector('.i-prod');
-        const val = sel.value;
-        const tam = row.querySelector('.i-tam');
-        const cust = row.querySelector('.i-cust');
-        const prc = row.querySelector('.i-prc');
-        const opt = sel.options[sel.selectedIndex];
-        const requerSabor = opt.getAttribute('data-sabor');
-        if(val === 'OUTRO') { cust.style.display = 'block'; cust.placeholder = "Nome do Produto"; tam.innerHTML = '<option value="Único">Único</option>'; prc.value = ''; }
-        else { if (requerSabor) { cust.style.display = 'block'; cust.placeholder = "Digite o Sabor"; } else { cust.style.display = 'none'; } const p = PRODUTOS.find(x => x.nome === val); if(p) { tam.innerHTML = p.tamanhos.map(t => `<option value="${t.t}" data-p="${t.p}">${t.t}</option>`).join(''); updPrice(id); } }
+        const row = document.getElementById(`row-${id}`); const sel = row.querySelector('.i-prod'); const val = sel.value; const tam = row.querySelector('.i-tam'); const cust = row.querySelector('.i-cust'); const prc = row.querySelector('.i-prc'); const opt = sel.options[sel.selectedIndex]; const requerSabor = opt.getAttribute('data-sabor');
+        if(val === 'OUTRO') { cust.style.display = 'block'; cust.placeholder = "Produto"; tam.innerHTML = '<option value="Único">Único</option>'; prc.value = ''; }
+        else { if (requerSabor) { cust.style.display = 'block'; cust.placeholder = "Sabor"; } else { cust.style.display = 'none'; } const p = PRODUTOS.find(x => x.nome === val); if(p) { tam.innerHTML = p.tamanhos.map(t => `<option value="${t.t}" data-p="${t.p}">${t.t}</option>`).join(''); updPrice(id); } }
     };
     window.updPrice = function(id) { const row = document.getElementById(`row-${id}`); const tam = row.querySelector('.i-tam'); const opt = tam.options[tam.selectedIndex]; if(opt && opt.dataset.p) { row.querySelector('.i-prc').value = opt.dataset.p; calcTotal(); } };
     window.calcTotal = function() {
-        let total = 0;
-        document.querySelectorAll('.item-row').forEach(row => {
-            const q = parseFloat(row.querySelector('.i-qtd').value) || 0; const p = parseFloat(row.querySelector('.i-prc').value) || 0;
-            const sub = q * p; row.querySelector('.i-total').innerText = fmtMoeda(sub); total += sub;
-        });
+        let total = 0; document.querySelectorAll('.item-row').forEach(row => { const q = parseFloat(row.querySelector('.i-qtd').value) || 0; const p = parseFloat(row.querySelector('.i-prc').value) || 0; const sub = q * p; row.querySelector('.i-total').innerText = fmtMoeda(sub); total += sub; });
         const taxa = parseFloat(document.getElementById('valTaxa').value) || 0; const pago = parseFloat(document.getElementById('valPago').value) || 0;
         document.getElementById('displayTotal').innerText = fmtMoeda(total); document.getElementById('valRest').value = fmtMoeda(total + taxa - pago);
     };
-
     window.buscarCep = async function() {
         let cep = document.getElementById('cliCep').value.replace(/\D/g,'');
         if(cep.length === 8) {
             try {
                 let r = await fetch(`https://viacep.com.br/ws/${cep}/json/`); let d = await r.json();
-                if(!d.erro) {
-                    document.getElementById('cliEnd').value = d.logradouro;
-                    const bSelect = document.getElementById('cliBairro'); let found = false;
-                    for (let i = 0; i < bSelect.options.length; i++) { if (bSelect.options[i].value.toLowerCase() === d.bairro.toLowerCase()) { bSelect.selectedIndex = i; found = true; break; } }
-                    if (!found) { bSelect.value = 'OUTRO'; document.getElementById('cliBairroOutro').value = d.bairro; } checkBairro();
-                }
+                if(!d.erro) { document.getElementById('cliEnd').value = d.logradouro; const bSelect = document.getElementById('cliBairro'); let found = false; for (let i = 0; i < bSelect.options.length; i++) { if (bSelect.options[i].value.toLowerCase() === d.bairro.toLowerCase()) { bSelect.selectedIndex = i; found = true; break; } } if (!found) { bSelect.value = 'OUTRO'; document.getElementById('cliBairroOutro').value = d.bairro; } checkBairro(); }
             } catch(e) {}
         }
     };
-    window.showNewOrderModal = function() { document.getElementById('orderForm').reset(); document.getElementById('itemsContainer').innerHTML = ''; document.getElementById('editFirebaseId').value = ''; document.getElementById('dataPed').valueAsDate = new Date(); document.getElementById('orderModal').classList.add('active'); checkTurno(); addItem(); };
+    window.showNewOrderModal = function() { document.getElementById('orderForm').reset(); document.getElementById('itemsContainer').innerHTML = ''; document.getElementById('editFirebaseId').value = ''; document.getElementById('dataPed').valueAsDate = new Date(); document.getElementById('orderModal').classList.add('active'); checkTipoEntrega(); addItem(); };
     window.closeOrderModal = function() { document.getElementById('orderModal').classList.remove('active'); };
     window.deleteOrder = async function(id) { if(confirm('Excluir?')) await deleteDoc(doc(db, "pedidos", id)); };
-    window.editOrder = function(id) {
-        const o = orders.find(x => x.fbId === id); if(!o) return; showNewOrderModal();
-        document.getElementById('editFirebaseId').value = id; document.getElementById('cliNome').value = o.cliente; document.getElementById('cliTel').value = o.tel; document.getElementById('turnoEntrega').value = o.turno || ''; checkTurno();
-        if(o.turno !== 'Retirada no local') { document.getElementById('cliCep').value = o.cep || ''; if(o.end && o.end.includes(', Nº')) { const parts = o.end.split(', Nº'); document.getElementById('cliEnd').value = parts[0].trim(); document.getElementById('cliNumero').value = parts[1].trim(); } else { document.getElementById('cliEnd').value = o.end; } const sel = document.getElementById('cliBairro'); if([...sel.options].some(op => op.value === o.bairro)) sel.value = o.bairro; else { sel.value = 'OUTRO'; checkBairro(); document.getElementById('cliBairroOutro').value = o.bairro; } }
-        document.getElementById('dataPed').value = o.dataPedido; document.getElementById('dataEnt').value = o.dataEntrega; document.getElementById('statusPed').value = o.status; document.getElementById('valPago').value = o.pago; document.getElementById('valTaxa').value = o.taxa || 0; document.getElementById('formaPag').value = o.pagamento; document.getElementById('obs').value = o.obs || '';
-        document.getElementById('itemsContainer').innerHTML = ''; o.itens.forEach(i => addItem(i)); setTimeout(calcTotal, 100);
-    };
     window.fmtMoeda = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
     window.fmtData = d => d.split('-').reverse().join('/');
     window.searchOrders = function() { applyFilters(); };
     window.clearFilters = function() { document.getElementById('searchInput').value = ''; document.getElementById('filterData').value = ''; document.getElementById('filterBairro').value = ''; document.getElementById('filterStatus').value = ''; applyFilters(); };
     window.applyFilters = function() {
-        const term = document.getElementById('searchInput').value.toLowerCase(); const date = document.getElementById('filterData').value;
-        const bairro = document.getElementById('filterBairro').value; const status = document.getElementById('filterStatus').value;
-        const filtered = orders.filter(o => {
-            let ok = true; if(term && !o.cliente.toLowerCase().includes(term)) ok = false; if(date && o.dataEntrega !== date) ok = false;
-            if(bairro && o.bairro !== bairro) ok = false; if(status && o.status !== status) ok = false; return ok;
-        }); renderOrdersList(filtered);
+        const term = document.getElementById('searchInput').value.toLowerCase(); const date = document.getElementById('filterData').value; const bairro = document.getElementById('filterBairro').value; const status = document.getElementById('filterStatus').value;
+        const filtered = orders.filter(o => { let ok = true; if(term && !o.cliente.toLowerCase().includes(term)) ok = false; if(date && o.dataEntrega !== date) ok = false; if(bairro && o.bairro !== bairro) ok = false; if(status && o.status !== status) ok = false; return ok; }); renderOrdersList(filtered);
     };
     window.populateBairroFilter = function() { const b = [...new Set(orders.map(o => o.bairro))].sort(); document.getElementById('filterBairro').innerHTML = '<option value="">Todos</option>' + b.map(x => `<option>${x}</option>`).join(''); };
     window.exportBackup = function() { const b = new Blob([JSON.stringify(orders)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'backup.json'; a.click(); };
-    window.handleImport = function(e) {
-        const f = e.target.files[0]; if(!f) return; const r = new FileReader();
-        r.onload = async (ev) => { try { const arr = JSON.parse(ev.target.result); if(confirm(`Importar ${arr.length} pedidos?`)) { for(let o of arr) { delete o.fbId; await addDoc(colRef, o); } alert('Concluído!'); } } catch(x) { alert('Erro arquivo invalido'); } };
-        r.readAsText(f);
+    window.handleImport = function(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = async (ev) => { try { const arr = JSON.parse(ev.target.result); if(confirm(`Importar ${arr.length} pedidos?`)) { for(let o of arr) { delete o.fbId; await addDoc(colRef, o); } alert('Concluído!'); } } catch(x) { alert('Erro arquivo invalido'); } }; r.readAsText(f); };
+    window.exportToPDF = function() {
+        const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4');
+        doc.setFontSize(18); doc.text("Relatório de Pedidos - Divine Pudim Gourmet", 14, 20); doc.setFontSize(10); doc.text("Gerado em: " + new Date().toLocaleString(), 14, 28);
+        const tableColumn = ["Entregue Em", "Cliente/Contato", "Endereço Completo", "Itens", "Total", "Pago", "Falta"]; const tableRows = [];
+        orders.sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega)).forEach(o => {
+            const itemsStr = o.itens.map(i => `${i.qtd}x ${i.prod} (${i.tam})`).join('\n');
+            const endStr = o.tipoEntrega === 'Retirada no local' ? 'RETIRADA' : `${o.end}\n${o.bairro}\nObs: ${o.obs || '-'}`;
+            tableRows.push([`${fmtData(o.dataEntrega)}\n${o.turno}`, `${o.cliente}\n${o.tel}`, endStr, itemsStr, fmtMoeda(o.total), fmtMoeda(o.pago), fmtMoeda(o.restante)]);
+        });
+        doc.autoTable({ head: [tableColumn], body: tableRows, startY: 35, theme: 'grid', styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' }, columnStyles: { 0: {cellWidth:25}, 1:{cellWidth:35}, 2:{cellWidth:60}, 3:{cellWidth:70}, 4:{cellWidth:20, halign:'right'}, 5:{cellWidth:20, halign:'right'}, 6:{cellWidth:20, halign:'right'} } });
+        doc.save(`Relatorio_${new Date().toISOString().split('T')[0]}.pdf`);
+    };
+    window.exportToExcel = function() {
+        const wb = XLSX.utils.book_new();
+        const data = orders.map(o => ({ "Data Entrega": fmtData(o.dataEntrega), "Tipo": o.tipoEntrega, "Turno": o.turno, "Status": o.status, "Cliente": o.cliente, "Telefone": o.tel, "Endereço": o.end, "Bairro": o.bairro, "Obs": o.obs, "Itens": o.itens.map(i => `${i.qtd}x ${i.prod}`).join('; '), "Total": o.total, "Pago": o.pago, "Restante": o.restante }));
+        const ws = XLSX.utils.json_to_sheet(data); ws['!cols'] = [{wch:12}, {wch:15}, {wch:15}, {wch:15}, {wch:25}, {wch:15}, {wch:40}, {wch:15}, {wch:20}, {wch:50}];
+        XLSX.utils.book_append_sheet(wb, ws, "Pedidos"); XLSX.writeFile(wb, `Relatorio_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
 </script>
 </body>
