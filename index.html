@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V3</title>
+    <title>Divine Pudim Gourmet - Sistema</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
@@ -17,9 +17,29 @@
             --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
             --transition: all 0.3s ease;
         }
-        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #fdf2f8, #fce7f3); color: var(--gray-800); min-height: 100vh; padding-bottom: 40px; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #fdf2f8, #fce7f3); color: var(--gray-800); min-height: 100vh; }
         .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
         
+        /* TELA DE LOGIN */
+        #loginScreen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex; justify-content: center; align-items: center; z-index: 9999;
+            padding: 20px;
+        }
+        .login-box {
+            background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%; max-width: 400px; text-align: center;
+        }
+        .login-logo { font-size: 40px; color: var(--primary); margin-bottom: 20px; }
+        .login-input { width: 100%; padding: 15px; margin-bottom: 15px; border: 2px solid var(--gray-200); border-radius: 10px; font-size: 16px; outline: none; transition: 0.3s; }
+        .login-input:focus { border-color: var(--primary); }
+        .btn-login { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-login:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+        /* CONTEÚDO DO APP (ESCONDIDO INICIALMENTE) */
+        #appContent { display: none; padding-bottom: 40px; }
+
         /* HEADER */
         .header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: var(--white); padding: 20px 0; position: sticky; top: 0; z-index: 1000; box-shadow: var(--shadow); }
         .header-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
@@ -35,11 +55,10 @@
         .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
         .btn-secondary { background: var(--gray-200); color: var(--gray-800); }
         .btn-danger { background: #fee2e2; color: #991b1b; }
-        .btn-success { background: #10b981; color: white; }
         
         /* ABAS */
-        .tabs-nav { background: var(--white); padding: 10px 0; position: sticky; top: 70px; z-index: 990; box-shadow: var(--shadow); margin-bottom: 20px; }
-        .tabs-buttons { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+        .tabs-nav { background: var(--white); padding: 10px 0; position: sticky; top: 70px; z-index: 990; box-shadow: var(--shadow); margin-bottom: 20px; overflow-x: auto; }
+        .tabs-buttons { display: flex; gap: 10px; padding: 0 20px; min-width: max-content; }
         .tab-btn { background: none; border: none; padding: 10px 20px; cursor: pointer; color: var(--gray-600); font-weight: 600; border-bottom: 3px solid transparent; white-space: nowrap; }
         .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--primary-light); border-radius: 8px 8px 0 0; }
         .tab-content { display: none; animation: fadeIn 0.3s; }
@@ -47,7 +66,7 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* CARDS & GRID */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .card { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); display: flex; flex-direction: column; justify-content: center; }
         .card-row { display: flex; align-items: center; gap: 15px; }
         .card-icon { width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; flex-shrink: 0; }
@@ -107,9 +126,15 @@
             padding-bottom: 10px; 
             border-bottom: 1px solid #eee; 
         }
-        @media(max-width: 700px) { 
+
+        /* RESPONSIVIDADE ESPECÍFICA */
+        @media(max-width: 768px) { 
+            .header-content { flex-direction: column; text-align: center; }
+            .header-actions { justify-content: center; }
             .items-header { display: none; }
-            .item-row { grid-template-columns: 1fr; border: 1px solid #ddd; padding: 10px; border-radius: 8px; } 
+            .item-row { grid-template-columns: 1fr; border: 1px solid #ddd; padding: 15px; border-radius: 10px; background: #fafafa; } 
+            .item-row > div { margin-bottom: 5px; }
+            .modal-content { width: 100%; height: 100%; border-radius: 0; max-height: 100vh; }
         }
 
         /* PRINT */
@@ -122,96 +147,111 @@
 </head>
 <body>
 
-<header class="header">
-    <div class="container">
-        <div class="header-content">
-            <div class="logo"><i class="fas fa-birthday-cake"></i> Divine Pudim Gourmet</div>
-            <div class="header-actions">
-                <button class="btn btn-header" onclick="exportBackup()"><i class="fas fa-download"></i> Backup</button>
-                <button class="btn btn-header" onclick="document.getElementById('importInput').click()"><i class="fas fa-upload"></i> Importar</button>
-                <button class="btn btn-primary" onclick="showNewOrderModal()"><i class="fas fa-plus"></i> Novo Pedido</button>
-            </div>
-        </div>
+<div id="loginScreen">
+    <div class="login-box">
+        <div class="login-logo"><i class="fas fa-birthday-cake"></i></div>
+        <h2 style="margin-bottom:20px; color:var(--gray-800)">Divine Pudim Gourmet</h2>
+        <form onsubmit="handleLogin(event)">
+            <input type="text" id="loginUser" class="login-input" placeholder="Usuário" required>
+            <input type="password" id="loginPass" class="login-input" placeholder="Senha" required>
+            <button type="submit" class="btn-login">Entrar</button>
+        </form>
     </div>
-</header>
+</div>
 
-<div id="alertsArea"></div>
+<div id="appContent">
 
-<nav class="tabs-nav">
-    <div class="container">
-        <div class="tabs-buttons">
-            <button class="tab-btn active" onclick="showTab(event, 'dashboard')"><i class="fas fa-chart-line"></i> Dashboard</button>
-            <button class="tab-btn" onclick="showTab(event, 'pedidos')"><i class="fas fa-list"></i> Pedidos</button>
-            <button class="tab-btn" onclick="showTab(event, 'graficos')"><i class="fas fa-chart-pie"></i> Gráficos</button>
-        </div>
-    </div>
-</nav>
-
-<section id="tabDashboard" class="tab-content active">
-    <div class="container">
-        <div class="dashboard-grid">
-            <div class="card"><div class="card-row"><div class="card-icon" style="background:#ec4899"><i class="fas fa-shopping-bag"></i></div><div><h3 id="dashTotal">0</h3><p>Total Pedidos</p></div></div></div>
-            <div class="card"><div class="card-row"><div class="card-icon" style="background:#8b5cf6"><i class="fas fa-dollar-sign"></i></div><div><h3 id="dashFaturado">R$ 0,00</h3><p>Total Faturado</p></div></div></div>
-            <div class="card"><div class="card-row"><div class="card-icon" style="background:#10b981"><i class="fas fa-check-double"></i></div><div><h3 id="dashRecebido">R$ 0,00</h3><p>Valor Recebido</p></div></div></div>
-            <div class="card"><div class="card-row"><div class="card-icon" style="background:#f59e0b"><i class="fas fa-hand-holding-usd"></i></div><div><h3 id="dashReceber">R$ 0,00</h3><p>A Receber</p></div></div></div>
-            <div class="card"><div class="card-row"><div class="card-icon" style="background:#06b6d4"><i class="fas fa-motorcycle"></i></div><div><h3 id="dashTaxas">R$ 0,00</h3><p>Taxas Entrega</p></div></div></div>
-        </div>
-        
-        <div class="card" style="display: block;">
-            <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px;"><i class="fas fa-trophy"></i> Top Produtos (Por Tamanho)</h3>
-            <div id="topProductsList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:10px;"></div>
-        </div>
-    </div>
-</section>
-
-<section id="tabPedidos" class="tab-content">
-    <div class="container">
-        <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Buscar cliente..." oninput="searchOrders()">
-        </div>
-        <div class="filters">
-            <div class="filters-grid">
-                <div><label>Data</label><input type="date" id="filterData" onchange="applyFilters()"></div>
-                <div><label>Bairro</label><select id="filterBairro" onchange="applyFilters()"><option value="">Todos</option></select></div>
-                <div><label>Status</label><select id="filterStatus" onchange="applyFilters()">
-                    <option value="">Todos</option>
-                    <option value="Pedido confirmado">Confirmado</option>
-                    <option value="Produzindo">Produzindo</option>
-                    <option value="Pronto">Pronto</option>
-                    <option value="Em rota">Em rota</option>
-                    <option value="Entregue">Entregue</option>
-                </select></div>
-                <div style="display:flex; align-items:end;"><button class="btn btn-secondary" onclick="clearFilters()" style="width:100%">Limpar</button></div>
-            </div>
-            <div style="margin-top:15px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
-                <button class="btn btn-secondary" onclick="exportToPDF()"><i class="fas fa-file-pdf"></i> Baixar PDF</button>
-                <button class="btn btn-success" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Baixar Excel</button>
-            </div>
-        </div>
-        <div id="ordersList" class="orders-grid"></div>
-    </div>
-</section>
-
-<section id="tabGraficos" class="tab-content">
-    <div class="container">
-        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
-            <div class="card" style="display:block; min-height:300px">
-                <h3>Produtos (Por Tamanho)</h3>
-                <div style="height:250px; position:relative;">
-                    <canvas id="chartProd"></canvas>
-                </div>
-            </div>
-            <div class="card" style="display:block; min-height:300px">
-                <h3>Faturamento</h3>
-                <div style="height:250px; position:relative;">
-                    <canvas id="chartFat"></canvas>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo"><i class="fas fa-birthday-cake"></i> Divine Pudim Gourmet</div>
+                <div class="header-actions">
+                    <button class="btn btn-header" onclick="exportBackup()"><i class="fas fa-download"></i> Backup</button>
+                    <button class="btn btn-header" onclick="document.getElementById('importInput').click()"><i class="fas fa-upload"></i> Importar</button>
+                    <button class="btn btn-primary" onclick="showNewOrderModal()"><i class="fas fa-plus"></i> Novo Pedido</button>
+                    <button class="btn btn-danger" onclick="location.reload()" title="Sair"><i class="fas fa-sign-out-alt"></i></button>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </header>
 
-<div id="orderModal" class="modal">
+    <div id="alertsArea"></div>
+
+    <nav class="tabs-nav">
+        <div class="container">
+            <div class="tabs-buttons">
+                <button class="tab-btn active" onclick="showTab(event, 'dashboard')"><i class="fas fa-chart-line"></i> Dashboard</button>
+                <button class="tab-btn" onclick="showTab(event, 'pedidos')"><i class="fas fa-list"></i> Pedidos</button>
+                <button class="tab-btn" onclick="showTab(event, 'graficos')"><i class="fas fa-chart-pie"></i> Gráficos</button>
+            </div>
+        </div>
+    </nav>
+
+    <section id="tabDashboard" class="tab-content active">
+        <div class="container">
+            <div class="dashboard-grid">
+                <div class="card"><div class="card-row"><div class="card-icon" style="background:#ec4899"><i class="fas fa-shopping-bag"></i></div><div><h3 id="dashTotal">0</h3><p>Total Pedidos</p></div></div></div>
+                <div class="card"><div class="card-row"><div class="card-icon" style="background:#8b5cf6"><i class="fas fa-dollar-sign"></i></div><div><h3 id="dashFaturado">R$ 0,00</h3><p>Total Faturado</p></div></div></div>
+                <div class="card"><div class="card-row"><div class="card-icon" style="background:#10b981"><i class="fas fa-check-double"></i></div><div><h3 id="dashRecebido">R$ 0,00</h3><p>Valor Recebido</p></div></div></div>
+                <div class="card"><div class="card-row"><div class="card-icon" style="background:#f59e0b"><i class="fas fa-hand-holding-usd"></i></div><div><h3 id="dashReceber">R$ 0,00</h3><p>A Receber</p></div></div></div>
+                <div class="card"><div class="card-row"><div class="card-icon" style="background:#06b6d4"><i class="fas fa-motorcycle"></i></div><div><h3 id="dashTaxas">R$ 0,00</h3><p>Taxas Entrega</p></div></div></div>
+            </div>
+            
+            <div class="card" style="display: block;">
+                <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px;"><i class="fas fa-box-open"></i> Quantidade de produtos pedidos</h3>
+                <div id="topProductsList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:10px;"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tabPedidos" class="tab-content">
+        <div class="container">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Buscar cliente..." oninput="searchOrders()">
+            </div>
+            <div class="filters">
+                <div class="filters-grid">
+                    <div><label>Data</label><input type="date" id="filterData" onchange="applyFilters()"></div>
+                    <div><label>Bairro</label><select id="filterBairro" onchange="applyFilters()"><option value="">Todos</option></select></div>
+                    <div><label>Status</label><select id="filterStatus" onchange="applyFilters()">
+                        <option value="">Todos</option>
+                        <option value="Pedido confirmado">Confirmado</option>
+                        <option value="Produzindo">Produzindo</option>
+                        <option value="Pronto">Pronto</option>
+                        <option value="Em rota">Em rota</option>
+                        <option value="Entregue">Entregue</option>
+                    </select></div>
+                    <div style="display:flex; align-items:end;"><button class="btn btn-secondary" onclick="clearFilters()" style="width:100%">Limpar</button></div>
+                </div>
+                <div style="margin-top:15px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
+                    <button class="btn btn-secondary" onclick="exportToPDF()"><i class="fas fa-file-pdf"></i> Baixar PDF</button>
+                    <button class="btn btn-secondary" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Baixar Excel</button>
+                </div>
+            </div>
+            <div id="ordersList" class="orders-grid"></div>
+        </div>
+    </section>
+
+    <section id="tabGraficos" class="tab-content">
+        <div class="container">
+            <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+                <div class="card" style="display:block; min-height:350px">
+                    <h3>Produtos (Por Tamanho)</h3>
+                    <div style="height:300px; position:relative;">
+                        <canvas id="chartProd"></canvas>
+                    </div>
+                </div>
+                <div class="card" style="display:block; min-height:350px">
+                    <h3>Faturamento</h3>
+                    <div style="height:300px; position:relative;">
+                        <canvas id="chartFat"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div> <div id="orderModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
             <h2>Novo Pedido</h2>
@@ -377,15 +417,32 @@
     let orders = [];
     let charts = { prod: null, fat: null };
 
+    // --- LOGIN ---
+    window.handleLogin = function(e) {
+        e.preventDefault();
+        const u = document.getElementById('loginUser').value;
+        const p = document.getElementById('loginPass').value;
+        if(u === 'divinepudimgourmet' && p === '1810') {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appContent').style.display = 'block';
+            initApp();
+        } else {
+            alert('Usuário ou senha incorretos!');
+        }
+    };
+
     // --- INICIALIZAÇÃO ---
-    document.addEventListener('DOMContentLoaded', () => {
+    function initApp() {
+        // Popula Bairros
         const bList = document.getElementById('cliBairro');
-        BAIRROS.forEach(b => {
-            let opt = document.createElement('option');
-            opt.value = b;
-            opt.textContent = b;
-            bList.appendChild(opt);
-        });
+        if(bList.options.length <= 1) { // Evita duplicar se relogar
+            BAIRROS.forEach(b => {
+                let opt = document.createElement('option');
+                opt.value = b;
+                opt.textContent = b;
+                bList.appendChild(opt);
+            });
+        }
 
         onSnapshot(query(colRef), (snapshot) => {
             orders = [];
@@ -398,7 +455,7 @@
         });
         
         document.getElementById('dataPed').valueAsDate = new Date();
-    });
+    }
 
     // --- NAVEGAÇÃO ---
     window.showTab = function(e, tabId) {
@@ -428,6 +485,7 @@
         document.getElementById('dashTaxas').innerText = fmtMoeda(taxas);
         document.getElementById('dashReceber').innerText = fmtMoeda(aReceber);
 
+        // Top Produtos
         const counts = {};
         orders.forEach(o => o.itens.forEach(i => {
             let key = `${i.prod} - ${i.tam}`;
@@ -439,14 +497,11 @@
         ).join('');
     };
 
-    // --- LISTA PEDIDOS (CORRIGIDO ORDEM 001) ---
+    // --- LISTA PEDIDOS ---
     window.renderOrdersList = function(list = orders) {
         const div = document.getElementById('ordersList');
         if(!list.length) { div.innerHTML = '<p>Nenhum pedido encontrado.</p>'; return; }
         
-        // ORDENAÇÃO: Mais ANTIGO primeiro (para ser o 001, 002...)
-        // Se você preferir ver o mais novo em cima, a gente inverte a exibição, mas mantém a numeração
-        // A lógica abaixo ordena por Data de Entrega Ascendente (Hoje -> Amanhã)
         const sorted = [...list].sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega));
 
         div.innerHTML = sorted.map((o, index) => {
@@ -475,7 +530,7 @@
         }).join('');
     };
 
-    // --- IMPRESSÃO IFOOD STYLE ---
+    // --- IMPRESSÃO ---
     window.printOrder = function(id, numPedido) {
         const o = orders.find(x => x.fbId === id);
         const w = window.open('', '', 'width=300,height=600');
@@ -527,10 +582,10 @@
         setTimeout(() => { w.print(); w.close(); }, 500);
     };
 
-    // --- RELATÓRIOS (PDF & EXCEL) ---
+    // --- RELATÓRIOS ---
     window.exportToPDF = function() {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('l', 'mm', 'a4'); // Paisagem para caber endereço
+        const doc = new jsPDF('l', 'mm', 'a4'); 
 
         doc.setFontSize(18);
         doc.text("Relatório de Pedidos - Divine Pudim Gourmet", 14, 20);
@@ -543,16 +598,7 @@
         orders.sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega)).forEach(o => {
             const itemsStr = o.itens.map(i => `${i.qtd}x ${i.prod} (${i.tam})`).join('\n');
             const endStr = o.turno === 'Retirada no local' ? 'RETIRADA' : `${o.end}\n${o.bairro}\nObs: ${o.obs || '-'}`;
-            
-            const row = [
-                `${fmtData(o.dataEntrega)}\n${o.turno}`,
-                `${o.cliente}\n${o.tel}`,
-                endStr,
-                itemsStr,
-                fmtMoeda(o.total),
-                fmtMoeda(o.pago),
-                fmtMoeda(o.restante)
-            ];
+            const row = [`${fmtData(o.dataEntrega)}\n${o.turno}`, `${o.cliente}\n${o.tel}`, endStr, itemsStr, fmtMoeda(o.total), fmtMoeda(o.pago), fmtMoeda(o.restante)];
             tableRows.push(row);
         });
 
@@ -562,44 +608,21 @@
             startY: 35,
             theme: 'grid',
             styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
-            columnStyles: {
-                0: { cellWidth: 25 },
-                1: { cellWidth: 35 },
-                2: { cellWidth: 60 }, // Endereço largo
-                3: { cellWidth: 70 }, // Itens largo
-                4: { cellWidth: 20, halign: 'right' },
-                5: { cellWidth: 20, halign: 'right' },
-                6: { cellWidth: 20, halign: 'right' }
-            }
+            columnStyles: { 0: {cellWidth:25}, 1:{cellWidth:35}, 2:{cellWidth:60}, 3:{cellWidth:70}, 4:{cellWidth:20, halign:'right'}, 5:{cellWidth:20, halign:'right'}, 6:{cellWidth:20, halign:'right'} }
         });
         doc.save(`Relatorio_DivinePudim_${new Date().toISOString().split('T')[0]}.pdf`);
     };
 
     window.exportToExcel = function() {
         const wb = XLSX.utils.book_new();
-        
         const data = orders.map(o => ({
-            "Data Entrega": fmtData(o.dataEntrega),
-            "Turno": o.turno,
-            "Status": o.status,
-            "Cliente": o.cliente,
-            "Telefone": o.tel,
-            "Endereço": o.turno === 'Retirada no local' ? 'RETIRADA' : o.end,
-            "Bairro": o.bairro,
-            "Obs/Ref": o.obs,
-            "Itens": o.itens.map(i => `${i.qtd}x ${i.prod} (${i.tam})`).join('; '),
-            "Taxa Entrega": o.taxa,
-            "Valor Total": o.total,
-            "Valor Pago": o.pago,
-            "Restante": o.restante,
-            "Forma Pagamento": o.pagamento
+            "Data Entrega": fmtData(o.dataEntrega), "Turno": o.turno, "Status": o.status,
+            "Cliente": o.cliente, "Telefone": o.tel, "Endereço": o.turno === 'Retirada no local' ? 'RETIRADA' : o.end,
+            "Bairro": o.bairro, "Obs/Ref": o.obs, "Itens": o.itens.map(i => `${i.qtd}x ${i.prod} (${i.tam})`).join('; '),
+            "Taxa Entrega": o.taxa, "Valor Total": o.total, "Valor Pago": o.pago, "Restante": o.restante, "Forma Pagamento": o.pagamento
         }));
-
         const ws = XLSX.utils.json_to_sheet(data);
-        // Ajusta largura colunas
-        const wscols = [{wch:12}, {wch:10}, {wch:15}, {wch:25}, {wch:15}, {wch:40}, {wch:15}, {wch:20}, {wch:50}];
-        ws['!cols'] = wscols;
-
+        ws['!cols'] = [{wch:12}, {wch:10}, {wch:15}, {wch:25}, {wch:15}, {wch:40}, {wch:15}, {wch:20}, {wch:50}];
         XLSX.utils.book_append_sheet(wb, ws, "Pedidos");
         XLSX.writeFile(wb, `Relatorio_DivinePudim_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
@@ -616,27 +639,11 @@
             let key = `${i.prod} (${i.tam})`;
             counts[key] = (counts[key] || 0) + i.qtd;
         }));
-        
-        charts.prod = new Chart(ctxProd, {
-            type: 'bar',
-            data: {
-                labels: Object.keys(counts),
-                datasets: [{ label: 'Qtd Vendida', data: Object.values(counts), backgroundColor: '#ec4899' }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
+        charts.prod = new Chart(ctxProd, { type: 'bar', data: { labels: Object.keys(counts), datasets: [{ label: 'Qtd Vendida', data: Object.values(counts), backgroundColor: '#ec4899' }] }, options: { responsive: true, maintainAspectRatio: false } });
 
         const statusFat = {};
         orders.forEach(o => statusFat[o.status] = (statusFat[o.status] || 0) + o.total);
-
-        charts.fat = new Chart(ctxFat, {
-            type: 'doughnut',
-            data: {
-                labels: Object.keys(statusFat),
-                datasets: [{ data: Object.values(statusFat), backgroundColor: ['#3b82f6','#f59e0b','#8b5cf6','#06b6d4','#10b981'] }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
+        charts.fat = new Chart(ctxFat, { type: 'doughnut', data: { labels: Object.keys(statusFat), datasets: [{ data: Object.values(statusFat), backgroundColor: ['#3b82f6','#f59e0b','#8b5cf6','#06b6d4','#10b981'] }] }, options: { responsive: true, maintainAspectRatio: false } });
     };
 
     // --- FORMULÁRIO E LÓGICA ---
@@ -644,97 +651,57 @@
         const turno = document.getElementById('turnoEntrega').value;
         const addrArea = document.getElementById('addressArea');
         const inputs = addrArea.querySelectorAll('input, select');
-        
-        if(turno === 'Retirada no local') {
-            addrArea.style.display = 'none';
-            inputs.forEach(i => i.required = false);
-        } else {
-            addrArea.style.display = 'block';
-            document.getElementById('cliEnd').required = true;
-            document.getElementById('cliBairro').required = true;
-        }
+        if(turno === 'Retirada no local') { addrArea.style.display = 'none'; inputs.forEach(i => i.required = false); }
+        else { addrArea.style.display = 'block'; document.getElementById('cliEnd').required = true; document.getElementById('cliBairro').required = true; }
     };
-
     window.checkBairro = function() {
         const s = document.getElementById('cliBairro');
         const i = document.getElementById('cliBairroOutro');
         i.style.display = s.value === 'OUTRO' ? 'block' : 'none';
-        if(s.value === 'OUTRO') i.required = true;
-        else i.required = false;
+        if(s.value === 'OUTRO') i.required = true; else i.required = false;
     };
-
     window.saveOrder = async function(e) {
         e.preventDefault();
-        
         let itens = [];
         let totalItens = 0;
         document.querySelectorAll('.item-row').forEach(row => {
             const prodSel = row.querySelector('.i-prod').value;
             let prodNome = prodSel === 'OUTRO' ? row.querySelector('.i-cust').value : prodSel;
             const custField = row.querySelector('.i-cust');
-            if (custField.style.display !== 'none' && prodSel !== 'OUTRO') {
-                prodNome += ` (${custField.value})`;
-            }
+            if (custField.style.display !== 'none' && prodSel !== 'OUTRO') { prodNome += ` (${custField.value})`; }
             const qtd = parseFloat(row.querySelector('.i-qtd').value);
             const prc = parseFloat(row.querySelector('.i-prc').value);
             totalItens += qtd * prc;
             itens.push({ prod: prodNome, tam: row.querySelector('.i-tam').value, qtd: qtd, prc: prc });
         });
-
         const turno = document.getElementById('turnoEntrega').value;
-        let bairroFinal = '';
-        let endFinal = '';
-        
+        let bairroFinal = ''; let endFinal = '';
         if(turno !== 'Retirada no local') {
             const bairroSel = document.getElementById('cliBairro').value;
             bairroFinal = bairroSel === 'OUTRO' ? document.getElementById('cliBairroOutro').value : bairroSel;
             const num = document.getElementById('cliNumero').value;
             endFinal = document.getElementById('cliEnd').value + (num ? `, Nº ${num}` : '');
-        } else {
-            bairroFinal = '-';
-            endFinal = 'Retirada na Loja';
-        }
-
+        } else { bairroFinal = '-'; endFinal = 'Retirada na Loja'; }
+        
         const taxa = parseFloat(document.getElementById('valTaxa').value) || 0;
         const pago = parseFloat(document.getElementById('valPago').value) || 0;
         const totalFinal = totalItens + taxa;
         const restante = totalFinal - pago;
 
         const obj = {
-            cliente: document.getElementById('cliNome').value,
-            tel: document.getElementById('cliTel').value,
-            cep: document.getElementById('cliCep').value,
-            end: endFinal,
-            bairro: bairroFinal,
-            turno: turno,
-            dataPedido: document.getElementById('dataPed').value,
-            dataEntrega: document.getElementById('dataEnt').value,
-            status: document.getElementById('statusPed').value,
-            itens: itens,
-            total: totalFinal,
-            pago: pago,
-            taxa: taxa,
-            restante: restante,
-            pagamento: document.getElementById('formaPag').value,
-            obs: document.getElementById('obs').value
+            cliente: document.getElementById('cliNome').value, tel: document.getElementById('cliTel').value, cep: document.getElementById('cliCep').value,
+            end: endFinal, bairro: bairroFinal, turno: turno, dataPedido: document.getElementById('dataPed').value, dataEntrega: document.getElementById('dataEnt').value,
+            status: document.getElementById('statusPed').value, itens: itens, total: totalFinal, pago: pago, taxa: taxa, restante: restante,
+            pagamento: document.getElementById('formaPag').value, obs: document.getElementById('obs').value
         };
 
         try {
             const editId = document.getElementById('editFirebaseId').value;
-            if(editId) {
-                await updateDoc(doc(db, "pedidos", editId), obj);
-                alert('Pedido atualizado!');
-            } else {
-                await addDoc(colRef, obj);
-                alert('Pedido salvo!');
-            }
+            if(editId) { await updateDoc(doc(db, "pedidos", editId), obj); alert('Atualizado!'); }
+            else { await addDoc(colRef, obj); alert('Salvo!'); }
             closeOrderModal();
-        } catch(err) {
-            console.error(err);
-            alert('Erro ao salvar.');
-        }
+        } catch(err) { console.error(err); alert('Erro ao salvar.'); }
     };
-
     window.addItem = function(data = null) {
         const id = Date.now();
         const html = `
@@ -754,36 +721,16 @@
             <button type="button" class="btn btn-danger" onclick="this.parentElement.remove(); calcTotal()">X</button>
         </div>`;
         document.getElementById('itemsContainer').insertAdjacentHTML('beforeend', html);
-
         if(data) {
             const row = document.getElementById(`row-${id}`);
             const sel = row.querySelector('.i-prod');
-            let baseName = data.prod;
-            let flavor = '';
-            if (data.prod.includes('(')) {
-               const parts = data.prod.match(/(.*) \((.*)\)/);
-               if(parts && PRODUTOS.find(p => p.nome === parts[1])) {
-                   baseName = parts[1];
-                   flavor = parts[2];
-               }
-            }
-
-            if(PRODUTOS.find(p => p.nome === baseName)) {
-                sel.value = baseName;
-                updItem(id);
-                row.querySelector('.i-tam').value = data.tam;
-                if(flavor) row.querySelector('.i-cust').value = flavor;
-            } else {
-                sel.value = 'OUTRO';
-                updItem(id);
-                row.querySelector('.i-cust').value = data.prod;
-                row.querySelector('.i-tam').innerHTML = `<option>${data.tam}</option>`;
-            }
-            row.querySelector('.i-qtd').value = data.qtd;
-            row.querySelector('.i-prc').value = data.prc;
+            let baseName = data.prod; let flavor = '';
+            if (data.prod.includes('(')) { const parts = data.prod.match(/(.*) \((.*)\)/); if(parts && PRODUTOS.find(p => p.nome === parts[1])) { baseName = parts[1]; flavor = parts[2]; } }
+            if(PRODUTOS.find(p => p.nome === baseName)) { sel.value = baseName; updItem(id); row.querySelector('.i-tam').value = data.tam; if(flavor) row.querySelector('.i-cust').value = flavor; }
+            else { sel.value = 'OUTRO'; updItem(id); row.querySelector('.i-cust').value = data.prod; row.querySelector('.i-tam').innerHTML = `<option>${data.tam}</option>`; }
+            row.querySelector('.i-qtd').value = data.qtd; row.querySelector('.i-prc').value = data.prc;
         }
     };
-
     window.updItem = function(id) {
         const row = document.getElementById(`row-${id}`);
         const sel = row.querySelector('.i-prod');
@@ -793,159 +740,61 @@
         const prc = row.querySelector('.i-prc');
         const opt = sel.options[sel.selectedIndex];
         const requerSabor = opt.getAttribute('data-sabor');
-
-        if(val === 'OUTRO') {
-            cust.style.display = 'block';
-            cust.placeholder = "Nome do Produto";
-            tam.innerHTML = '<option value="Único">Único</option>';
-            prc.value = '';
-        } else {
-            if (requerSabor) {
-                cust.style.display = 'block';
-                cust.placeholder = "Digite o Sabor";
-            } else {
-                cust.style.display = 'none';
-            }
-            const p = PRODUTOS.find(x => x.nome === val);
-            if(p) {
-                tam.innerHTML = p.tamanhos.map(t => `<option value="${t.t}" data-p="${t.p}">${t.t}</option>`).join('');
-                updPrice(id);
-            }
-        }
+        if(val === 'OUTRO') { cust.style.display = 'block'; cust.placeholder = "Nome do Produto"; tam.innerHTML = '<option value="Único">Único</option>'; prc.value = ''; }
+        else { if (requerSabor) { cust.style.display = 'block'; cust.placeholder = "Digite o Sabor"; } else { cust.style.display = 'none'; } const p = PRODUTOS.find(x => x.nome === val); if(p) { tam.innerHTML = p.tamanhos.map(t => `<option value="${t.t}" data-p="${t.p}">${t.t}</option>`).join(''); updPrice(id); } }
     };
-
-    window.updPrice = function(id) {
-        const row = document.getElementById(`row-${id}`);
-        const tam = row.querySelector('.i-tam');
-        const opt = tam.options[tam.selectedIndex];
-        if(opt && opt.dataset.p) {
-            row.querySelector('.i-prc').value = opt.dataset.p;
-            calcTotal();
-        }
-    };
-
+    window.updPrice = function(id) { const row = document.getElementById(`row-${id}`); const tam = row.querySelector('.i-tam'); const opt = tam.options[tam.selectedIndex]; if(opt && opt.dataset.p) { row.querySelector('.i-prc').value = opt.dataset.p; calcTotal(); } };
     window.calcTotal = function() {
         let total = 0;
         document.querySelectorAll('.item-row').forEach(row => {
-            const q = parseFloat(row.querySelector('.i-qtd').value) || 0;
-            const p = parseFloat(row.querySelector('.i-prc').value) || 0;
-            const sub = q * p;
-            row.querySelector('.i-total').innerText = fmtMoeda(sub);
-            total += sub;
+            const q = parseFloat(row.querySelector('.i-qtd').value) || 0; const p = parseFloat(row.querySelector('.i-prc').value) || 0;
+            const sub = q * p; row.querySelector('.i-total').innerText = fmtMoeda(sub); total += sub;
         });
-        const taxa = parseFloat(document.getElementById('valTaxa').value) || 0;
-        const pago = parseFloat(document.getElementById('valPago').value) || 0;
-        const final = total + taxa;
-        document.getElementById('displayTotal').innerText = fmtMoeda(total);
-        document.getElementById('valRest').value = fmtMoeda(final - pago);
+        const taxa = parseFloat(document.getElementById('valTaxa').value) || 0; const pago = parseFloat(document.getElementById('valPago').value) || 0;
+        document.getElementById('displayTotal').innerText = fmtMoeda(total); document.getElementById('valRest').value = fmtMoeda(total + taxa - pago);
     };
 
-    // --- UTILS ---
     window.buscarCep = async function() {
         let cep = document.getElementById('cliCep').value.replace(/\D/g,'');
         if(cep.length === 8) {
             try {
-                let r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-                let d = await r.json();
+                let r = await fetch(`https://viacep.com.br/ws/${cep}/json/`); let d = await r.json();
                 if(!d.erro) {
                     document.getElementById('cliEnd').value = d.logradouro;
-                    const bSelect = document.getElementById('cliBairro');
-                    let found = false;
-                    for (let i = 0; i < bSelect.options.length; i++) {
-                        if (bSelect.options[i].value.toLowerCase() === d.bairro.toLowerCase()) {
-                            bSelect.selectedIndex = i;
-                            found = true; break;
-                        }
-                    }
-                    if (!found) { bSelect.value = 'OUTRO'; document.getElementById('cliBairroOutro').value = d.bairro; }
-                    checkBairro();
+                    const bSelect = document.getElementById('cliBairro'); let found = false;
+                    for (let i = 0; i < bSelect.options.length; i++) { if (bSelect.options[i].value.toLowerCase() === d.bairro.toLowerCase()) { bSelect.selectedIndex = i; found = true; break; } }
+                    if (!found) { bSelect.value = 'OUTRO'; document.getElementById('cliBairroOutro').value = d.bairro; } checkBairro();
                 }
             } catch(e) {}
         }
     };
-
-    window.showNewOrderModal = function() {
-        document.getElementById('orderForm').reset();
-        document.getElementById('itemsContainer').innerHTML = '';
-        document.getElementById('editFirebaseId').value = '';
-        document.getElementById('dataPed').valueAsDate = new Date();
-        document.getElementById('orderModal').classList.add('active');
-        checkTurno(); addItem(); 
-    };
+    window.showNewOrderModal = function() { document.getElementById('orderForm').reset(); document.getElementById('itemsContainer').innerHTML = ''; document.getElementById('editFirebaseId').value = ''; document.getElementById('dataPed').valueAsDate = new Date(); document.getElementById('orderModal').classList.add('active'); checkTurno(); addItem(); };
     window.closeOrderModal = function() { document.getElementById('orderModal').classList.remove('active'); };
     window.deleteOrder = async function(id) { if(confirm('Excluir?')) await deleteDoc(doc(db, "pedidos", id)); };
-    
     window.editOrder = function(id) {
-        const o = orders.find(x => x.fbId === id);
-        if(!o) return;
-        showNewOrderModal();
-        document.getElementById('editFirebaseId').value = id;
-        document.getElementById('cliNome').value = o.cliente;
-        document.getElementById('cliTel').value = o.tel;
-        document.getElementById('turnoEntrega').value = o.turno || '';
-        checkTurno();
-
-        if(o.turno !== 'Retirada no local') {
-            document.getElementById('cliCep').value = o.cep || '';
-            if(o.end && o.end.includes(', Nº')) {
-                const parts = o.end.split(', Nº');
-                document.getElementById('cliEnd').value = parts[0].trim();
-                document.getElementById('cliNumero').value = parts[1].trim();
-            } else {
-                document.getElementById('cliEnd').value = o.end;
-            }
-            const sel = document.getElementById('cliBairro');
-            if([...sel.options].some(op => op.value === o.bairro)) sel.value = o.bairro;
-            else { sel.value = 'OUTRO'; checkBairro(); document.getElementById('cliBairroOutro').value = o.bairro; }
-        }
-
-        document.getElementById('dataPed').value = o.dataPedido;
-        document.getElementById('dataEnt').value = o.dataEntrega;
-        document.getElementById('statusPed').value = o.status;
-        document.getElementById('valPago').value = o.pago;
-        document.getElementById('valTaxa').value = o.taxa || 0;
-        document.getElementById('formaPag').value = o.pagamento;
-        document.getElementById('obs').value = o.obs || '';
-
-        document.getElementById('itemsContainer').innerHTML = '';
-        o.itens.forEach(i => addItem(i));
-        setTimeout(calcTotal, 100);
+        const o = orders.find(x => x.fbId === id); if(!o) return; showNewOrderModal();
+        document.getElementById('editFirebaseId').value = id; document.getElementById('cliNome').value = o.cliente; document.getElementById('cliTel').value = o.tel; document.getElementById('turnoEntrega').value = o.turno || ''; checkTurno();
+        if(o.turno !== 'Retirada no local') { document.getElementById('cliCep').value = o.cep || ''; if(o.end && o.end.includes(', Nº')) { const parts = o.end.split(', Nº'); document.getElementById('cliEnd').value = parts[0].trim(); document.getElementById('cliNumero').value = parts[1].trim(); } else { document.getElementById('cliEnd').value = o.end; } const sel = document.getElementById('cliBairro'); if([...sel.options].some(op => op.value === o.bairro)) sel.value = o.bairro; else { sel.value = 'OUTRO'; checkBairro(); document.getElementById('cliBairroOutro').value = o.bairro; } }
+        document.getElementById('dataPed').value = o.dataPedido; document.getElementById('dataEnt').value = o.dataEntrega; document.getElementById('statusPed').value = o.status; document.getElementById('valPago').value = o.pago; document.getElementById('valTaxa').value = o.taxa || 0; document.getElementById('formaPag').value = o.pagamento; document.getElementById('obs').value = o.obs || '';
+        document.getElementById('itemsContainer').innerHTML = ''; o.itens.forEach(i => addItem(i)); setTimeout(calcTotal, 100);
     };
-
     window.fmtMoeda = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
     window.fmtData = d => d.split('-').reverse().join('/');
     window.searchOrders = function() { applyFilters(); };
     window.clearFilters = function() { document.getElementById('searchInput').value = ''; document.getElementById('filterData').value = ''; document.getElementById('filterBairro').value = ''; document.getElementById('filterStatus').value = ''; applyFilters(); };
     window.applyFilters = function() {
-        const term = document.getElementById('searchInput').value.toLowerCase();
-        const date = document.getElementById('filterData').value;
-        const bairro = document.getElementById('filterBairro').value;
-        const status = document.getElementById('filterStatus').value;
+        const term = document.getElementById('searchInput').value.toLowerCase(); const date = document.getElementById('filterData').value;
+        const bairro = document.getElementById('filterBairro').value; const status = document.getElementById('filterStatus').value;
         const filtered = orders.filter(o => {
-            let ok = true;
-            if(term && !o.cliente.toLowerCase().includes(term)) ok = false;
-            if(date && o.dataEntrega !== date) ok = false;
-            if(bairro && o.bairro !== bairro) ok = false;
-            if(status && o.status !== status) ok = false;
-            return ok;
-        });
-        renderOrdersList(filtered);
+            let ok = true; if(term && !o.cliente.toLowerCase().includes(term)) ok = false; if(date && o.dataEntrega !== date) ok = false;
+            if(bairro && o.bairro !== bairro) ok = false; if(status && o.status !== status) ok = false; return ok;
+        }); renderOrdersList(filtered);
     };
     window.populateBairroFilter = function() { const b = [...new Set(orders.map(o => o.bairro))].sort(); document.getElementById('filterBairro').innerHTML = '<option value="">Todos</option>' + b.map(x => `<option>${x}</option>`).join(''); };
     window.exportBackup = function() { const b = new Blob([JSON.stringify(orders)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'backup.json'; a.click(); };
     window.handleImport = function(e) {
-        const f = e.target.files[0];
-        if(!f) return;
-        const r = new FileReader();
-        r.onload = async (ev) => {
-            try {
-                const arr = JSON.parse(ev.target.result);
-                if(confirm(`Importar ${arr.length} pedidos?`)) {
-                    for(let o of arr) { delete o.fbId; await addDoc(colRef, o); }
-                    alert('Concluído!');
-                }
-            } catch(x) { alert('Erro arquivo invalido'); }
-        };
+        const f = e.target.files[0]; if(!f) return; const r = new FileReader();
+        r.onload = async (ev) => { try { const arr = JSON.parse(ev.target.result); if(confirm(`Importar ${arr.length} pedidos?`)) { for(let o of arr) { delete o.fbId; await addDoc(colRef, o); } alert('Concluído!'); } } catch(x) { alert('Erro arquivo invalido'); } };
         r.readAsText(f);
     };
 </script>
