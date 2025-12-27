@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V5</title>
+    <title>Divine Pudim Gourmet - Sistema V6</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
@@ -21,59 +21,44 @@
         .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
         
         /* TELA DE LOGIN */
-        #loginScreen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            display: flex; justify-content: center; align-items: center; z-index: 9999;
-            padding: 20px;
-        }
-        .login-box {
-            background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            width: 100%; max-width: 400px; text-align: center;
-        }
+        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 20px; }
+        .login-box { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 100%; max-width: 400px; text-align: center; }
         .login-logo { font-size: 40px; color: var(--primary); margin-bottom: 20px; }
         .login-input { width: 100%; padding: 15px; margin-bottom: 15px; border: 2px solid var(--gray-200); border-radius: 10px; font-size: 16px; outline: none; transition: 0.3s; }
         .login-input:focus { border-color: var(--primary); }
         .btn-login { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-login:hover { background: var(--primary-dark); transform: translateY(-2px); }
 
-        /* CONTEÚDO DO APP */
+        /* APP */
         #appContent { display: none; padding-bottom: 40px; }
-
-        /* HEADER */
         .header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: var(--white); padding: 20px 0; position: sticky; top: 0; z-index: 1000; box-shadow: var(--shadow); }
         .header-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
         .logo { font-size: 24px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-        .logo i { color: var(--accent); font-size: 28px; }
         .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
         
-        /* BOTÕES */
-        .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: var(--transition); }
+        .btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: var(--transition); font-size: 14px; }
         .btn-header { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); }
-        .btn-header:hover { background: rgba(255,255,255,0.3); }
         .btn-primary { background: var(--accent); color: var(--gray-800); font-weight: 700; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
         .btn-secondary { background: var(--gray-200); color: var(--gray-800); }
         .btn-danger { background: #fee2e2; color: #991b1b; }
         
-        /* ABAS */
+        /* TABS */
         .tabs-nav { background: var(--white); padding: 10px 0; position: sticky; top: 70px; z-index: 990; box-shadow: var(--shadow); margin-bottom: 20px; overflow-x: auto; }
         .tabs-buttons { display: flex; gap: 10px; padding: 0 20px; min-width: max-content; }
-        .tab-btn { background: none; border: none; padding: 10px 20px; cursor: pointer; color: var(--gray-600); font-weight: 600; border-bottom: 3px solid transparent; white-space: nowrap; }
+        .tab-btn { background: none; border: none; padding: 10px 20px; cursor: pointer; color: var(--gray-600); font-weight: 600; border-bottom: 3px solid transparent; }
         .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--primary-light); border-radius: 8px 8px 0 0; }
         .tab-content { display: none; animation: fadeIn 0.3s; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* CARDS & GRID */
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        /* CARDS */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .card { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); display: flex; flex-direction: column; justify-content: center; }
         .card-row { display: flex; align-items: center; gap: 15px; }
         .card-icon { width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; flex-shrink: 0; }
         .card h3 { font-size: 20px; font-weight: 700; margin-bottom: 5px; }
-        .card p { font-size: 14px; color: var(--gray-600); }
 
-        /* PEDIDOS CARD */
+        /* PEDIDOS */
         .search-bar, .filters { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 20px; }
         .filters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
         input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-family: inherit; }
@@ -83,41 +68,35 @@
         .order-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
         .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
         .order-items { background: var(--gray-50); padding: 10px; border-radius: 6px; margin: 10px 0; font-size: 14px; }
-        
         .order-details-card { background: #fff; border: 1px solid #eee; border-radius: 6px; padding: 10px; margin-bottom: 10px; font-size: 13px; color: #555; }
-        .order-details-card i { color: var(--primary); width: 15px; text-align: center; margin-right: 5px; }
         .order-actions { margin-top: auto; display: flex; gap: 5px; padding-top: 10px; }
 
-        /* STATUS COLORS */
-        .st-confirmado { background: #dbeafe; color: #1e40af; }
-        .st-produzindo { background: #fef3c7; color: #92400e; }
-        .st-pronto { background: #ede9fe; color: #5b21b6; }
-        .st-rota { background: #cffafe; color: #155e75; }
-        .st-entregue { background: #d1fae5; color: #065f46; }
+        /* QUICK STATUS SELECT */
+        .quick-status-select {
+            padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; border: 1px solid #ddd; cursor: pointer;
+        }
+        .quick-status-select:focus { outline: none; border-color: var(--primary); }
 
         /* MODAL */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
         .modal.active { display: flex; }
-        .modal-content { background: white; border-radius: 16px; width: 100%; max-width: 950px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-content { background: white; border-radius: 16px; width: 100%; max-width: 950px; max-height: 90vh; overflow-y: auto; }
         .modal-header { background: var(--primary); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 16px 16px 0 0; }
         .modal-body { padding: 30px; }
-        
         .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        
+        .items-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; gap: 10px; font-weight: bold; color: var(--gray-600); margin-bottom: 5px; font-size: 14px; padding: 0 10px; }
+        .item-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; gap: 10px; align-items: center; margin-bottom: 10px; padding: 10px; border: 1px solid #eee; border-radius: 8px; background: #fff; }
         .input-group { position: relative; }
-        .input-group span { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--gray-600); font-weight: bold; }
+        .input-group span { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-weight: bold; color: #666; }
         .input-group input { padding-left: 35px; }
 
-        /* ITEMS MODAL */
-        .items-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; gap: 10px; font-weight: bold; color: var(--gray-600); margin-bottom: 5px; padding: 0 10px; font-size: 14px; }
-        .item-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; gap: 10px; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
-
-        @media(max-width: 768px) { 
-            .header-content { flex-direction: column; text-align: center; }
-            .header-actions { justify-content: center; }
+        @media(max-width: 768px) {
             .items-header { display: none; }
-            .item-row { grid-template-columns: 1fr; border: 1px solid #ddd; padding: 15px; border-radius: 10px; background: #fafafa; } 
-            .item-row > div { margin-bottom: 5px; }
+            .item-row { grid-template-columns: 1fr; }
+            .header-content { flex-direction: column; }
         }
+        @media print { body * { visibility: hidden; } #printArea, #printArea * { visibility: visible; } #printArea { position: absolute; left: 0; top: 0; width: 58mm; padding: 0; margin: 0; font-size: 12px; font-family: monospace; } }
     </style>
 </head>
 <body>
@@ -135,15 +114,14 @@
 </div>
 
 <div id="appContent">
-
     <header class="header">
         <div class="container">
             <div class="header-content">
                 <div class="logo"><i class="fas fa-birthday-cake"></i> Divine Pudim Gourmet</div>
                 <div class="header-actions">
-                    <button class="btn btn-header" onclick="exportBackup()"><i class="fas fa-download"></i> Backup</button>
-                    <button class="btn btn-header" onclick="document.getElementById('importInput').click()"><i class="fas fa-upload"></i> Importar</button>
-                    <button class="btn btn-primary" onclick="showNewOrderModal()"><i class="fas fa-plus"></i> Novo Pedido</button>
+                    <button class="btn btn-header" onclick="exportBackup()">Backup</button>
+                    <button class="btn btn-header" onclick="document.getElementById('importInput').click()">Importar</button>
+                    <button class="btn btn-primary" onclick="showNewOrderModal()">+ Novo Pedido</button>
                     <button class="btn btn-danger" onclick="location.reload()"><i class="fas fa-sign-out-alt"></i></button>
                 </div>
             </div>
@@ -219,7 +197,6 @@
             </div>
         </div>
     </section>
-
 </div>
 
 <div id="orderModal" class="modal">
@@ -296,7 +273,7 @@
                     <div><label>Restante</label><div class="input-group"><span>R$</span><input type="text" id="valRest" readonly></div></div>
                     <div><label>Pagamento</label><select id="formaPag"><option value="Pix">Pix</option><option value="Dinheiro">Dinheiro</option><option value="Cartão">Cartão</option></select></div>
                 </div>
-                <div style="margin-top:10px"><label>Observação (Ponto de Referência)</label><textarea id="obs" rows="2"></textarea></div>
+                <div style="margin-top:10px"><label>Observação</label><textarea id="obs" rows="2"></textarea></div>
 
                 <input type="hidden" id="editFirebaseId">
                 <div style="margin-top:30px; display:flex; justify-content:flex-end; gap:10px">
@@ -372,7 +349,7 @@
     // --- LOGIN ---
     window.handleLogin = function(e) {
         e.preventDefault();
-        const u = document.getElementById('loginUser').value;
+        const u = document.getElementById('loginUser').value.toLowerCase().trim();
         const p = document.getElementById('loginPass').value;
         if(u === 'divinepudimgourmet' && p === '1810') {
             document.getElementById('loginScreen').style.display = 'none';
@@ -397,7 +374,132 @@
         document.getElementById('dataPed').valueAsDate = new Date();
     }
 
-    // --- LOGICA FORMA ENTREGA ---
+    // --- LÓGICA DE ITENS (CORREÇÃO DE BUGS) ---
+    window.addItem = function(data = null) {
+        const id = Date.now() + Math.floor(Math.random() * 1000); // Garante ID único
+        const html = `
+        <div class="item-row" id="row-${id}">
+            <div><select class="i-prod" onchange="updItem(${id})"><option value="">Selecione...</option>${PRODUTOS.map(p => `<option value="${p.nome}" ${p.requerSabor ? 'data-sabor="1"' : ''}>${p.nome}</option>`).join('')}<option value="OUTRO">Outro (Manual)</option></select><input type="text" class="i-cust" style="display:none; margin-top:5px; width:100%" placeholder="Digite aqui..."></div>
+            <div><select class="i-tam" onchange="updPrice(${id})"><option>-</option></select></div>
+            <div><input type="number" class="i-qtd" value="1" onchange="calcTotal()" style="width:60px"></div>
+            <div><input type="number" class="i-prc" step="0.01" onchange="calcTotal()" style="width:80px"></div>
+            <div class="i-total" style="font-weight:bold; color:#666">R$ 0,00</div>
+            <button type="button" class="btn btn-danger" onclick="this.parentElement.remove(); calcTotal()">X</button>
+        </div>`;
+        document.getElementById('itemsContainer').insertAdjacentHTML('beforeend', html);
+
+        // Se tiver dados para preencher (Edição)
+        if(data) {
+            const row = document.getElementById(`row-${id}`);
+            const selProd = row.querySelector('.i-prod');
+            const selTam = row.querySelector('.i-tam');
+            const inpCust = row.querySelector('.i-cust');
+            const inpQtd = row.querySelector('.i-qtd');
+            const inpPrc = row.querySelector('.i-prc');
+
+            // 1. Tenta identificar produto e sabor
+            let baseName = data.prod;
+            let flavor = '';
+            
+            // Regex para pegar "Nome (Sabor)"
+            const match = data.prod.match(/^(.*)\s\((.*)\)$/);
+            if (match && PRODUTOS.find(p => p.nome === match[1])) {
+               baseName = match[1];
+               flavor = match[2];
+            }
+
+            const produtoObj = PRODUTOS.find(p => p.nome === baseName);
+
+            // 2. Preenche campos
+            if(produtoObj) {
+                selProd.value = baseName;
+                // Popula tamanhos manualmente para garantir que existam antes de selecionar
+                selTam.innerHTML = produtoObj.tamanhos.map(t => `<option value="${t.t}" data-p="${t.p}">${t.t}</option>`).join('');
+                selTam.value = data.tam;
+                
+                if(produtoObj.requerSabor) {
+                    inpCust.style.display = 'block';
+                    inpCust.placeholder = "Sabor";
+                    inpCust.value = flavor;
+                }
+            } else {
+                // Caso Manual/Outro
+                selProd.value = 'OUTRO';
+                inpCust.style.display = 'block';
+                inpCust.placeholder = "Produto";
+                inpCust.value = data.prod;
+                selTam.innerHTML = `<option value="Único">Único</option>`;
+                selTam.value = data.tam;
+            }
+
+            // 3. Valores numéricos
+            inpQtd.value = data.qtd;
+            inpPrc.value = data.prc;
+            
+            // 4. Calcula subtotal visual
+            row.querySelector('.i-total').innerText = fmtMoeda(data.qtd * data.prc);
+        }
+    };
+
+    window.updItem = function(id) {
+        const row = document.getElementById(`row-${id}`);
+        const sel = row.querySelector('.i-prod');
+        const tam = row.querySelector('.i-tam');
+        const cust = row.querySelector('.i-cust');
+        const prc = row.querySelector('.i-prc');
+        
+        const opt = sel.options[sel.selectedIndex];
+        const requerSabor = opt.getAttribute('data-sabor');
+        const val = sel.value;
+
+        if(val === 'OUTRO') {
+            cust.style.display = 'block';
+            cust.placeholder = "Produto";
+            tam.innerHTML = '<option value="Único">Único</option>';
+            prc.value = '';
+        } else {
+            const p = PRODUTOS.find(x => x.nome === val);
+            if(p) {
+                tam.innerHTML = p.tamanhos.map(t => `<option value="${t.t}" data-p="${t.p}">${t.t}</option>`).join('');
+                // Define preço do primeiro tamanho automaticamente
+                if(p.tamanhos[0]) prc.value = p.tamanhos[0].p;
+            }
+            
+            if (requerSabor) {
+                cust.style.display = 'block';
+                cust.placeholder = "Sabor";
+            } else {
+                cust.style.display = 'none';
+                cust.value = '';
+            }
+        }
+        calcTotal();
+    };
+
+    window.updPrice = function(id) {
+        const row = document.getElementById(`row-${id}`);
+        const tam = row.querySelector('.i-tam');
+        const prc = row.querySelector('.i-prc');
+        const opt = tam.options[tam.selectedIndex];
+        if(opt && opt.dataset.p) {
+            prc.value = opt.dataset.p;
+            calcTotal();
+        }
+    };
+
+    // --- FUNÇÕES DE STATUS RÁPIDO ---
+    window.quickUpdateStatus = async function(id, newStatus) {
+        const o = orders.find(x => x.fbId === id);
+        if(!o) return;
+        try {
+            await updateDoc(doc(db, "pedidos", id), { status: newStatus });
+            // Não precisa de alert, o onSnapshot atualiza sozinho
+        } catch(e) {
+            alert('Erro ao atualizar status.');
+        }
+    };
+
+    // --- LÓGICA GERAL ---
     window.checkTipoEntrega = function() {
         const tipo = document.getElementById('tipoEntrega').value;
         const divDel = document.getElementById('deliveryFields');
@@ -455,7 +557,7 @@
         const taxa = parseFloat(document.getElementById('valTaxa').value) || 0;
         const pago = parseFloat(document.getElementById('valPago').value) || 0;
         
-        // RECALCULA TOTAL NO SALVAMENTO PARA GARANTIR
+        // RECALCULA TOTAL NO SALVAMENTO
         let sumItens = itens.reduce((acc, i) => acc + (i.qtd * i.prc), 0);
         const totalFinal = sumItens + taxa;
         const restante = totalFinal - pago;
@@ -477,18 +579,34 @@
     };
 
     window.editOrder = function(id) {
-        const o = orders.find(x => x.fbId === id); if(!o) return; showNewOrderModal();
+        const o = orders.find(x => x.fbId === id); if(!o) return; 
+        showNewOrderModal();
         document.getElementById('editFirebaseId').value = id;
         document.getElementById('cliNome').value = o.cliente;
         document.getElementById('cliTel').value = o.tel;
-        document.getElementById('tipoEntrega').value = o.tipoEntrega || (o.turno.includes('Retirada') ? 'Retirada no local' : 'Delivery');
+        
+        // Lógica de Entrega
+        const isDelivery = o.tipoEntrega === 'Delivery' || (o.turno && !o.turno.includes('Retirada'));
+        document.getElementById('tipoEntrega').value = isDelivery ? 'Delivery' : 'Retirada no local';
         checkTipoEntrega();
 
-        if(o.tipoEntrega === 'Delivery' || !o.turno.includes('Retirada')) {
+        if(isDelivery) {
             document.getElementById('cliCep').value = o.cep || '';
-            if(o.end && o.end.includes(', Nº')) { const parts = o.end.split(', Nº'); document.getElementById('cliEnd').value = parts[0].trim(); document.getElementById('cliNumero').value = parts[1].trim(); } else { document.getElementById('cliEnd').value = o.end; }
+            if(o.end && o.end.includes(', Nº')) { 
+                const parts = o.end.split(', Nº'); 
+                document.getElementById('cliEnd').value = parts[0].trim(); 
+                document.getElementById('cliNumero').value = parts[1].trim(); 
+            } else { 
+                document.getElementById('cliEnd').value = o.end; 
+            }
+            
             const sel = document.getElementById('cliBairro');
-            if([...sel.options].some(op => op.value === o.bairro)) sel.value = o.bairro; else { sel.value = 'OUTRO'; checkBairro(); document.getElementById('cliBairroOutro').value = o.bairro; }
+            let found = false;
+            for(let i=0; i<sel.options.length; i++) {
+                if(sel.options[i].value === o.bairro) { sel.selectedIndex = i; found = true; break; }
+            }
+            if(!found) { sel.value = 'OUTRO'; checkBairro(); document.getElementById('cliBairroOutro').value = o.bairro; }
+            
             document.getElementById('turnoEntrega').value = (o.turno === 'Manhã' || o.turno === 'Tarde') ? o.turno : '';
         } else {
             if(o.turno.includes('às')) { document.getElementById('horarioRetirada').value = o.turno.split('às')[1].trim(); }
@@ -496,10 +614,30 @@
 
         document.getElementById('dataPed').value = o.dataPedido; document.getElementById('dataEnt').value = o.dataEntrega; document.getElementById('statusPed').value = o.status;
         document.getElementById('valPago').value = o.pago; document.getElementById('valTaxa').value = o.taxa || 0; document.getElementById('formaPag').value = o.pagamento; document.getElementById('obs').value = o.obs || '';
-        document.getElementById('itemsContainer').innerHTML = ''; o.itens.forEach(i => addItem(i)); setTimeout(calcTotal, 100);
+        
+        // ITENS - Limpa e Readiciona
+        document.getElementById('itemsContainer').innerHTML = '';
+        o.itens.forEach(i => addItem(i));
+        
+        setTimeout(calcTotal, 200); // Pequeno delay para garantir DOM
     };
 
-    // --- RENDER LIST ---
+    window.calcTotal = function() {
+        let itemsTotal = 0; 
+        document.querySelectorAll('.item-row').forEach(row => { 
+            const q = parseFloat(row.querySelector('.i-qtd').value) || 0; 
+            const p = parseFloat(row.querySelector('.i-prc').value) || 0; 
+            const sub = q * p; 
+            row.querySelector('.i-total').innerText = fmtMoeda(sub); 
+            itemsTotal += sub; 
+        });
+        const taxa = parseFloat(document.getElementById('valTaxa').value) || 0; 
+        const pago = parseFloat(document.getElementById('valPago').value) || 0;
+        const finalTotal = itemsTotal + taxa;
+        document.getElementById('displayTotal').innerText = fmtMoeda(finalTotal); 
+        document.getElementById('valRest').value = fmtMoeda(finalTotal - pago);
+    };
+
     window.renderOrdersList = function(list = orders) {
         const div = document.getElementById('ordersList');
         if(!list.length) { div.innerHTML = '<p>Nenhum pedido encontrado.</p>'; return; }
@@ -507,10 +645,9 @@
 
         div.innerHTML = sorted.map((o, index) => {
             const numPedido = (index + 1).toString().padStart(3, '0');
-            const stClass = 'st-' + (o.status ? o.status.toLowerCase().split(' ')[0] : 'confirmado');
             const itensHtml = o.itens.map(i => `<div>${i.qtd}x ${i.prod} (${i.tam}) - <span style="color:#666">${fmtMoeda(i.prc * i.qtd)}</span></div>`).join('');
             
-            // Construção do endereço no card
+            // Address Logic
             let addressInfo = '';
             if(o.tipoEntrega === 'Delivery' || (o.turno && !o.turno.includes('Retirada'))) {
                 addressInfo = `<div><i class="fas fa-map-marker-alt"></i> ${o.end}, ${o.bairro}</div>`;
@@ -519,11 +656,17 @@
             }
             if(o.obs) addressInfo += `<div><i class="fas fa-comment"></i> ${o.obs}</div>`;
 
+            // Status Selector Logic
+            const statuses = ['Pedido confirmado', 'Produzindo', 'Pronto', 'Em rota', 'Entregue'];
+            const statusOptions = statuses.map(s => `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`).join('');
+
             return `
             <div class="order-card">
                 <div class="order-header">
                     <div><b>#${numPedido} - ${o.cliente}</b> <br> <small>${fmtData(o.dataEntrega)} • ${o.turno}</small></div>
-                    <span class="status-badge ${stClass}">${o.status}</span>
+                    <select class="quick-status-select" onchange="quickUpdateStatus('${o.fbId}', this.value)" style="background:${getStatusColor(o.status)}20; color:${getStatusColor(o.status)}">
+                        ${statusOptions}
+                    </select>
                 </div>
                 <div class="order-details-card">${addressInfo}</div>
                 <div class="order-items">${itensHtml}</div>
@@ -541,155 +684,15 @@
         }).join('');
     };
 
-    // --- IMPRESSÃO ---
-    window.printOrder = function(id, numPedido) {
-        const o = orders.find(x => x.fbId === id);
-        const w = window.open('', '', 'width=300,height=600');
-        
-        let headerEnd = "";
-        let bodyEnd = "";
-        
-        if (o.tipoEntrega === 'Delivery' || !o.turno.includes('Retirada')) {
-            headerEnd = "DELIVERY";
-            bodyEnd = `
-                <div class="bold">ENDEREÇO:</div>
-                <div>${o.end}</div>
-                <div>${o.bairro}</div>
-                ${o.obs ? `<div style="margin-top:5px"><b>Ref:</b> ${o.obs}</div>` : ''}
-            `;
-        } else {
-            headerEnd = "RETIRADA";
-            bodyEnd = `<div class="center bold">CLIENTE VAI RETIRAR</div>`;
-        }
+    function getStatusColor(status) {
+        if(status.includes('confirmado')) return '#3b82f6';
+        if(status.includes('Produzindo')) return '#f59e0b';
+        if(status.includes('Pronto')) return '#8b5cf6';
+        if(status.includes('rota')) return '#06b6d4';
+        return '#10b981';
+    }
 
-        w.document.write(`
-            <html><head><style>
-                body { font-family: 'Courier New', monospace; font-size: 12px; margin: 0; padding: 5px; width: 58mm; }
-                .center { text-align: center; } .line { border-bottom: 1px dashed #000; margin: 8px 0; }
-                .row { display: flex; justify-content: space-between; } .bold { font-weight: bold; } .big { font-size: 14px; }
-            </style></head><body>
-                <div class="center bold big">DIVINE PUDIM GOURMET</div>
-                <div class="center">88 98824-4346</div>
-                <div class="line"></div>
-                <div class="center bold big">PEDIDO #${numPedido}</div>
-                <div class="center bold">${headerEnd}</div>
-                <div class="center">${fmtData(o.dataEntrega)} - ${o.turno}</div>
-                <div class="line"></div>
-                <div class="bold">CLIENTE:</div><div>${o.cliente}</div><div>${o.tel}</div>
-                <div class="line"></div>
-                ${bodyEnd}
-                <div class="line"></div>
-                <div class="bold">ITENS:</div>
-                ${o.itens.map(i=>`<div style="margin-bottom:3px">${i.qtd}x ${i.prod} (${i.tam})<br><div style="text-align:right">${fmtMoeda(i.prc*i.qtd)}</div></div>`).join('')}
-                <div class="line"></div>
-                <div class="row"><span>Taxa:</span> <span>${fmtMoeda(o.taxa)}</span></div>
-                <div class="row bold big"><span>TOTAL:</span> <span>${fmtMoeda(o.total)}</span></div>
-                <div class="row"><span>Pago:</span> <span>${fmtMoeda(o.pago)}</span></div>
-                <div class="row bold"><span>FALTA:</span> <span>${fmtMoeda(o.restante)}</span></div>
-                <div class="line"></div>
-                <div class="center bold">Obrigado pela preferência!</div>
-            </body></html>
-        `);
-        setTimeout(() => { w.print(); w.close(); }, 500);
-    };
-
-    // --- STANDARD FUNCTIONS ---
-    window.showTab = function(e, tabId) {
-        if(e) e.preventDefault();
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-        document.getElementById('tab' + tabId.charAt(0).toUpperCase() + tabId.slice(1)).classList.add('active');
-        if(e && e.target) e.target.closest('.tab-btn').classList.add('active');
-        if(tabId === 'graficos') window.renderCharts();
-    };
-    window.refreshAll = function() { renderDashboard(); renderOrdersList(); populateBairroFilter(); };
-    window.renderDashboard = function() {
-        document.getElementById('dashTotal').innerText = orders.length;
-        const fat = orders.reduce((acc, o) => acc + (o.total || 0), 0);
-        const recebido = orders.reduce((acc, o) => acc + (o.pago || 0), 0);
-        const taxas = orders.reduce((acc, o) => acc + (o.taxa || 0), 0);
-        const aReceber = orders.reduce((acc, o) => acc + (o.restante || 0), 0);
-        document.getElementById('dashFaturado').innerText = fmtMoeda(fat);
-        document.getElementById('dashRecebido').innerText = fmtMoeda(recebido);
-        document.getElementById('dashTaxas').innerText = fmtMoeda(taxas);
-        document.getElementById('dashReceber').innerText = fmtMoeda(aReceber);
-        const counts = {};
-        orders.forEach(o => o.itens.forEach(i => { let key = `${i.prod} - ${i.tam}`; counts[key] = (counts[key] || 0) + i.qtd; }));
-        const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]);
-        document.getElementById('topProductsList').innerHTML = sorted.map(([k,v]) => `<div style="background:#f9f9f9; padding:12px; border-radius:8px; display:flex; justify-content:space-between; border-left:4px solid var(--primary)"><b>${k}</b><span style="background:var(--primary); color:white; padding:2px 8px; border-radius:10px; font-size:12px">${v} un</span></div>`).join('');
-    };
-    window.renderCharts = function() {
-        const ctxProd = document.getElementById('chartProd'); const ctxFat = document.getElementById('chartFat');
-        if(charts.prod) charts.prod.destroy(); if(charts.fat) charts.fat.destroy();
-        const counts = {}; orders.forEach(o => o.itens.forEach(i => { let key = `${i.prod} (${i.tam})`; counts[key] = (counts[key] || 0) + i.qtd; }));
-        charts.prod = new Chart(ctxProd, { type: 'bar', data: { labels: Object.keys(counts), datasets: [{ label: 'Qtd', data: Object.values(counts), backgroundColor: '#ec4899' }] }, options: { responsive: true, maintainAspectRatio: false } });
-        const statusFat = {}; orders.forEach(o => statusFat[o.status] = (statusFat[o.status] || 0) + o.total);
-        charts.fat = new Chart(ctxFat, { type: 'doughnut', data: { labels: Object.keys(statusFat), datasets: [{ data: Object.values(statusFat), backgroundColor: ['#3b82f6','#f59e0b','#8b5cf6','#06b6d4','#10b981'] }] }, options: { responsive: true, maintainAspectRatio: false } });
-    };
-    window.addItem = function(data = null) {
-        const id = Date.now();
-        const html = `
-        <div class="item-row" id="row-${id}">
-            <div><select class="i-prod" onchange="updItem(${id})"><option value="">Selecione...</option>${PRODUTOS.map(p => `<option value="${p.nome}" ${p.requerSabor ? 'data-sabor="1"' : ''}>${p.nome}</option>`).join('')}<option value="OUTRO">Outro (Manual)</option></select><input type="text" class="i-cust" style="display:none; margin-top:5px; width:100%" placeholder="Digite aqui..."></div>
-            <div><select class="i-tam" onchange="updPrice(${id})"><option>-</option></select></div>
-            <div><input type="number" class="i-qtd" value="1" onchange="calcTotal()" style="width:60px"></div>
-            <div><input type="number" class="i-prc" step="0.01" onchange="calcTotal()" style="width:80px"></div>
-            <div class="i-total" style="font-weight:bold; color:#666">R$ 0,00</div>
-            <button type="button" class="btn btn-danger" onclick="this.parentElement.remove(); calcTotal()">X</button>
-        </div>`;
-        document.getElementById('itemsContainer').insertAdjacentHTML('beforeend', html);
-        if(data) {
-            const row = document.getElementById(`row-${id}`); const sel = row.querySelector('.i-prod');
-            let baseName = data.prod; let flavor = '';
-            // Match para "Produto (Sabor)"
-            const match = data.prod.match(/^(.*)\s\((.*)\)$/);
-            if (match && PRODUTOS.find(p => p.nome === match[1])) {
-               baseName = match[1];
-               flavor = match[2];
-            }
-
-            if(PRODUTOS.find(p => p.nome === baseName)) { 
-                sel.value = baseName; 
-                updItem(id); 
-                row.querySelector('.i-tam').value = data.tam; 
-                if(flavor) row.querySelector('.i-cust').value = flavor; 
-            } else { 
-                sel.value = 'OUTRO'; 
-                updItem(id); 
-                row.querySelector('.i-cust').value = data.prod; 
-                row.querySelector('.i-tam').innerHTML = `<option>${data.tam}</option>`; 
-            }
-            row.querySelector('.i-qtd').value = data.qtd; 
-            row.querySelector('.i-prc').value = data.prc;
-        }
-    };
-    window.updItem = function(id) {
-        const row = document.getElementById(`row-${id}`); const sel = row.querySelector('.i-prod'); const val = sel.value; const tam = row.querySelector('.i-tam'); const cust = row.querySelector('.i-cust'); const prc = row.querySelector('.i-prc'); const opt = sel.options[sel.selectedIndex]; const requerSabor = opt.getAttribute('data-sabor');
-        if(val === 'OUTRO') { cust.style.display = 'block'; cust.placeholder = "Produto"; tam.innerHTML = '<option value="Único">Único</option>'; prc.value = ''; }
-        else { if (requerSabor) { cust.style.display = 'block'; cust.placeholder = "Sabor"; } else { cust.style.display = 'none'; } const p = PRODUTOS.find(x => x.nome === val); if(p) { tam.innerHTML = p.tamanhos.map(t => `<option value="${t.t}" data-p="${t.p}">${t.t}</option>`).join(''); updPrice(id); } }
-    };
-    window.updPrice = function(id) { const row = document.getElementById(`row-${id}`); const tam = row.querySelector('.i-tam'); const opt = tam.options[tam.selectedIndex]; if(opt && opt.dataset.p) { row.querySelector('.i-prc').value = opt.dataset.p; calcTotal(); } };
-    
-    // CORREÇÃO: CALCULO TOTAL COM TAXA
-    window.calcTotal = function() {
-        let itemsTotal = 0; 
-        document.querySelectorAll('.item-row').forEach(row => { 
-            const q = parseFloat(row.querySelector('.i-qtd').value) || 0; 
-            const p = parseFloat(row.querySelector('.i-prc').value) || 0; 
-            const sub = q * p; 
-            row.querySelector('.i-total').innerText = fmtMoeda(sub); 
-            itemsTotal += sub; 
-        });
-        const taxa = parseFloat(document.getElementById('valTaxa').value) || 0; 
-        const pago = parseFloat(document.getElementById('valPago').value) || 0;
-        
-        // TOTAL = ITENS + TAXA
-        const finalTotal = itemsTotal + taxa;
-        
-        document.getElementById('displayTotal').innerText = fmtMoeda(finalTotal); 
-        document.getElementById('valRest').value = fmtMoeda(finalTotal - pago);
-    };
-
+    // --- UTILS ---
     window.buscarCep = async function() {
         let cep = document.getElementById('cliCep').value.replace(/\D/g,'');
         if(cep.length === 8) {
@@ -706,46 +709,25 @@
     window.fmtData = d => d.split('-').reverse().join('/');
     window.searchOrders = function() { applyFilters(); };
     window.clearFilters = function() { document.getElementById('searchInput').value = ''; document.getElementById('filterData').value = ''; document.getElementById('filterBairro').value = ''; document.getElementById('filterStatus').value = ''; document.getElementById('filterTipo').value = ''; applyFilters(); };
-    
+    window.showTab = function(e, tabId) { if(e) e.preventDefault(); document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active')); document.getElementById('tab' + tabId.charAt(0).toUpperCase() + tabId.slice(1)).classList.add('active'); if(e && e.target) e.target.closest('.tab-btn').classList.add('active'); if(tabId === 'graficos') window.renderCharts(); };
+    window.refreshAll = function() { renderDashboard(); renderOrdersList(); populateBairroFilter(); };
     window.applyFilters = function() {
-        const term = document.getElementById('searchInput').value.toLowerCase(); 
-        const date = document.getElementById('filterData').value; 
-        const bairro = document.getElementById('filterBairro').value; 
-        const status = document.getElementById('filterStatus').value;
-        const tipo = document.getElementById('filterTipo').value;
-
-        const filtered = orders.filter(o => { 
-            let ok = true; 
-            if(term && !o.cliente.toLowerCase().includes(term)) ok = false; 
-            if(date && o.dataEntrega !== date) ok = false; 
-            if(bairro && o.bairro !== bairro) ok = false; 
-            if(status && o.status !== status) ok = false; 
-            if(tipo && tipo !== 'Todos' && o.tipoEntrega !== tipo) ok = false;
-            return ok; 
-        }); 
-        renderOrdersList(filtered);
+        const term = document.getElementById('searchInput').value.toLowerCase(); const date = document.getElementById('filterData').value; const bairro = document.getElementById('filterBairro').value; const status = document.getElementById('filterStatus').value; const tipo = document.getElementById('filterTipo').value;
+        const filtered = orders.filter(o => { let ok = true; if(term && !o.cliente.toLowerCase().includes(term)) ok = false; if(date && o.dataEntrega !== date) ok = false; if(bairro && o.bairro !== bairro) ok = false; if(status && o.status !== status) ok = false; if(tipo && tipo !== 'Todos' && o.tipoEntrega !== tipo) ok = false; return ok; }); renderOrdersList(filtered);
+    };
+    window.printOrder = function(id, numPedido) {
+        const o = orders.find(x => x.fbId === id); const w = window.open('', '', 'width=300,height=600');
+        let headerEnd = ""; let bodyEnd = "";
+        if (o.tipoEntrega === 'Delivery' || !o.turno.includes('Retirada')) { headerEnd = "DELIVERY"; bodyEnd = `<div class="bold">ENDEREÇO:</div><div>${o.end}</div><div>${o.bairro}</div>${o.obs ? `<div style="margin-top:5px"><b>Ref:</b> ${o.obs}</div>` : ''}`; } else { headerEnd = "RETIRADA"; bodyEnd = `<div class="center bold">CLIENTE VAI RETIRAR</div>`; }
+        w.document.write(`<html><head><style>body { font-family: 'Courier New', monospace; font-size: 12px; margin: 0; padding: 5px; width: 58mm; } .center { text-align: center; } .line { border-bottom: 1px dashed #000; margin: 8px 0; } .row { display: flex; justify-content: space-between; } .bold { font-weight: bold; } .big { font-size: 14px; }</style></head><body><div class="center bold big">DIVINE PUDIM GOURMET</div><div class="center">88 98824-4346</div><div class="line"></div><div class="center bold big">PEDIDO #${numPedido}</div><div class="center bold">${headerEnd}</div><div class="center">${fmtData(o.dataEntrega)} - ${o.turno}</div><div class="line"></div><div class="bold">CLIENTE:</div><div>${o.cliente}</div><div>${o.tel}</div><div class="line"></div>${bodyEnd}<div class="line"></div><div class="bold">ITENS:</div>${o.itens.map(i=>`<div style="margin-bottom:3px">${i.qtd}x ${i.prod} (${i.tam})<br><div style="text-align:right">${fmtMoeda(i.prc*i.qtd)}</div></div>`).join('')}<div class="line"></div><div class="row"><span>Taxa:</span> <span>${fmtMoeda(o.taxa)}</span></div><div class="row bold big"><span>TOTAL:</span> <span>${fmtMoeda(o.total)}</span></div><div class="row"><span>Pago:</span> <span>${fmtMoeda(o.pago)}</span></div><div class="row bold"><span>FALTA:</span> <span>${fmtMoeda(o.restante)}</span></div><div class="line"></div><div class="center bold">Obrigado pela preferência!</div></body></html>`); setTimeout(() => { w.print(); w.close(); }, 500);
     };
     window.populateBairroFilter = function() { const b = [...new Set(orders.map(o => o.bairro))].sort(); document.getElementById('filterBairro').innerHTML = '<option value="">Todos</option>' + b.map(x => `<option>${x}</option>`).join(''); };
     window.exportBackup = function() { const b = new Blob([JSON.stringify(orders)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'backup.json'; a.click(); };
     window.handleImport = function(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = async (ev) => { try { const arr = JSON.parse(ev.target.result); if(confirm(`Importar ${arr.length} pedidos?`)) { for(let o of arr) { delete o.fbId; await addDoc(colRef, o); } alert('Concluído!'); } } catch(x) { alert('Erro arquivo invalido'); } }; r.readAsText(f); };
-    window.exportToPDF = function() {
-        const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4');
-        doc.setFontSize(18); doc.text("Relatório de Pedidos - Divine Pudim Gourmet", 14, 20); doc.setFontSize(10); doc.text("Gerado em: " + new Date().toLocaleString(), 14, 28);
-        const tableColumn = ["Entregue Em", "Cliente/Contato", "Endereço Completo", "Itens", "Total", "Pago", "Falta"]; const tableRows = [];
-        orders.sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega)).forEach(o => {
-            const itemsStr = o.itens.map(i => `${i.qtd}x ${i.prod} (${i.tam})`).join('\n');
-            const endStr = o.tipoEntrega === 'Retirada no local' ? 'RETIRADA' : `${o.end}\n${o.bairro}\nObs: ${o.obs || '-'}`;
-            tableRows.push([`${fmtData(o.dataEntrega)}\n${o.turno}`, `${o.cliente}\n${o.tel}`, endStr, itemsStr, fmtMoeda(o.total), fmtMoeda(o.pago), fmtMoeda(o.restante)]);
-        });
-        doc.autoTable({ head: [tableColumn], body: tableRows, startY: 35, theme: 'grid', styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' }, columnStyles: { 0: {cellWidth:25}, 1:{cellWidth:35}, 2:{cellWidth:60}, 3:{cellWidth:70}, 4:{cellWidth:20, halign:'right'}, 5:{cellWidth:20, halign:'right'}, 6:{cellWidth:20, halign:'right'} } });
-        doc.save(`Relatorio_${new Date().toISOString().split('T')[0]}.pdf`);
-    };
-    window.exportToExcel = function() {
-        const wb = XLSX.utils.book_new();
-        const data = orders.map(o => ({ "Data Entrega": fmtData(o.dataEntrega), "Tipo": o.tipoEntrega, "Turno": o.turno, "Status": o.status, "Cliente": o.cliente, "Telefone": o.tel, "Endereço": o.end, "Bairro": o.bairro, "Obs": o.obs, "Itens": o.itens.map(i => `${i.qtd}x ${i.prod}`).join('; '), "Total": o.total, "Pago": o.pago, "Restante": o.restante }));
-        const ws = XLSX.utils.json_to_sheet(data); ws['!cols'] = [{wch:12}, {wch:15}, {wch:15}, {wch:15}, {wch:25}, {wch:15}, {wch:40}, {wch:15}, {wch:20}, {wch:50}];
-        XLSX.utils.book_append_sheet(wb, ws, "Pedidos"); XLSX.writeFile(wb, `Relatorio_${new Date().toISOString().split('T')[0]}.xlsx`);
-    };
+    window.exportToPDF = function() { const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); doc.setFontSize(18); doc.text("Relatório de Pedidos - Divine Pudim Gourmet", 14, 20); doc.setFontSize(10); doc.text("Gerado em: " + new Date().toLocaleString(), 14, 28); const tableColumn = ["Entregue Em", "Cliente/Contato", "Endereço Completo", "Itens", "Total", "Pago", "Falta"]; const tableRows = []; orders.sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega)).forEach(o => { const itemsStr = o.itens.map(i => `${i.qtd}x ${i.prod} (${i.tam})`).join('\n'); const endStr = o.tipoEntrega === 'Retirada no local' ? 'RETIRADA' : `${o.end}\n${o.bairro}\nObs: ${o.obs || '-'}`; tableRows.push([`${fmtData(o.dataEntrega)}\n${o.turno}`, `${o.cliente}\n${o.tel}`, endStr, itemsStr, fmtMoeda(o.total), fmtMoeda(o.pago), fmtMoeda(o.restante)]); }); doc.autoTable({ head: [tableColumn], body: tableRows, startY: 35, theme: 'grid', styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' }, columnStyles: { 0: {cellWidth:25}, 1:{cellWidth:35}, 2:{cellWidth:60}, 3:{cellWidth:70}, 4:{cellWidth:20, halign:'right'}, 5:{cellWidth:20, halign:'right'}, 6:{cellWidth:20, halign:'right'} } }); doc.save(`Relatorio_${new Date().toISOString().split('T')[0]}.pdf`); };
+    window.exportToExcel = function() { const wb = XLSX.utils.book_new(); const data = orders.map(o => ({ "Data Entrega": fmtData(o.dataEntrega), "Tipo": o.tipoEntrega, "Turno": o.turno, "Status": o.status, "Cliente": o.cliente, "Telefone": o.tel, "Endereço": o.end, "Bairro": o.bairro, "Obs": o.obs, "Itens": o.itens.map(i => `${i.qtd}x ${i.prod}`).join('; '), "Total": o.total, "Pago": o.pago, "Restante": o.restante })); const ws = XLSX.utils.json_to_sheet(data); ws['!cols'] = [{wch:12}, {wch:15}, {wch:15}, {wch:15}, {wch:25}, {wch:15}, {wch:40}, {wch:15}, {wch:20}, {wch:50}]; XLSX.utils.book_append_sheet(wb, ws, "Pedidos"); XLSX.writeFile(wb, `Relatorio_${new Date().toISOString().split('T')[0]}.xlsx`); };
+    window.renderCharts = function() { const ctxProd = document.getElementById('chartProd'); const ctxFat = document.getElementById('chartFat'); if(charts.prod) charts.prod.destroy(); if(charts.fat) charts.fat.destroy(); const counts = {}; orders.forEach(o => o.itens.forEach(i => { let key = `${i.prod} (${i.tam})`; counts[key] = (counts[key] || 0) + i.qtd; })); charts.prod = new Chart(ctxProd, { type: 'bar', data: { labels: Object.keys(counts), datasets: [{ label: 'Qtd', data: Object.values(counts), backgroundColor: '#ec4899' }] }, options: { responsive: true, maintainAspectRatio: false } }); const statusFat = {}; orders.forEach(o => statusFat[o.status] = (statusFat[o.status] || 0) + o.total); charts.fat = new Chart(ctxFat, { type: 'doughnut', data: { labels: Object.keys(statusFat), datasets: [{ data: Object.values(statusFat), backgroundColor: ['#3b82f6','#f59e0b','#8b5cf6','#06b6d4','#10b981'] }] }, options: { responsive: true, maintainAspectRatio: false } }); };
+    window.renderDashboard = function() { document.getElementById('dashTotal').innerText = orders.length; const fat = orders.reduce((acc, o) => acc + (o.total || 0), 0); const recebido = orders.reduce((acc, o) => acc + (o.pago || 0), 0); const taxas = orders.reduce((acc, o) => acc + (o.taxa || 0), 0); const aReceber = orders.reduce((acc, o) => acc + (o.restante || 0), 0); document.getElementById('dashFaturado').innerText = fmtMoeda(fat); document.getElementById('dashRecebido').innerText = fmtMoeda(recebido); document.getElementById('dashTaxas').innerText = fmtMoeda(taxas); document.getElementById('dashReceber').innerText = fmtMoeda(aReceber); const counts = {}; orders.forEach(o => o.itens.forEach(i => { let key = `${i.prod} - ${i.tam}`; counts[key] = (counts[key] || 0) + i.qtd; })); const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]); document.getElementById('topProductsList').innerHTML = sorted.map(([k,v]) => `<div style="background:#f9f9f9; padding:12px; border-radius:8px; display:flex; justify-content:space-between; border-left:4px solid var(--primary)"><b>${k}</b><span style="background:var(--primary); color:white; padding:2px 8px; border-radius:10px; font-size:12px">${v} un</span></div>`).join(''); };
 </script>
 </body>
 </html>
