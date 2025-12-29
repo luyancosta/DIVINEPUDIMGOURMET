@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V14</title>
+    <title>Divine Pudim Gourmet - Sistema V15 (Config Print)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
@@ -45,7 +45,7 @@
         .btn-primary:hover { transform: translateY(-2px); }
         .btn-secondary { background: var(--gray-200); color: var(--gray-800); }
         .btn-danger { background: #fee2e2; color: #991b1b; }
-        .btn-dark { background: #1e293b; color: white; } /* Botão novo para o resumo */
+        .btn-dark { background: #1e293b; color: white; } 
         
         /* TABS */
         .tabs-nav { background: var(--white); padding: 10px 0; position: sticky; top: 70px; z-index: 990; box-shadow: var(--shadow); margin-bottom: 20px; overflow-x: auto; }
@@ -84,7 +84,6 @@
         }
         .order-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         
-        /* FAIXA LATERAL (12px) */
         .order-card::before {
             content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 12px;
             background: var(--card-color, var(--primary)); 
@@ -107,7 +106,6 @@
         .finance-row { display: flex; justify-content: space-between; margin-bottom: 3px; color: #666; }
         .finance-total { font-weight: 800; font-size: 15px; color: var(--gray-800); margin-top: 5px; border-top: 1px solid #eee; padding-top: 5px; }
         
-        /* DESTAQUE DE PAGAMENTO NO CARD */
         .payment-highlight {
             background: #fef2f2;
             border: 1px solid #fee2e2;
@@ -139,11 +137,11 @@
         .btn-card:hover { background: var(--primary-light); color: var(--primary-dark); border-color: var(--primary-light); }
 
         /* CORES */
-        .card-confirmado { --card-color: #111827; } /* PRETO */
-        .card-produzindo { --card-color: #facc15; } /* AMARELO */
-        .card-pronto { --card-color: #3b82f6; }     /* AZUL */
-        .card-rota { --card-color: #ec4899; }       /* ROSA */
-        .card-entregue { --card-color: #22c55e; }   /* VERDE */
+        .card-confirmado { --card-color: #111827; }
+        .card-produzindo { --card-color: #facc15; }
+        .card-pronto { --card-color: #3b82f6; }     
+        .card-rota { --card-color: #ec4899; }        
+        .card-entregue { --card-color: #22c55e; }   
 
         /* MODAL */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
@@ -187,6 +185,7 @@
             <div class="header-content">
                 <div class="logo"><i class="fas fa-birthday-cake"></i> Divine Pudim Gourmet</div>
                 <div class="header-actions">
+                    <button class="btn btn-header" onclick="openPrintConfig()"><i class="fas fa-print"></i> Config. Impressão</button>
                     <button class="btn btn-header" onclick="exportBackup()">Backup</button>
                     <button class="btn btn-header" onclick="document.getElementById('importInput').click()">Importar</button>
                     <button class="btn btn-primary" onclick="showNewOrderModal()">+ Novo Pedido</button>
@@ -282,6 +281,28 @@
             </div>
         </div>
     </section>
+</div>
+
+<div id="printConfigModal" class="modal">
+    <div class="modal-content" style="max-width:500px">
+        <div class="modal-header">
+            <h2>Configurar Impressão</h2>
+            <button onclick="document.getElementById('printConfigModal').classList.remove('active')" style="background:none; border:none; color:white; font-size:24px; cursor:pointer">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-row" style="grid-template-columns: 1fr;">
+                <div><label>Título da Loja</label><input type="text" id="cfgTitle" placeholder="Ex: DIVINE PUDIM"></div>
+                <div><label>Subtítulo</label><input type="text" id="cfgSubtitle" placeholder="Ex: GOURMET"></div>
+                <div><label>Telefone/Contato</label><input type="text" id="cfgPhone" placeholder="Ex: 88 98824-4346"></div>
+                <div><label>Mensagem Rodapé</label><input type="text" id="cfgMsg" placeholder="Ex: Obrigado pela preferência!"></div>
+                <div><label>Rede Social (Rodapé)</label><input type="text" id="cfgSocial" placeholder="Ex: @divinepudimgourmet"></div>
+            </div>
+            <div style="margin-top:20px; display:flex; justify-content:space-between;">
+                <button class="btn btn-secondary" onclick="resetPrintConfig()">Restaurar Padrão</button>
+                <button class="btn btn-primary" onclick="savePrintConfig()">Salvar Configuração</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div id="orderModal" class="modal">
@@ -638,6 +659,171 @@
         }).join('');
     };
 
+    // --- CONFIGURAÇÕES DE IMPRESSÃO (NOVO) ---
+    const DEFAULT_PRINT_CONFIG = {
+        title: 'DIVINE PUDIM',
+        subtitle: 'GOURMET',
+        phone: '88 98824-4346',
+        msg: 'Obrigado pela preferência!',
+        social: '@divinepudimgourmet'
+    };
+
+    window.openPrintConfig = function() {
+        const cfg = JSON.parse(localStorage.getItem('printConfig')) || DEFAULT_PRINT_CONFIG;
+        document.getElementById('cfgTitle').value = cfg.title;
+        document.getElementById('cfgSubtitle').value = cfg.subtitle;
+        document.getElementById('cfgPhone').value = cfg.phone;
+        document.getElementById('cfgMsg').value = cfg.msg;
+        document.getElementById('cfgSocial').value = cfg.social;
+        document.getElementById('printConfigModal').classList.add('active');
+    };
+
+    window.savePrintConfig = function() {
+        const cfg = {
+            title: document.getElementById('cfgTitle').value || DEFAULT_PRINT_CONFIG.title,
+            subtitle: document.getElementById('cfgSubtitle').value || DEFAULT_PRINT_CONFIG.subtitle,
+            phone: document.getElementById('cfgPhone').value || DEFAULT_PRINT_CONFIG.phone,
+            msg: document.getElementById('cfgMsg').value || DEFAULT_PRINT_CONFIG.msg,
+            social: document.getElementById('cfgSocial').value || DEFAULT_PRINT_CONFIG.social
+        };
+        localStorage.setItem('printConfig', JSON.stringify(cfg));
+        alert('Configuração salva!');
+        document.getElementById('printConfigModal').classList.remove('active');
+    };
+
+    window.resetPrintConfig = function() {
+        if(confirm('Restaurar textos originais?')) {
+            localStorage.removeItem('printConfig');
+            window.openPrintConfig();
+        }
+    };
+
+    // --- FUNÇÃO DE IMPRESSÃO OTIMIZADA PARA 48MM (Com Config Customizável) ---
+    window.printOrder = function(id, numPedido) {
+        const o = orders.find(x => x.fbId === id);
+        // Carrega configurações salvas ou usa padrão
+        const cfg = JSON.parse(localStorage.getItem('printConfig')) || DEFAULT_PRINT_CONFIG;
+        
+        const w = window.open('', '', 'width=300,height=600');
+        
+        let headerEnd = "";
+        let bodyEnd = "";
+
+        // Lógica de cabeçalho (Delivery ou Retirada)
+        if (o.tipoEntrega === 'Delivery' || (o.turno && !o.turno.includes('Retirada'))) {
+            headerEnd = "DELIVERY";
+            bodyEnd = `
+                <div class="destaque">ENDEREÇO:</div>
+                <div class="big">${o.end || ''}</div>
+                <div class="big">${o.bairro || ''}</div>
+                ${o.obs ? `<div style="margin-top:5px; border:1px solid #000; padding:2px"><b>OBS:</b> ${o.obs}</div>` : ''}
+            `;
+        } else {
+            headerEnd = "RETIRADA";
+            bodyEnd = `<div class="center big" style="border:2px solid #000; padding:5px; margin:5px 0;">CLIENTE VAI RETIRAR</div>`;
+        }
+
+        // Lógica de Pagamento
+        let paymentBox = '';
+        if(o.restante <= 0.01) {
+            paymentBox = `<div class="box-pagamento">PAGO TOTAL</div>`;
+        } else if(o.pago > 0) {
+            paymentBox = `<div class="box-pagamento">RESTANTE: ${fmtMoeda(o.restante)}<br><small>(${o.formaPagRestante || '?'})</small></div>`;
+        } else {
+            paymentBox = `<div class="box-pagamento">A PAGAR: ${fmtMoeda(o.total)}<br><small>(${o.formaPagRestante || '?'})</small></div>`;
+        }
+
+        w.document.write(`
+            <html>
+            <head>
+                <style>
+                    @page { margin: 0; size: auto; }
+                    body { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; width: 48mm; color: #000; margin-right: 2mm; }
+                    .container { padding: 2px 2px 20px 2px; overflow-x: hidden; }
+                    * { font-weight: bold; line-height: 1.1; word-wrap: break-word; }
+                    .center { text-align: center; }
+                    .row { display: flex; justify-content: space-between; }
+                    .big { font-size: 14px; }
+                    .giant { font-size: 16px; text-transform: uppercase; }
+                    .line { border-bottom: 2px dashed #000; margin: 5px 0; }
+                    .destaque { font-size: 11px; text-transform: uppercase; margin-top: 5px; }
+                    .item-row { margin-bottom: 4px; padding-bottom: 2px; border-bottom: 1px dotted #ccc; }
+                    .box-pagamento { border: 2px solid #000; padding: 5px; margin-top: 10px; text-align: center; font-size: 14px; border-radius: 5px; background: #eee !important; -webkit-print-color-adjust: exact; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="center giant">${cfg.title}</div>
+                    <div class="center" style="font-size:11px">${cfg.subtitle}</div>
+                    <div class="center" style="margin-bottom:5px">${cfg.phone}</div>
+                    
+                    <div class="line"></div>
+                    
+                    <div class="row big">
+                        <span>PEDIDO</span>
+                        <span>#${numPedido}</span>
+                    </div>
+                    <div class="center giant" style="margin:5px 0; background:#000; color:#fff; -webkit-print-color-adjust: exact;">${headerEnd}</div>
+                    <div class="center">${fmtData(o.dataEntrega)}</div>
+                    <div class="center">${o.turno}</div>
+                    
+                    <div class="line"></div>
+                    
+                    <div class="destaque">CLIENTE:</div>
+                    <div class="big">${o.cliente}</div>
+                    <div>${o.tel}</div>
+                    
+                    <div class="line"></div>
+                    
+                    ${bodyEnd}
+                    
+                    <div class="line"></div>
+                    <div class="destaque" style="margin-bottom:5px">ITENS:</div>
+                    
+                    ${o.itens.map(i => `
+                        <div class="item-row">
+                            <div style="font-size:13px">${i.qtd}x ${i.prod}</div>
+                            <div class="row">
+                                <span style="font-size:10px; font-weight:normal">${i.tam}</span>
+                                <span>${fmtMoeda(i.prc * i.qtd)}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                    
+                    <div class="line"></div>
+                    
+                    <div class="row" style="font-size:11px">
+                        <span>Taxa:</span>
+                        <span>${fmtMoeda(o.taxa)}</span>
+                    </div>
+                    <div class="row" style="font-size:11px">
+                        <span>Sinal:</span>
+                        <span>${fmtMoeda(o.pago)}</span>
+                    </div>
+                    
+                    <div class="row giant" style="margin-top:5px">
+                        <span>TOTAL:</span>
+                        <span>${fmtMoeda(o.total)}</span>
+                    </div>
+
+                    ${paymentBox}
+                    
+                    <div class="center" style="margin-top:15px; font-size:10px;">
+                        ${cfg.msg} <br>
+                        ${cfg.social}
+                    </div>
+                    <br>.
+                </div>
+            </body>
+            </html>
+        `);
+        
+        setTimeout(() => {
+            w.print();
+            w.close();
+        }, 500);
+    };
+
     // --- UTILS ---
     window.buscarCep = async function() {
         let cep = document.getElementById('cliCep').value.replace(/\D/g,'');
@@ -672,15 +858,6 @@
         doc.save(`Resumo_Producao_${new Date().toISOString().split('T')[0]}.pdf`);
     };
 
-    window.printOrder = function(id, numPedido) {
-        const o = orders.find(x => x.fbId === id); const w = window.open('', '', 'width=300,height=600');
-        let headerEnd = ""; let bodyEnd = "";
-        if (o.tipoEntrega === 'Delivery' || !o.turno.includes('Retirada')) { headerEnd = "DELIVERY"; bodyEnd = `<div class="bold">ENDEREÇO:</div><div>${o.end}</div><div>${o.bairro}</div>${o.obs ? `<div style="margin-top:5px"><b>Ref:</b> ${o.obs}</div>` : ''}`; } else { headerEnd = "RETIRADA"; bodyEnd = `<div class="center bold">CLIENTE VAI RETIRAR</div>`; }
-        let paymentBox = '';
-        if(o.restante <= 0.01) { paymentBox = `<div style="border:3px solid #000; padding:10px; margin-top:10px; font-weight:bold; font-size:18px">PAGO TOTAL</div>`; } else if(o.pago > 0) { paymentBox = `<div style="border:3px solid #000; padding:10px; margin-top:10px; font-weight:bold; font-size:16px">RESTANTE: ${fmtMoeda(o.restante)}<br>(${o.formaPagRestante})</div>`; } else { paymentBox = `<div style="border:3px solid #000; padding:10px; margin-top:10px; font-weight:bold; font-size:16px">TOTAL A PAGAR: ${fmtMoeda(o.total)}<br>(${o.formaPagRestante})</div>`; }
-        w.document.write(`<html><head><style>body { font-family: 'Courier New', monospace; font-size: 12px; margin: 0; padding: 5px; width: 58mm; } .center { text-align: center; } .line { border-bottom: 1px dashed #000; margin: 8px 0; } .row { display: flex; justify-content: space-between; } .bold { font-weight: bold; } .big { font-size: 14px; }</style></head><body><div class="center bold big">DIVINE PUDIM GOURMET</div><div class="center">88 98824-4346</div><div class="line"></div><div class="center bold big">PEDIDO #${numPedido}</div><div class="center bold">${headerEnd}</div><div class="center">${fmtData(o.dataEntrega)} - ${o.turno}</div><div class="line"></div><div class="bold">CLIENTE:</div><div>${o.cliente}</div><div>${o.tel}</div><div class="line"></div>${bodyEnd}<div class="line"></div><div class="bold">ITENS:</div>${o.itens.map(i=>`<div style="margin-bottom:3px">${i.qtd}x ${i.prod} (${i.tam})<br><div style="text-align:right">${fmtMoeda(i.prc*i.qtd)}</div></div>`).join('')}<div class="line"></div><div class="row"><span>Taxa:</span> <span>${fmtMoeda(o.taxa)}</span></div><div class="row bold big"><span>TOTAL:</span> <span>${fmtMoeda(o.total)}</span></div><div class="row"><span>Pago:</span> <span>${fmtMoeda(o.pago)}</span></div><div class="row bold"><span>FALTA:</span> <span>${o.restante <= 0.01 ? 'R$ 0,00' : fmtMoeda(o.restante)}</span></div><div class="center">${paymentBox}</div><div class="line"></div><div class="center bold">Obrigada pela preferência e esperamos adoçar seu dia mais vezes 😄✨</div></body></html>`); setTimeout(() => { w.print(); w.close(); }, 500);
-    };
-    
     window.populateBairroFilter = function() { const b = [...new Set(orders.map(o => o.bairro))].sort(); document.getElementById('filterBairro').innerHTML = '<option value="">Todos</option>' + b.map(x => `<option>${x}</option>`).join(''); };
     window.exportBackup = function() { const b = new Blob([JSON.stringify(orders)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'backup.json'; a.click(); };
     window.handleImport = function(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = async (ev) => { try { const arr = JSON.parse(ev.target.result); if(confirm(`Importar ${arr.length} pedidos?`)) { for(let o of arr) { delete o.fbId; await addDoc(colRef, o); } alert('Concluído!'); } } catch(x) { alert('Erro arquivo invalido'); } }; r.readAsText(f); };
