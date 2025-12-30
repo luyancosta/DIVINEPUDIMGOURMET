@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - V28 (Estoque Inteligente)</title>
+    <title>Divine Pudim Gourmet - Sistema V29 (Estoque Ajustado)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -355,7 +355,7 @@
             
             <h4 style="margin:15px 0 10px 0; border-bottom:1px solid #eee; padding-bottom:5px; color:#f59e0b">Controle de Estoque</h4>
             <div style="background:#fffbeb; border:1px solid #fcd34d; padding:10px; border-radius:6px; margin-bottom:15px">
-                <p style="font-size:12px; color:#92400e; margin-bottom:5px">Use este botão para definir o estoque inicial com os números fornecidos (6 Delícias, 14 Pudins, etc.). Ele deduzirá automaticamente os pedidos pendentes.</p>
+                <p style="font-size:12px; color:#92400e; margin-bottom:5px"><b>Passo Obrigatório:</b> Clique aqui para atualizar o sistema com a contagem física (13 Pudins M, 6 Delícias, etc) e recalcular o saldo com base nos pedidos pendentes.</p>
                 <button class="btn btn-warning" onclick="applyInitialStock()" style="width:100%; justify-content:center">📦 Aplicar Contagem Inicial (Reset)</button>
             </div>
 
@@ -503,13 +503,12 @@
         { prod: 'Ouro branco', tam: 'P', qtd: 3 },
         { prod: 'Supreme de morango', tam: 'P', qtd: 2 },
         { prod: 'Supreme de morango', tam: 'G', qtd: 4 },
-        { prod: 'Pudim tradicional', tam: 'M', qtd: 14 },
+        { prod: 'Pudim tradicional', tam: 'M', qtd: 13 }, // Atualizado para 13
         { prod: 'Pudim tradicional', tam: 'G', qtd: 2 },
         { prod: 'Ferrero Rocher', tam: 'P', qtd: 1 },
         { prod: 'Bombom de morango', tam: 'G', qtd: 2 },
-        { prod: 'Bombom de uva', tam: 'P', qtd: 1 }, // Note: User said G(1) for Uva, adjusted logic to match name
+        { prod: 'Bombom de uva', tam: 'G', qtd: 1 }, // Atualizado para G
         { prod: 'Bombom de morango', tam: 'P', qtd: 2 }
-        // Items not listed here start at 0
     ];
 
     const PRODUTOS = [
@@ -599,31 +598,31 @@
         
         // 1. Calcular o que está comprometido (Pending Orders)
         const pendingItems = {};
-        const activeOrders = orders.filter(o => o.status !== 'Entregue'); // Pedidos não entregues consomem estoque
+        const activeOrders = orders.filter(o => o.status !== 'Entregue');
         
         activeOrders.forEach(o => {
             o.itens.forEach(item => {
                 let baseName = item.prod;
                 const match = item.prod.match(/^(.*)\s\((.*)\)$/);
                 if (match && PRODUTOS.find(p => p.nome === match[1])) { baseName = match[1]; }
+                
+                // Normaliza chave para evitar erros de case (bombom vs Bombom)
                 const key = getStockKey(baseName, item.tam);
                 pendingItems[key] = (pendingItems[key] || 0) + item.qtd;
             });
         });
 
         // 2. Definir o estoque base
-        // Primeiro, zera tudo ou itera sobre PRODUTOS para garantir que tudo seja tocado
         const promises = [];
         
         PRODUTOS.forEach(p => {
             p.tamanhos.forEach(t => {
                 const key = getStockKey(p.nome, t.t);
                 
-                // Encontra se tem valor inicial definido pelo usuario
-                // Obs: Comparação de strings simplificada
+                // Encontra se tem valor inicial definido pelo usuario com comparação segura
                 const initData = INITIAL_STOCK_DATA.find(i => 
-                    i.prod.toLowerCase() === p.nome.toLowerCase() && 
-                    i.tam.toLowerCase() === t.t.toLowerCase()
+                    i.prod.trim().toLowerCase() === p.nome.trim().toLowerCase() && 
+                    i.tam.trim().toLowerCase() === t.t.trim().toLowerCase()
                 );
                 
                 const physicalCount = initData ? initData.qtd : 0;
@@ -666,8 +665,6 @@
         onSnapshot(query(colRef), (snapshot) => {
             orders = [];
             snapshot.forEach(doc => { let d = doc.data(); d.fbId = doc.id; orders.push(d); });
-            // Sort by Date Created (using delivery date as proxy since creation date wasn't tracked strictly, but delivery date works for urgency)
-            // Better: If we added timestamp, we'd use that. For FIFO logic, Delivery Date is fair.
             orders.sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega));
             orders.forEach((o, i) => o.displayId = (i + 1).toString().padStart(3, '0'));
             refreshAll();
@@ -676,7 +673,7 @@
         onSnapshot(query(stockCol), (snapshot) => {
             stockData = {};
             snapshot.forEach(doc => { stockData[doc.id] = doc.data(); });
-            refreshAll(); // Refresh orders to update indicators
+            refreshAll();
         });
 
         document.getElementById('dataPed').value = new Date().toISOString().split('T')[0];
@@ -906,12 +903,10 @@
         const activeOrders = orders.filter(o => o.status !== 'Entregue');
         const inventoryTracker = {}; 
         
-        // Inicializa com o que está no DB (que é o Net Stock)
         for (const [key, data] of Object.entries(stockData)) {
             inventoryTracker[key] = (data.pronto || 0);
         }
         
-        // Soma o que está nos pedidos para achar o físico real
         activeOrders.forEach(o => {
             o.itens.forEach(i => {
                 let baseName = i.prod;
@@ -926,16 +921,13 @@
         const sorted = [...list].sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega));
         
         div.innerHTML = sorted.map((o, index) => {
-            // Se o pedido já foi entregue, ignora lógica de estoque
             const isDelivered = o.status === 'Entregue';
-            
             const numPedido = o.displayId; 
             const statusMap = { 'Pedido confirmado': 'card-confirmado', 'Produzindo': 'card-produzindo', 'Pronto': 'card-pronto', 'Em rota': 'card-rota', 'Entregue': 'card-entregue' };
             const statusClass = statusMap[o.status] || 'card-confirmado';
             const colorMap = { 'Pedido confirmado': '#000000', 'Produzindo': '#facc15', 'Pronto': '#3b82f6', 'Em rota': '#a855f7', 'Entregue': '#22c55e' };
             const selectBg = colorMap[o.status] || '#000000'; const selectColor = o.status === 'Produzindo' ? '#000000' : '#ffffff';
             
-            // Gera HTML dos itens com verificação de estoque
             const itensHtml = o.itens.map(i => {
                 let statusBadge = '';
                 if (!isDelivered) {
@@ -944,13 +936,11 @@
                     if (match && PRODUTOS.find(p => p.nome === match[1])) { baseName = match[1]; }
                     const key = getStockKey(baseName, i.tam);
                     
-                    // Verifica disponibilidade
                     if ((inventoryTracker[key] || 0) >= i.qtd) {
                         inventoryTracker[key] -= i.qtd;
                         statusBadge = '<span class="item-status-ok">✅ Estoque</span>';
                     } else {
-                        // Consome o que tem (mesmo que parcial) ou zero
-                        inventoryTracker[key] = 0; // Zerou estoque pra esse item
+                        inventoryTracker[key] = 0; 
                         statusBadge = '<span class="item-status-wait">⏳ Produzir</span>';
                     }
                 }
@@ -978,9 +968,11 @@
         setTimeout(() => { w.document.close(); w.print(); w.close(); }, 500);
     };
 
+    // --- RESTANTE ---
     window.buscarCep = async function() { let cep = document.getElementById('cliCep').value.replace(/\D/g,''); if(cep.length === 8) { try { let r = await fetch(`https://viacep.com.br/ws/${cep}/json/`); let d = await r.json(); if(!d.erro) { document.getElementById('cliEnd').value = d.logradouro; const bSelect = document.getElementById('cliBairro'); let found = false; for (let i = 0; i < bSelect.options.length; i++) { if (bSelect.options[i].value.toLowerCase() === d.bairro.toLowerCase()) { bSelect.selectedIndex = i; found = true; break; } } if (!found) { bSelect.value = 'OUTRO'; document.getElementById('cliBairroOutro').value = d.bairro; } checkBairro(); } } catch(e) {} } };
     window.showNewOrderModal = function() { document.getElementById('orderForm').reset(); document.getElementById('itemsContainer').innerHTML = ''; document.getElementById('editFirebaseId').value = ''; document.getElementById('dataPed').value = new Date().toISOString().split('T')[0]; document.getElementById('checkAdiantamento').checked = false; toggleAdiantamento(); document.getElementById('orderModal').classList.add('active'); checkTipoEntrega(); addItem(); };
     window.closeOrderModal = function() { document.getElementById('orderModal').classList.remove('active'); };
+    window.deleteOrder = async function(id) { if(confirm('Excluir?')) await deleteDoc(doc(db, "pedidos", id)); };
     window.fmtMoeda = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
     window.fmtData = d => d.split('-').reverse().join('/');
     window.searchOrders = function() { applyFilters(); };
