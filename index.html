@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V20 (Ultimate AI Routing)</title>
+    <title>Divine Pudim Gourmet - Sistema V21 (Final)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -35,7 +35,7 @@
         .btn-login { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-login:hover { background: var(--primary-dark); transform: translateY(-2px); }
 
-        /* APP HEADER */
+        /* HEADER E BOTÕES */
         #appContent { display: none; padding-bottom: 40px; }
         .header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: var(--white); padding: 20px 0; position: sticky; top: 0; z-index: 1000; box-shadow: var(--shadow); }
         .header-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
@@ -43,18 +43,16 @@
         .logo i { color: var(--accent); font-size: 28px; }
         .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
         
-        /* BOTÕES */
         .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: var(--transition); }
         .btn-header { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3); }
         .btn-header:hover { background: rgba(255,255,255,0.3); }
         .btn-primary { background: var(--accent); color: var(--gray-800); font-weight: 700; box-shadow: var(--shadow); }
-        .btn-primary:hover { transform: translateY(-2px); }
         .btn-secondary { background: var(--gray-200); color: var(--gray-800); }
         .btn-danger { background: #fee2e2; color: #991b1b; }
         .btn-dark { background: #1e293b; color: white; } 
         .btn-success { background: #22c55e; color: white; }
         .btn-warning { background: #f59e0b; color: white; }
-        
+
         /* TABS */
         .tabs-nav { background: var(--white); padding: 10px 0; position: sticky; top: 70px; z-index: 990; box-shadow: var(--shadow); margin-bottom: 20px; overflow-x: auto; }
         .tabs-buttons { display: flex; gap: 10px; padding: 0 20px; min-width: max-content; }
@@ -64,57 +62,25 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* CARDS GERAIS */
+        /* CARDS E LISTAS */
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .card { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); display: flex; flex-direction: column; justify-content: center; }
         .card-row { display: flex; align-items: center; gap: 15px; }
         .card-icon { width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; flex-shrink: 0; }
-        .card h3 { font-size: 20px; font-weight: 700; margin-bottom: 5px; }
-
-        /* PEDIDOS E FILTROS */
+        
         .search-bar, .filters { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 20px; }
         .filters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; }
         input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-family: inherit; }
         .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
 
-        /* ================= ESTILOS DA ROTA ================= */
-        .route-container { display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
-        .route-list { background: #fff; padding: 10px; border-radius: 12px; min-height: 500px; border: 1px solid #e5e7eb; box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05); }
-        .route-map-placeholder { background: white; border-radius: 12px; padding: 20px; height: fit-content; box-shadow: var(--shadow); position: sticky; top: 140px; }
-        
-        .route-item { 
-            background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.08); 
-            display: flex; align-items: center; gap: 15px; cursor: grab; border-left: 5px solid var(--primary); transition: transform 0.1s, box-shadow 0.2s; position: relative;
-        }
-        .route-item:active { cursor: grabbing; }
-        .sortable-ghost { opacity: 0.4; background: #fdf2f8; border: 2px dashed var(--primary); }
-        .sortable-drag { background: #fff; opacity: 1; box-shadow: 0 15px 30px rgba(0,0,0,0.2); transform: scale(1.02); }
-        
-        .route-number { background: var(--gray-800); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; flex-shrink: 0; }
-        .route-details { flex: 1; user-select: none; }
-        .route-addr { font-size: 14px; color: #333; font-weight: 600; margin-bottom: 2px; }
-        .route-bairro { font-size: 12px; color: #666; background: #f1f5f9; padding: 2px 8px; border-radius: 10px; display: inline-block; font-weight: 600; }
-        .route-handle { color: #ccc; padding: 5px; font-size: 18px; }
-        .route-handle:hover { color: var(--primary); }
-
-        /* LOADING BAR */
-        #apiLoading { display: none; margin-top: 10px; background: #f0f9ff; padding: 10px; border-radius: 8px; border: 1px solid #bae6fd; color: #0369a1; text-align: center; font-weight: bold; }
-        .loading-bar-bg { width: 100%; height: 8px; background: #e0e0e0; border-radius: 4px; margin-top: 5px; overflow: hidden; }
-        .loading-bar-fill { height: 100%; background: #0ea5e9; width: 0%; transition: width 0.3s; }
-
-        @media(max-width: 900px) {
-            .route-container { grid-template-columns: 1fr; }
-            .route-map-placeholder { order: -1; position: static; }
-        }
-
-        /* ================= CARD DO PEDIDO ================= */
+        /* PEDIDO CARD */
         .order-card { background: white; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-direction: column; position: relative; transition: transform 0.2s; }
         .order-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .order-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 12px; background: var(--card-color, var(--primary)); }
-        .order-header { padding: 15px 15px 15px 25px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; background: #fafafa; }
+        .order-header { padding: 15px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; background: #fafafa; }
         .order-id { font-weight: 800; font-size: 16px; color: var(--gray-800); }
         .order-date { font-size: 12px; color: var(--gray-600); }
-        .order-body { padding: 15px 15px 15px 25px; flex: 1; }
+        .order-body { padding: 15px; flex: 1; }
         .client-info { margin-bottom: 12px; }
         .client-name { font-weight: 700; font-size: 15px; display: block; margin-bottom: 2px; color:#333; }
         .client-detail { font-size: 13px; color: #666; display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
@@ -132,8 +98,28 @@
         .card-produzindo { --card-color: #facc15; }
         .card-pronto { --card-color: #3b82f6; }     
         .card-rota { --card-color: #ec4899; }        
-        .card-entregue { --card-color: #22c55e; }   
+        .card-entregue { --card-color: #22c55e; } 
 
+        /* ROTAS */
+        .route-container { display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
+        .route-list { background: #fff; padding: 10px; border-radius: 12px; min-height: 500px; border: 1px solid #e5e7eb; box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05); }
+        .route-map-placeholder { background: white; border-radius: 12px; padding: 20px; height: fit-content; box-shadow: var(--shadow); position: sticky; top: 140px; }
+        .route-item { background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 15px; cursor: grab; border-left: 5px solid var(--primary); transition: transform 0.1s, box-shadow 0.2s; position: relative; }
+        .route-item:active { cursor: grabbing; }
+        .sortable-ghost { opacity: 0.4; background: #fdf2f8; border: 2px dashed var(--primary); }
+        .sortable-drag { background: #fff; opacity: 1; box-shadow: 0 15px 30px rgba(0,0,0,0.2); transform: scale(1.02); }
+        .route-number { background: var(--gray-800); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; flex-shrink: 0; }
+        .route-details { flex: 1; user-select: none; }
+        .route-addr { font-size: 14px; color: #333; font-weight: 600; margin-bottom: 2px; }
+        .route-bairro { font-size: 12px; color: #666; background: #f1f5f9; padding: 2px 8px; border-radius: 10px; display: inline-block; font-weight: 600; }
+        .route-handle { color: #ccc; padding: 5px; font-size: 18px; }
+        #apiLoading { display: none; margin-top: 10px; background: #f0f9ff; padding: 10px; border-radius: 8px; border: 1px solid #bae6fd; color: #0369a1; text-align: center; font-weight: bold; }
+        .loading-bar-bg { width: 100%; height: 8px; background: #e0e0e0; border-radius: 4px; margin-top: 5px; overflow: hidden; }
+        .loading-bar-fill { height: 100%; background: #0ea5e9; width: 0%; transition: width 0.3s; }
+
+        @media(max-width: 900px) { .route-container { grid-template-columns: 1fr; } .route-map-placeholder { order: -1; position: static; } }
+        @media(max-width: 768px) { .items-header { display: none; } .item-row { grid-template-columns: 1fr; } .header-content { flex-direction: column; } }
+        
         /* MODAL */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
         .modal.active { display: flex; }
@@ -141,11 +127,6 @@
         .modal-header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 16px 16px 0 0; }
         .modal-body { padding: 30px; }
         .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        .items-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; gap: 10px; font-weight: bold; color: var(--gray-600); margin-bottom: 5px; font-size: 14px; padding: 0 10px; }
-        .item-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto; gap: 10px; align-items: center; margin-bottom: 10px; padding: 10px; border: 1px solid #eee; border-radius: 8px; background: #fff; }
-        .input-group { position: relative; }
-        .input-group span { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-weight: bold; color: #666; }
-        .input-group input { padding-left: 35px; }
         @media print { body * { visibility: hidden; } #printArea, #printArea * { visibility: visible; } #printArea { position: absolute; left: 0; top: 0; width: 58mm; padding: 0; margin: 0; font-size: 12px; font-family: monospace; } }
     </style>
 </head>
@@ -270,7 +251,7 @@
                         <p><i class="fas fa-truck"></i> Entregas: <strong id="routeCount">0</strong></p>
                         <p><i class="fas fa-clock"></i> Turno: <strong id="routeTurnoDisplay">-</strong></p>
                         <p style="margin-top:10px; font-size:12px; line-height:1.4">
-                            <i>* Arraste os cartões na lista ao lado para ajustar a ordem.</i><br>
+                            <i>* Arraste os cartões na lista para ajustar.</i><br>
                             <i>* Saída: Rua Apolo XI, 519.</i>
                         </p>
                     </div>
@@ -278,7 +259,7 @@
                     <div style="text-align:center">
                         <div style="background:#e0f2fe; padding:15px; border-radius:8px; color:#0369a1; margin-bottom:15px">
                             <i class="fas fa-info-circle"></i><br>
-                            Use o botão <b>"Otimizar com IA"</b> para calcular a rota real (Requer API Key na Configuração).
+                            Para usar a Otimização GPS, configure a API Key no menu.
                         </div>
                         <img src="https://www.google.com/images/branding/product/2x/maps_96in128dp.png" alt="Maps" style="width:64px; opacity:0.8">
                     </div>
@@ -433,10 +414,6 @@
 
 <input type="file" id="importInput" style="display:none" onchange="handleImport(event)" accept=".json">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -489,42 +466,53 @@
         "Tiradentes", "Três Marias", "Triângulo", "OUTRO"
     ];
 
-    // --- LÓGICA REFINADA PARA JUAZEIRO DO NORTE (BASE: RUA APOLO XI - SALESIANOS) ---
-    // A lógica é: Centro/Próximo -> Norte/Leste -> Oeste -> Sul/Distantes (Espiral)
     const SEQUENCIA_LOGICA_BAIRROS = [
-        "Salesianos", // Ponto de partida
-        "Santo Antônio",
-        "Santa Teresa", 
-        "Socorro",
-        "Centro",
-        "São Miguel",
-        "Romeirão",
-        "Pirajá",
-        "Franciscanos",
-        "Limoeiro",
-        "João Cabral",
-        "Horto",
-        "Triângulo",
-        "Antônio Vieira",
-        "São José",
-        "Frei Damião",
-        "Jardim Gonzaga",
-        "Lagoa Seca",
-        "Planalto",
-        "Cidade Universitária",
-        "Campo Alegre",
-        "Betolândia",
-        "Aeroporto",
-        "Novo Juazeiro",
-        "Tiradentes",
-        "Pedrinhas",
-        "Brejo Seco"
+        "Salesianos", "Santo Antônio", "Santa Teresa", "Socorro", "Centro", "São Miguel",
+        "Romeirão", "Pirajá", "Franciscanos", "Limoeiro", "João Cabral", "Horto",
+        "Triângulo", "Antônio Vieira", "São José", "Frei Damião", "Jardim Gonzaga",
+        "Lagoa Seca", "Planalto", "Cidade Universitária", "Campo Alegre", "Betolândia",
+        "Aeroporto", "Novo Juazeiro", "Tiradentes", "Pedrinhas", "Brejo Seco"
     ];
 
     let orders = [];
-    let charts = { prod: null, fat: null };
     let activeRouteOrders = [];
-    let sortableInstance = null; // Variável para controlar o SortableJS
+    let charts = { prod: null, fat: null };
+    let sortableInstance = null;
+
+    // --- CONFIGURAÇÃO ---
+    const DEFAULT_PRINT_CONFIG = { title: 'DIVINE PUDIM', subtitle: 'GOURMET', phone: '88 98824-4346', msg: 'Obrigado pela preferência!', social: '@divinepudimgourmet', apiKey: '' };
+
+    window.openPrintConfig = function() { 
+        const cfg = JSON.parse(localStorage.getItem('printConfig')) || DEFAULT_PRINT_CONFIG; 
+        if(document.getElementById('cfgTitle')) document.getElementById('cfgTitle').value = cfg.title; 
+        if(document.getElementById('cfgSubtitle')) document.getElementById('cfgSubtitle').value = cfg.subtitle; 
+        if(document.getElementById('cfgPhone')) document.getElementById('cfgPhone').value = cfg.phone; 
+        if(document.getElementById('cfgMsg')) document.getElementById('cfgMsg').value = cfg.msg; 
+        if(document.getElementById('cfgSocial')) document.getElementById('cfgSocial').value = cfg.social; 
+        if(document.getElementById('cfgApiKey')) document.getElementById('cfgApiKey').value = cfg.apiKey || ''; 
+        document.getElementById('printConfigModal').classList.add('active'); 
+    };
+
+    window.savePrintConfig = function() { 
+        const cfg = { 
+            title: document.getElementById('cfgTitle').value, 
+            subtitle: document.getElementById('cfgSubtitle').value, 
+            phone: document.getElementById('cfgPhone').value, 
+            msg: document.getElementById('cfgMsg').value, 
+            social: document.getElementById('cfgSocial').value,
+            apiKey: document.getElementById('cfgApiKey') ? document.getElementById('cfgApiKey').value : ''
+        }; 
+        localStorage.setItem('printConfig', JSON.stringify(cfg)); 
+        alert('Configuração salva!'); 
+        document.getElementById('printConfigModal').classList.remove('active'); 
+    };
+
+    window.resetPrintConfig = function() { 
+        if(confirm('Restaurar padrão?')) { 
+            localStorage.removeItem('printConfig'); 
+            window.openPrintConfig(); 
+        } 
+    };
 
     // --- LOGIN ---
     window.handleLogin = function(e) {
@@ -556,7 +544,7 @@
         document.getElementById('dataPed').valueAsDate = new Date();
     }
 
-    // --- LÓGICA DE PAGAMENTO E ITENS ---
+    // --- FUNÇÕES GERAIS ---
     window.toggleAdiantamento = function() {
         const chk = document.getElementById('checkAdiantamento');
         const area = document.getElementById('areaAdiantamento');
@@ -568,15 +556,7 @@
 
     window.addItem = function(data = null) {
         const id = Date.now() + Math.floor(Math.random() * 1000); 
-        const html = `
-        <div class="item-row" id="row-${id}">
-            <div><select class="i-prod" onchange="updItem(${id})"><option value="">Selecione...</option>${PRODUTOS.map(p => `<option value="${p.nome}" ${p.requerSabor ? 'data-sabor="1"' : ''}>${p.nome}</option>`).join('')}<option value="OUTRO">Outro (Manual)</option></select><input type="text" class="i-cust" style="display:none; margin-top:5px; width:100%" placeholder="Digite aqui..."></div>
-            <div><select class="i-tam" onchange="updPrice(${id})"><option>-</option></select></div>
-            <div><input type="number" class="i-qtd" value="1" onchange="calcTotal()" style="width:60px"></div>
-            <div><input type="number" class="i-prc" step="0.01" onchange="calcTotal()" style="width:80px"></div>
-            <div class="i-total" style="font-weight:bold; color:#666">R$ 0,00</div>
-            <button type="button" class="btn btn-danger" onclick="this.parentElement.remove(); calcTotal()">X</button>
-        </div>`;
+        const html = `<div class="item-row" id="row-${id}"><div><select class="i-prod" onchange="updItem(${id})"><option value="">Selecione...</option>${PRODUTOS.map(p => `<option value="${p.nome}" ${p.requerSabor ? 'data-sabor="1"' : ''}>${p.nome}</option>`).join('')}<option value="OUTRO">Outro (Manual)</option></select><input type="text" class="i-cust" style="display:none; margin-top:5px; width:100%" placeholder="Digite aqui..."></div><div><select class="i-tam" onchange="updPrice(${id})"><option>-</option></select></div><div><input type="number" class="i-qtd" value="1" onchange="calcTotal()" style="width:60px"></div><div><input type="number" class="i-prc" step="0.01" onchange="calcTotal()" style="width:80px"></div><div class="i-total" style="font-weight:bold; color:#666">R$ 0,00</div><button type="button" class="btn btn-danger" onclick="this.parentElement.remove(); calcTotal()">X</button></div>`;
         document.getElementById('itemsContainer').insertAdjacentHTML('beforeend', html);
         if(data) {
             const row = document.getElementById(`row-${id}`); const selProd = row.querySelector('.i-prod'); const selTam = row.querySelector('.i-tam'); const inpCust = row.querySelector('.i-cust');
@@ -587,6 +567,7 @@
             row.querySelector('.i-qtd').value = data.qtd; row.querySelector('.i-prc').value = data.prc; row.querySelector('.i-total').innerText = fmtMoeda(data.qtd * data.prc);
         }
     };
+
     window.updItem = function(id) { const row = document.getElementById(`row-${id}`); const sel = row.querySelector('.i-prod'); const tam = row.querySelector('.i-tam'); const cust = row.querySelector('.i-cust'); const prc = row.querySelector('.i-prc'); const opt = sel.options[sel.selectedIndex]; const val = sel.value; if(val === 'OUTRO') { cust.style.display = 'block'; cust.placeholder = "Produto"; tam.innerHTML = '<option value="Único">Único</option>'; prc.value = ''; } else { const p = PRODUTOS.find(x => x.nome === val); if(p) { tam.innerHTML = p.tamanhos.map(t => `<option value="${t.t}" data-p="${t.p}">${t.t}</option>`).join(''); if(p.tamanhos[0]) prc.value = p.tamanhos[0].p; } if (opt.getAttribute('data-sabor')) { cust.style.display = 'block'; cust.placeholder = "Sabor"; } else { cust.style.display = 'none'; cust.value = ''; } } calcTotal(); };
     window.updPrice = function(id) { const row = document.getElementById(`row-${id}`); const tam = row.querySelector('.i-tam'); const prc = row.querySelector('.i-prc'); const opt = tam.options[tam.selectedIndex]; if(opt && opt.dataset.p) { prc.value = opt.dataset.p; calcTotal(); } };
     window.quickUpdateStatus = async function(id, newStatus) { try { await updateDoc(doc(db, "pedidos", id), { status: newStatus }); } catch(e) {} };
@@ -596,239 +577,87 @@
     window.editOrder = function(id) { const o = orders.find(x => x.fbId === id); if(!o) return; showNewOrderModal(); document.getElementById('editFirebaseId').value = id; document.getElementById('cliNome').value = o.cliente; document.getElementById('cliTel').value = o.tel; const isDelivery = o.tipoEntrega === 'Delivery' || (o.turno && !o.turno.includes('Retirada')); document.getElementById('tipoEntrega').value = isDelivery ? 'Delivery' : 'Retirada no local'; checkTipoEntrega(); if(isDelivery) { document.getElementById('cliCep').value = o.cep || ''; if(o.end && o.end.includes(', Nº')) { const parts = o.end.split(', Nº'); document.getElementById('cliEnd').value = parts[0].trim(); document.getElementById('cliNumero').value = parts[1].trim(); } else { document.getElementById('cliEnd').value = o.end; } const sel = document.getElementById('cliBairro'); let found = false; for(let i=0; i<sel.options.length; i++) { if(sel.options[i].value === o.bairro) { sel.selectedIndex = i; found = true; break; } } if(!found) { sel.value = 'OUTRO'; checkBairro(); document.getElementById('cliBairroOutro').value = o.bairro; } document.getElementById('turnoEntrega').value = (o.turno === 'Manhã' || o.turno === 'Tarde') ? o.turno : ''; } else { if(o.turno.includes('às')) { document.getElementById('horarioRetirada').value = o.turno.split('às')[1].trim(); } } document.getElementById('dataPed').value = o.dataPedido; document.getElementById('dataEnt').value = o.dataEntrega; document.getElementById('statusPed').value = o.status; document.getElementById('valPago').value = o.pago; document.getElementById('valTaxa').value = o.taxa || 0; document.getElementById('formaPagRestante').value = o.formaPagRestante || ''; document.getElementById('obs').value = o.obs || ''; if(o.pago > 0) { document.getElementById('checkAdiantamento').checked = true; document.getElementById('areaAdiantamento').style.display = 'grid'; document.getElementById('formaPagSinal').value = o.formaPagSinal || ''; document.getElementById('lblFormaRestante').innerText = "Forma de Pagamento (Do Restante)"; } else { document.getElementById('checkAdiantamento').checked = false; document.getElementById('areaAdiantamento').style.display = 'none'; document.getElementById('lblFormaRestante').innerText = "Forma de Pagamento (Valor Total)"; } document.getElementById('itemsContainer').innerHTML = ''; o.itens.forEach(i => addItem(i)); calcTotal(); };
     window.calcTotal = function() { let itemsTotal = 0; document.querySelectorAll('.item-row').forEach(row => { const q = parseFloat(row.querySelector('.i-qtd').value) || 0; const p = parseFloat(row.querySelector('.i-prc').value) || 0; const sub = q * p; row.querySelector('.i-total').innerText = fmtMoeda(sub); itemsTotal += sub; }); const taxa = parseFloat(document.getElementById('valTaxa').value) || 0; const pago = parseFloat(document.getElementById('valPago').value) || 0; const finalTotal = itemsTotal + taxa; const divRestante = document.getElementById('divFormaRestante'); const valRestante = finalTotal - pago; if (valRestante <= 0.01) { divRestante.style.display = 'none'; } else { divRestante.style.display = 'block'; } document.getElementById('displayTotal').innerText = fmtMoeda(finalTotal); document.getElementById('valRest').value = fmtMoeda(valRestante); };
 
-    // --- NOVA FUNCIONALIDADE: ROTAS DE ENTREGA (V19 - SORTABLEJS + API AI) ---
-    
-    // 1. Renderizar Rota e Inicializar SortableJS
+    // --- ROTAS (SORTABLEJS + API) ---
     window.renderRoutes = function() {
         const selectedTurno = document.getElementById('routeTurnoSelector').value;
         const listArea = document.getElementById('routeListArea');
-        
-        // Filtra pedidos
         activeRouteOrders = orders.filter(o => {
             return (o.turno === selectedTurno || (o.turno && o.turno.includes(selectedTurno))) && 
                    o.status !== 'Entregue' && 
                    o.tipoEntrega === 'Delivery';
         });
-
         document.getElementById('routeCount').innerText = activeRouteOrders.length;
         document.getElementById('routeTurnoDisplay').innerText = selectedTurno;
-
-        if(activeRouteOrders.length === 0) {
-            listArea.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px">Nenhuma entrega pendente para este turno.</p>';
-            return;
-        }
-
-        // Renderiza lista
-        listArea.innerHTML = activeRouteOrders.map((o, idx) => `
-            <div class="route-item" data-fb-id="${o.fbId}">
-                <div class="route-number">${idx + 1}</div>
-                <div class="route-details">
-                    <div class="route-addr">${o.end}</div>
-                    <div class="route-bairro">${o.bairro}</div>
-                    <div style="font-size:12px; color:#999">${o.cliente} (Ped #${o.displayId})</div>
-                </div>
-                <i class="fas fa-grip-lines route-handle"></i>
-            </div>
-        `).join('');
-
-        // Inicializa/Reinicializa o SortableJS (Biblioteca Pro)
+        if(activeRouteOrders.length === 0) { listArea.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px">Nenhuma entrega pendente para este turno.</p>'; return; }
+        listArea.innerHTML = activeRouteOrders.map((o, idx) => `<div class="route-item" data-fb-id="${o.fbId}"><div class="route-number">${idx + 1}</div><div class="route-details"><div class="route-addr">${o.end}</div><div class="route-bairro">${o.bairro}</div><div style="font-size:12px; color:#999">${o.cliente} (Ped #${o.displayId})</div></div><i class="fas fa-grip-lines route-handle"></i></div>`).join('');
         if (sortableInstance) { sortableInstance.destroy(); }
-        
         sortableInstance = Sortable.create(listArea, {
-            animation: 150,
-            handle: '.route-item', // Pode arrastar clicando em qualquer lugar do item
-            ghostClass: 'sortable-ghost',
-            dragClass: 'sortable-drag',
+            animation: 150, handle: '.route-item', ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
             onEnd: function (evt) {
-                // Ao soltar, reconstruímos o array activeRouteOrders baseado na nova ordem do DOM
                 const newOrderIds = Array.from(listArea.children).map(el => el.getAttribute('data-fb-id'));
-                const newRouteArray = [];
-                newOrderIds.forEach(id => {
-                    const found = activeRouteOrders.find(o => o.fbId === id);
-                    if(found) newRouteArray.push(found);
-                });
-                activeRouteOrders = newRouteArray;
-                
-                // Atualiza apenas os números visuais sem recriar todo o HTML para não perder a fluidez
-                Array.from(listArea.children).forEach((el, index) => {
-                    el.querySelector('.route-number').innerText = index + 1;
-                });
+                const newRouteArray = []; newOrderIds.forEach(id => { const found = activeRouteOrders.find(o => o.fbId === id); if(found) newRouteArray.push(found); }); activeRouteOrders = newRouteArray;
+                Array.from(listArea.children).forEach((el, index) => { el.querySelector('.route-number').innerText = index + 1; });
             }
         });
     };
 
-    // 2. Auto-Sort LÓGICO (V19 - Inteligência de Juazeiro do Norte)
     window.autoSortRouteLogic = function() {
         if(activeRouteOrders.length === 0) return;
-
         activeRouteOrders.sort((a, b) => {
-            const idxA = SEQUENCIA_LOGICA_BAIRROS.indexOf(a.bairro);
-            const idxB = SEQUENCIA_LOGICA_BAIRROS.indexOf(b.bairro);
-            
-            // Se o bairro não estiver na lista lógica, coloca no final
-            const valA = idxA === -1 ? 999 : idxA;
-            const valB = idxB === -1 ? 999 : idxB;
-            
+            const idxA = SEQUENCIA_LOGICA_BAIRROS.indexOf(a.bairro); const idxB = SEQUENCIA_LOGICA_BAIRROS.indexOf(b.bairro);
+            const valA = idxA === -1 ? 999 : idxA; const valB = idxB === -1 ? 999 : idxB;
             return valA - valB;
         });
-        
-        renderRoutes(); // Re-renderiza com a nova ordem
-        alert('Rota organizada por sequência lógica de bairros!');
+        renderRoutes(); alert('Rota organizada por sequência lógica de bairros!');
     };
 
-    // --- INTEGRAÇÃO API (OPENROUTESERVICE) ---
-    // Ponto de partida fixo
-    const START_COORDS = [-39.3175, -7.2270]; // Apolo XI, Salesianos (Aproximado)
-
+    const START_COORDS = [-39.3175, -7.2270]; // Rua Apolo XI
     const sleep = ms => new Promise(r => setTimeout(r, ms));
 
     window.optimizeRouteWithAI = async function() {
         const cfg = JSON.parse(localStorage.getItem('printConfig')) || DEFAULT_PRINT_CONFIG;
         const apiKey = cfg.apiKey;
-
-        if (!apiKey) {
-            alert('Você precisa cadastrar uma API Key do OpenRouteService nas Configurações!');
-            openPrintConfig();
-            return;
-        }
-
+        if (!apiKey) { alert('Você precisa cadastrar uma API Key do OpenRouteService nas Configurações!'); openPrintConfig(); return; }
         if (activeRouteOrders.length === 0) { alert('Nenhuma entrega para otimizar.'); return; }
-        if (activeRouteOrders.length > 20) { 
-            if(!confirm('Atenção: Otimizar mais de 20 endereços pode demorar. Deseja continuar?')) return; 
-        }
-
-        // UI Loading
-        const loadingDiv = document.getElementById('apiLoading');
-        const loadingBar = document.getElementById('loadingBar');
-        const loadingText = document.getElementById('loadingText');
-        loadingDiv.style.display = 'block';
-        loadingBar.style.width = '0%';
-
+        const loadingDiv = document.getElementById('apiLoading'); const loadingBar = document.getElementById('loadingBar'); const loadingText = document.getElementById('loadingText');
+        loadingDiv.style.display = 'block'; loadingBar.style.width = '0%';
         try {
-            // 1. GEOCODING (Endereço -> Lat/Lon) usando Nominatim (Gratuito/Lento)
             const coords = [];
-            
             for (let i = 0; i < activeRouteOrders.length; i++) {
                 const order = activeRouteOrders[i];
                 loadingText.innerText = `Lendo endereço ${i+1}/${activeRouteOrders.length}: ${order.end}`;
                 loadingBar.style.width = `${((i)/activeRouteOrders.length)*50}%`;
-
-                // Monta query segura
                 const query = `${order.end}, ${order.bairro}, Juazeiro do Norte, CE, Brazil`;
                 const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
-
-                const res = await fetch(url);
-                const data = await res.json();
-
-                if (data && data.length > 0) {
-                    coords.push({
-                        id: order.fbId,
-                        location: [parseFloat(data[0].lon), parseFloat(data[0].lat)]
-                    });
-                } else {
-                    console.warn("Endereço não encontrado:", query);
-                    // Se falhar, usa o ponto de partida (fallback) para não quebrar a matriz, mas avisa
-                }
-                
-                // Delay obrigatório de 1.1s para não ser bloqueado pelo Nominatim
+                const res = await fetch(url); const data = await res.json();
+                if (data && data.length > 0) { coords.push({ id: order.fbId, location: [parseFloat(data[0].lon), parseFloat(data[0].lat)] }); }
                 await sleep(1100);
             }
-
             if (coords.length === 0) throw new Error("Nenhum endereço foi localizado pelo GPS.");
-
-            // 2. OTIMIZAÇÃO (OpenRouteService)
-            loadingText.innerText = "Calculando melhor rota...";
-            loadingBar.style.width = '75%';
-
-            // Monta o corpo do pedido (TSP - Traveling Salesman Problem)
-            const jobs = coords.map(c => ({
-                id: c.id,
-                location: c.location
-            }));
-
-            const vehicle = {
-                id: 1,
-                profile: 'driving-car',
-                start: START_COORDS,
-                end: START_COORDS // Volta pra loja? Se não, remova essa linha.
-            };
-
-            const orsBody = {
-                jobs: jobs,
-                vehicles: [vehicle]
-            };
-
-            const orsRes = await fetch('https://api.openrouteservice.org/v2/optimization', {
-                method: 'POST',
-                headers: {
-                    'Authorization': apiKey,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(orsBody)
-            });
-
+            loadingText.innerText = "Calculando melhor rota..."; loadingBar.style.width = '75%';
+            const jobs = coords.map(c => ({ id: c.id, location: c.location }));
+            const vehicle = { id: 1, profile: 'driving-car', start: START_COORDS, end: START_COORDS };
+            const orsRes = await fetch('https://api.openrouteservice.org/v2/optimization', { method: 'POST', headers: { 'Authorization': apiKey, 'Content-Type': 'application/json' }, body: JSON.stringify({ jobs: jobs, vehicles: [vehicle] }) });
             if (!orsRes.ok) throw new Error("Erro na API de Otimização. Verifique sua chave.");
-
             const routeData = await orsRes.json();
-
-            // 3. APLICA A NOVA ORDEM
-            loadingText.innerText = "Reorganizando lista...";
-            loadingBar.style.width = '100%';
-
+            loadingText.innerText = "Reorganizando lista..."; loadingBar.style.width = '100%';
             if (routeData.routes && routeData.routes.length > 0) {
-                const steps = routeData.routes[0].steps;
-                const optimizedOrder = [];
-
-                // Pula o primeiro e o último passo se forem "start/end"
-                steps.forEach(step => {
-                    if (step.type === 'job') {
-                        const originalOrder = activeRouteOrders.find(o => o.fbId === step.id.toString()); // ORS converte ID pra int as vezes? O ID do FB é string.
-                        // O id que mandamos no jobs é string (fbId). O retorno deve ser igual.
-                        // Correção: Encontrar pelo ID enviado
-                        const found = activeRouteOrders.find(o => o.fbId === step.id); 
-                        if (found) optimizedOrder.push(found);
-                    }
-                });
-
-                // Se sobrou alguém (erro de geocoding), coloca no final
-                activeRouteOrders.forEach(o => {
-                    if (!optimizedOrder.includes(o)) optimizedOrder.push(o);
-                });
-
-                activeRouteOrders = optimizedOrder;
-                renderRoutes();
-                alert('Rota otimizada com sucesso via GPS!');
+                const steps = routeData.routes[0].steps; const optimizedOrder = [];
+                steps.forEach(step => { if (step.type === 'job') { const found = activeRouteOrders.find(o => o.fbId === step.id); if (found) optimizedOrder.push(found); } });
+                activeRouteOrders.forEach(o => { if (!optimizedOrder.includes(o)) optimizedOrder.push(o); });
+                activeRouteOrders = optimizedOrder; renderRoutes(); alert('Rota otimizada com sucesso via GPS!');
             }
-
-        } catch (error) {
-            console.error(error);
-            alert('Erro ao otimizar: ' + error.message);
-        } finally {
-            loadingDiv.style.display = 'none';
-        }
+        } catch (error) { console.error(error); alert('Erro ao otimizar: ' + error.message); } finally { loadingDiv.style.display = 'none'; }
     };
 
-    // 3. Gerar Link do Google Maps (Com Ponto de Partida Fixo)
     window.openGoogleMapsRoute = function() {
         if(activeRouteOrders.length === 0) { alert('A rota está vazia.'); return; }
-        
-        let url = "https://www.google.com/maps/dir/";
-        
-        // PONTO DE PARTIDA FIXO (Rua Apolo XI)
-        const origin = "Rua Apolo XI, 519, Juazeiro do Norte - CE";
-        url += encodeURIComponent(origin) + "/";
-
-        // Pontos Intermediários
-        activeRouteOrders.forEach(o => {
-            let cleanAddr = `${o.end}, ${o.bairro}, Juazeiro do Norte - CE`;
-            url += encodeURIComponent(cleanAddr) + "/";
-        });
-
+        let url = "https://www.google.com/maps/dir/Rua+Apolo+XI,+519,+Juazeiro+do+Norte+-+CE/";
+        activeRouteOrders.forEach(o => { let cleanAddr = `${o.end}, ${o.bairro}, Juazeiro do Norte - CE`; url += encodeURIComponent(cleanAddr) + "/"; });
         window.open(url, '_blank');
     };
 
-
-    // --- UTILS & CORE ---
+    // --- RENDER LISTA E PRINT ---
     window.renderOrdersList = function(list = orders) {
         const div = document.getElementById('ordersList');
         if(!list.length) { div.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa">Nenhum pedido encontrado.</p>'; return; }
@@ -843,21 +672,23 @@
             let endInfo = o.tipoEntrega === 'Delivery' || (o.turno && !o.turno.includes('Retirada')) ? `<i class="fas fa-map-marker-alt" style="color:var(--primary)"></i> ${o.end}, ${o.bairro}` : `<i class="fas fa-store" style="color:var(--primary)"></i> Retirada na Loja`;
             const opts = ['Pedido confirmado','Produzindo','Pronto','Em rota','Entregue'].map(s => `<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('');
             let pagInfo = o.restante <= 0.01 ? `<div class="payment-highlight" style="background:#dcfce7; color:#166534; border-color:#bbf7d0"><span>STATUS:</span> <span>PAGO TOTAL</span></div>` : (o.pago > 0 ? `<div class="payment-highlight"><span>Restante:</span> <span>${o.formaPagRestante || '?'}</span></div>` : `<div class="payment-highlight"><span>Total:</span> <span>${o.formaPagRestante || '?'}</span></div>`);
-            return `
-            <div class="order-card ${statusClass}">
-                <div class="order-header"><div><div class="order-id">#${numPedido}</div><div class="order-date">${fmtData(o.dataEntrega)} • ${o.turno}</div></div><select class="status-select" onchange="quickUpdateStatus('${o.fbId}', this.value)" style="background:${selectBg}; color:${selectColor}">${opts}</select></div>
-                <div class="order-body"><div class="client-info"><span class="client-name">${o.cliente}</span><div class="client-detail"><i class="fas fa-phone" style="font-size:11px"></i> ${o.tel}</div><div class="client-detail">${endInfo}</div>${o.obs ? `<div class="client-detail" style="color:#e11d48;font-style:italic"><i class="fas fa-comment"></i> ${o.obs}</div>` : ''}</div><div class="items-box">${itensHtml}</div>${pagInfo}<div class="finance-box">${o.pago > 0 ? `<div class="finance-row"><span>Pago (Sinal):</span> <span style="color:#10b981">${fmtMoeda(o.pago)}</span></div>` : ''}<div class="finance-total" style="display:flex;justify-content:space-between;color:${o.restante>0?'#ef4444':'#10b981'}"><span>A PAGAR:</span> <span>${fmtMoeda(o.restante)}</span></div></div></div>
-                <div class="order-footer"><button class="btn btn-card" onclick="editOrder('${o.fbId}')"><i class="fas fa-edit"></i> Editar</button><button class="btn btn-card" onclick="printOrder('${o.fbId}', '${numPedido}')"><i class="fas fa-print"></i> Cupom</button><button class="btn btn-card" onclick="deleteOrder('${o.fbId}')" style="color:#ef4444"><i class="fas fa-trash"></i></button></div>
-            </div>`;
+            return `<div class="order-card ${statusClass}"><div class="order-header"><div><div class="order-id">#${numPedido}</div><div class="order-date">${fmtData(o.dataEntrega)} • ${o.turno}</div></div><select class="status-select" onchange="quickUpdateStatus('${o.fbId}', this.value)" style="background:${selectBg}; color:${selectColor}">${opts}</select></div><div class="order-body"><div class="client-info"><span class="client-name">${o.cliente}</span><div class="client-detail"><i class="fas fa-phone" style="font-size:11px"></i> ${o.tel}</div><div class="client-detail">${endInfo}</div>${o.obs ? `<div class="client-detail" style="color:#e11d48;font-style:italic"><i class="fas fa-comment"></i> ${o.obs}</div>` : ''}</div><div class="items-box">${itensHtml}</div>${pagInfo}<div class="finance-box">${o.pago > 0 ? `<div class="finance-row"><span>Pago (Sinal):</span> <span style="color:#10b981">${fmtMoeda(o.pago)}</span></div>` : ''}<div class="finance-total" style="display:flex;justify-content:space-between;color:${o.restante>0?'#ef4444':'#10b981'}"><span>A PAGAR:</span> <span>${fmtMoeda(o.restante)}</span></div></div></div><div class="order-footer"><button class="btn btn-card" onclick="editOrder('${o.fbId}')"><i class="fas fa-edit"></i> Editar</button><button class="btn btn-card" onclick="printOrder('${o.fbId}', '${numPedido}')"><i class="fas fa-print"></i> Cupom</button><button class="btn btn-card" onclick="deleteOrder('${o.fbId}')" style="color:#ef4444"><i class="fas fa-trash"></i></button></div></div>`;
         }).join('');
     };
 
-    // IMPRESSÃO E CONFIGURAÇÕES
-    const DEFAULT_PRINT_CONFIG = { title: 'DIVINE PUDIM', subtitle: 'GOURMET', phone: '88 98824-4346', msg: 'Obrigado pela preferência!', social: '@divinepudimgourmet', apiKey: '' };
-    window.openPrintConfig = function() { const cfg = JSON.parse(localStorage.getItem('printConfig')) || DEFAULT_PRINT_CONFIG; document.getElementById('cfgTitle').value = cfg.title; document.getElementById('cfgSubtitle').value = cfg.subtitle; document.getElementById('cfgPhone').value = cfg.phone; document.getElementById('cfgMsg').value = cfg.msg; document.getElementById('cfgSocial').value = cfg.social; document.getElementById('cfgApiKey').value = cfg.apiKey || ''; document.getElementById('printConfigModal').classList.add('active'); };
-    window.savePrintConfig = function() { const cfg = { title: document.getElementById('cfgTitle').value || DEFAULT_PRINT_CONFIG.title, subtitle: document.getElementById('cfgSubtitle').value || DEFAULT_PRINT_CONFIG.subtitle, phone: document.getElementById('cfgPhone').value || DEFAULT_PRINT_CONFIG.phone, msg: document.getElementById('cfgMsg').value || DEFAULT_PRINT_CONFIG.msg, social: document.getElementById('cfgSocial').value || DEFAULT_PRINT_CONFIG.social, apiKey: document.getElementById('cfgApiKey').value }; localStorage.setItem('printConfig', JSON.stringify(cfg)); alert('Configuração salva!'); document.getElementById('printConfigModal').classList.remove('active'); };
-    window.resetPrintConfig = function() { if(confirm('Restaurar textos originais?')) { localStorage.removeItem('printConfig'); window.openPrintConfig(); } };
-    window.printOrder = function(id, numPedido) { const o = orders.find(x => x.fbId === id); const cfg = JSON.parse(localStorage.getItem('printConfig')) || DEFAULT_PRINT_CONFIG; const w = window.open('', '', 'width=300,height=600'); let headerEnd = ""; let bodyEnd = ""; if (o.tipoEntrega === 'Delivery' || (o.turno && !o.turno.includes('Retirada'))) { headerEnd = "DELIVERY"; bodyEnd = `<div class="destaque">ENDEREÇO:</div><div class="big">${o.end || ''}</div><div class="big">${o.bairro || ''}</div>${o.obs ? `<div style="margin-top:5px; border:1px solid #000; padding:2px"><b>OBS:</b> ${o.obs}</div>` : ''}`; } else { headerEnd = "RETIRADA"; bodyEnd = `<div class="center big" style="border:2px solid #000; padding:5px; margin:5px 0;">CLIENTE VAI RETIRAR</div>`; } let paymentBox = ''; if(o.restante <= 0.01) { paymentBox = `<div class="box-pagamento">PAGO TOTAL</div>`; } else if(o.pago > 0) { paymentBox = `<div class="box-pagamento">RESTANTE: ${fmtMoeda(o.restante)}<br><small>(${o.formaPagRestante || '?'})</small></div>`; } else { paymentBox = `<div class="box-pagamento">A PAGAR: ${fmtMoeda(o.total)}<br><small>(${o.formaPagRestante || '?'})</small></div>`; } w.document.write(`<html><head><style>@page { margin: 0; size: auto; } body { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; width: 48mm; color: #000; margin-right: 2mm; } .container { padding: 2px 2px 20px 2px; overflow-x: hidden; } * { font-weight: bold; line-height: 1.1; word-wrap: break-word; } .center { text-align: center; } .row { display: flex; justify-content: space-between; } .big { font-size: 14px; } .giant { font-size: 16px; text-transform: uppercase; } .line { border-bottom: 2px dashed #000; margin: 5px 0; } .destaque { font-size: 11px; text-transform: uppercase; margin-top: 5px; } .item-row { margin-bottom: 4px; padding-bottom: 2px; border-bottom: 1px dotted #ccc; } .box-pagamento { border: 2px solid #000; padding: 5px; margin-top: 10px; text-align: center; font-size: 14px; border-radius: 5px; background: #eee !important; -webkit-print-color-adjust: exact; } </style></head><body><div class="container"><div class="center giant">${cfg.title}</div><div class="center" style="font-size:11px">${cfg.subtitle}</div><div class="center" style="margin-bottom:5px">${cfg.phone}</div><div class="line"></div><div class="row big"><span>PEDIDO</span><span>#${numPedido}</span></div><div class="center giant" style="margin:5px 0; background:#000; color:#fff; -webkit-print-color-adjust: exact;">${headerEnd}</div><div class="center">${fmtData(o.dataEntrega)}</div><div class="center">${o.turno}</div><div class="line"></div><div class="destaque">CLIENTE:</div><div class="big">${o.cliente}</div><div>${o.tel}</div><div class="line"></div>${bodyEnd}<div class="line"></div><div class="destaque" style="margin-bottom:5px">ITENS:</div>${o.itens.map(i => `<div class="item-row"><div style="font-size:13px">${i.qtd}x ${i.prod}</div><div class="row"><span style="font-size:10px; font-weight:normal">${i.tam}</span><span>${fmtMoeda(i.prc * i.qtd)}</span></div></div>`).join('')}<div class="line"></div><div class="row" style="font-size:11px"><span>Taxa:</span><span>${fmtMoeda(o.taxa)}</span></div><div class="row" style="font-size:11px"><span>Sinal:</span><span>${fmtMoeda(o.pago)}</span></div><div class="row giant" style="margin-top:5px"><span>TOTAL:</span><span>${fmtMoeda(o.total)}</span></div>${paymentBox}<div class="center" style="margin-top:15px; font-size:10px;">${cfg.msg} <br>${cfg.social}</div><br>.</div></body></html>`); setTimeout(() => { w.print(); w.close(); }, 500); };
+    window.printOrder = function(id, numPedido) {
+        const o = orders.find(x => x.fbId === id);
+        const cfg = JSON.parse(localStorage.getItem('printConfig')) || DEFAULT_PRINT_CONFIG;
+        const w = window.open('', '', 'width=300,height=600');
+        let headerEnd = ""; let bodyEnd = "";
+        if (o.tipoEntrega === 'Delivery' || (o.turno && !o.turno.includes('Retirada'))) { headerEnd = "DELIVERY"; bodyEnd = `<div class="destaque">ENDEREÇO:</div><div class="big">${o.end || ''}</div><div class="big">${o.bairro || ''}</div>${o.obs ? `<div style="margin-top:5px; border:1px solid #000; padding:2px"><b>OBS:</b> ${o.obs}</div>` : ''}`; } 
+        else { headerEnd = "RETIRADA"; bodyEnd = `<div class="center big" style="border:2px solid #000; padding:5px; margin:5px 0;">CLIENTE VAI RETIRAR</div>`; }
+        let paymentBox = o.restante <= 0.01 ? `<div class="box-pagamento">PAGO TOTAL</div>` : (o.pago > 0 ? `<div class="box-pagamento">RESTANTE: ${fmtMoeda(o.restante)}<br><small>(${o.formaPagRestante || '?'})</small></div>` : `<div class="box-pagamento">A PAGAR: ${fmtMoeda(o.total)}<br><small>(${o.formaPagRestante || '?'})</small></div>`);
+        w.document.write(`<html><head><style>@page { margin: 0; size: auto; } body { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; width: 48mm; color: #000; margin-right: 2mm; } .container { padding: 2px 2px 20px 2px; overflow-x: hidden; } * { font-weight: bold; line-height: 1.1; word-wrap: break-word; } .center { text-align: center; } .row { display: flex; justify-content: space-between; } .big { font-size: 14px; } .giant { font-size: 16px; text-transform: uppercase; } .line { border-bottom: 2px dashed #000; margin: 5px 0; } .destaque { font-size: 11px; text-transform: uppercase; margin-top: 5px; } .item-row { margin-bottom: 4px; padding-bottom: 2px; border-bottom: 1px dotted #ccc; } .box-pagamento { border: 2px solid #000; padding: 5px; margin-top: 10px; text-align: center; font-size: 14px; border-radius: 5px; background: #eee !important; -webkit-print-color-adjust: exact; } </style></head><body><div class="container"><div class="center giant">${cfg.title}</div><div class="center" style="font-size:11px">${cfg.subtitle}</div><div class="center" style="margin-bottom:5px">${cfg.phone}</div><div class="line"></div><div class="row big"><span>PEDIDO</span><span>#${numPedido}</span></div><div class="center giant" style="margin:5px 0; background:#000; color:#fff; -webkit-print-color-adjust: exact;">${headerEnd}</div><div class="center">${fmtData(o.dataEntrega)}</div><div class="center">${o.turno}</div><div class="line"></div><div class="destaque">CLIENTE:</div><div class="big">${o.cliente}</div><div>${o.tel}</div><div class="line"></div>${bodyEnd}<div class="line"></div><div class="destaque" style="margin-bottom:5px">ITENS:</div>${o.itens.map(i => `<div class="item-row"><div style="font-size:13px">${i.qtd}x ${i.prod}</div><div class="row"><span style="font-size:10px; font-weight:normal">${i.tam}</span><span>${fmtMoeda(i.prc * i.qtd)}</span></div></div>`).join('')}<div class="line"></div><div class="row" style="font-size:11px"><span>Taxa:</span><span>${fmtMoeda(o.taxa)}</span></div><div class="row" style="font-size:11px"><span>Sinal:</span><span>${fmtMoeda(o.pago)}</span></div><div class="row giant" style="margin-top:5px"><span>TOTAL:</span><span>${fmtMoeda(o.total)}</span></div>${paymentBox}<div class="center" style="margin-top:15px; font-size:10px;">${cfg.msg} <br>${cfg.social}</div><br>.</div></body></html>`);
+        setTimeout(() => { w.document.close(); w.print(); w.close(); }, 500);
+    };
+
+    // --- RESTANTE ---
     window.buscarCep = async function() { let cep = document.getElementById('cliCep').value.replace(/\D/g,''); if(cep.length === 8) { try { let r = await fetch(`https://viacep.com.br/ws/${cep}/json/`); let d = await r.json(); if(!d.erro) { document.getElementById('cliEnd').value = d.logradouro; const bSelect = document.getElementById('cliBairro'); let found = false; for (let i = 0; i < bSelect.options.length; i++) { if (bSelect.options[i].value.toLowerCase() === d.bairro.toLowerCase()) { bSelect.selectedIndex = i; found = true; break; } } if (!found) { bSelect.value = 'OUTRO'; document.getElementById('cliBairroOutro').value = d.bairro; } checkBairro(); } } catch(e) {} } };
     window.showNewOrderModal = function() { document.getElementById('orderForm').reset(); document.getElementById('itemsContainer').innerHTML = ''; document.getElementById('editFirebaseId').value = ''; document.getElementById('dataPed').valueAsDate = new Date(); document.getElementById('checkAdiantamento').checked = false; toggleAdiantamento(); document.getElementById('orderModal').classList.add('active'); checkTipoEntrega(); addItem(); };
     window.closeOrderModal = function() { document.getElementById('orderModal').classList.remove('active'); };
@@ -869,8 +700,6 @@
     window.showTab = function(e, tabId) { if(e) e.preventDefault(); document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active')); document.getElementById('tab' + tabId.charAt(0).toUpperCase() + tabId.slice(1)).classList.add('active'); if(e && e.target) e.target.closest('.tab-btn').classList.add('active'); if(tabId === 'graficos') window.renderCharts(); if(tabId === 'rotas') window.renderRoutes(); };
     window.refreshAll = function() { renderDashboard(); renderOrdersList(); populateBairroFilter(); if(document.getElementById('tabRotas').classList.contains('active')) renderRoutes(); };
     window.applyFilters = function() { const term = document.getElementById('searchInput').value.toLowerCase(); const date = document.getElementById('filterData').value; const bairro = document.getElementById('filterBairro').value; const status = document.getElementById('filterStatus').value; const tipo = document.getElementById('filterTipo').value; const turno = document.getElementById('filterTurno').value; const filtered = orders.filter(o => { let ok = true; if(term && !o.cliente.toLowerCase().includes(term)) ok = false; if(date && o.dataEntrega !== date) ok = false; if(bairro && o.bairro !== bairro) ok = false; if(status && o.status !== status) ok = false; if(tipo && tipo !== 'Todos' && o.tipoEntrega !== tipo) ok = false; if(turno && turno !== 'Todos' && o.turno !== turno && !o.turno.includes(turno)) ok = false; return ok; }); renderOrdersList(filtered); };
-    
-    // EXPORT PRODUCT SUMMARY (V16 - Separado)
     window.exportProductSummary = function() {
         const term = document.getElementById('searchInput').value.toLowerCase(); const date = document.getElementById('filterData').value; const bairro = document.getElementById('filterBairro').value; const statusFilter = document.getElementById('filterStatus').value; const tipo = document.getElementById('filterTipo').value; const turno = document.getElementById('filterTurno').value;
         const filtered = orders.filter(o => { let ok = true; if(term && !o.cliente.toLowerCase().includes(term)) ok = false; if(date && o.dataEntrega !== date) ok = false; if(bairro && o.bairro !== bairro) ok = false; if(statusFilter && o.status !== statusFilter) ok = false; if(tipo && tipo !== 'Todos' && o.tipoEntrega !== tipo) ok = false; if(turno && turno !== 'Todos' && o.turno !== turno && !o.turno.includes(turno)) ok = false; return ok; });
@@ -886,7 +715,6 @@
         if (rowsProduced.length > 0) { doc.setFontSize(14); doc.setTextColor(22, 163, 74); doc.text("JÁ PRODUZIDOS (Prontos no Balcão/Freezer)", 14, currentY); currentY += 5; doc.autoTable({ head: [["Produto (Tamanho)", "Quantidade"]], body: rowsProduced, startY: currentY, theme: 'grid', headStyles: { fillColor: [22, 163, 74] }, columnStyles: { 0: { cellWidth: 140 }, 1: { cellWidth: 40, halign: 'center', fontStyle: 'bold' } } }); }
         doc.save(`Resumo_Producao_Separado_${new Date().toISOString().split('T')[0]}.pdf`);
     };
-
     window.populateBairroFilter = function() { const b = [...new Set(orders.map(o => o.bairro))].sort(); document.getElementById('filterBairro').innerHTML = '<option value="">Todos</option>' + b.map(x => `<option>${x}</option>`).join(''); };
     window.exportBackup = function() { const b = new Blob([JSON.stringify(orders)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'backup.json'; a.click(); };
     window.handleImport = function(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = async (ev) => { try { const arr = JSON.parse(ev.target.result); if(confirm(`Importar ${arr.length} pedidos?`)) { for(let o of arr) { delete o.fbId; await addDoc(colRef, o); } alert('Concluído!'); } } catch(x) { alert('Erro arquivo invalido'); } }; r.readAsText(f); };
