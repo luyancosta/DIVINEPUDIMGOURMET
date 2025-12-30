@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V24 (Correção HTML/JSON)</title>
+    <title>Divine Pudim Gourmet - Sistema V25 (Clean Layout)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -113,20 +113,34 @@
         .route-addr { font-size: 14px; color: #333; font-weight: 600; margin-bottom: 2px; }
         .route-bairro { font-size: 12px; color: #666; background: #f1f5f9; padding: 2px 8px; border-radius: 10px; display: inline-block; font-weight: 600; }
         .route-handle { color: #ccc; padding: 5px; font-size: 18px; }
-        #apiLoading { display: none; margin-top: 10px; background: #f0f9ff; padding: 10px; border-radius: 8px; border: 1px solid #bae6fd; color: #0369a1; text-align: center; font-weight: bold; }
-        .loading-bar-bg { width: 100%; height: 8px; background: #e0e0e0; border-radius: 4px; margin-top: 5px; overflow: hidden; }
-        .loading-bar-fill { height: 100%; background: #0ea5e9; width: 0%; transition: width 0.3s; }
 
         @media(max-width: 900px) { .route-container { grid-template-columns: 1fr; } .route-map-placeholder { order: -1; position: static; } }
-        @media(max-width: 768px) { .items-header { display: none; } .item-row { grid-template-columns: 1fr; } .header-content { flex-direction: column; } }
         
-        /* MODAL */
+        /* MODAL ORGANIZADO */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
         .modal.active { display: flex; }
-        .modal-content { background: white; border-radius: 16px; width: 100%; max-width: 950px; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: white; border-radius: 16px; width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; }
         .modal-header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 16px 16px 0 0; }
-        .modal-body { padding: 30px; }
-        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .modal-body { padding: 25px; }
+
+        /* NOVA ESTRUTURA DE FORMULÁRIO (GRID LIMPO) */
+        .form-section { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 15px; margin-bottom: 20px; }
+        .form-section-title { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; }
+        
+        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        .form-grid-full { grid-column: 1 / -1; }
+        
+        /* ITENS TABLE HEADER */
+        .items-header { display: grid; grid-template-columns: 2fr 1fr 0.7fr 1fr 1fr 40px; gap: 10px; background: #e5e7eb; padding: 8px 10px; border-radius: 6px; font-weight: bold; font-size: 13px; color: #374151; margin-bottom: 10px; }
+        .item-row { display: grid; grid-template-columns: 2fr 1fr 0.7fr 1fr 1fr 40px; gap: 10px; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dotted #e5e7eb; }
+        
+        @media(max-width: 600px) {
+            .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
+            .items-header { display: none; }
+            .item-row { grid-template-columns: 1fr; gap: 5px; background: #f9fafb; padding: 10px; border-radius: 6px; }
+        }
+
         @media print { body * { visibility: hidden; } #printArea, #printArea * { visibility: visible; } #printArea { position: absolute; left: 0; top: 0; width: 58mm; padding: 0; margin: 0; font-size: 12px; font-family: monospace; } }
     </style>
 </head>
@@ -150,7 +164,7 @@
             <div class="header-content">
                 <div class="logo"><i class="fas fa-birthday-cake"></i> Divine Pudim Gourmet</div>
                 <div class="header-actions">
-                    <button class="btn btn-header" onclick="openPrintConfig()"><i class="fas fa-cog"></i> Config. Impressão/API</button>
+                    <button class="btn btn-header" onclick="openPrintConfig()"><i class="fas fa-cog"></i> Config. Impressão</button>
                     <button class="btn btn-header" onclick="exportBackup()">Backup</button>
                     <button class="btn btn-header" onclick="document.getElementById('importInput').click()">Importar</button>
                     <button class="btn btn-primary" onclick="showNewOrderModal()">+ Novo Pedido</button>
@@ -228,18 +242,13 @@
                     </select>
                 </div>
                 <div style="display:flex; gap:10px">
-                    <button class="btn btn-secondary" onclick="autoSortRouteLogic()"><i class="fas fa-list-ol"></i> Organizar por Bairro</button>
-                    <button class="btn btn-warning" onclick="optimizeRouteWithAI()"><i class="fas fa-brain"></i> <b>Otimizar com IA (GPS)</b></button>
+                    <button class="btn btn-secondary" onclick="autoSortRouteLogic()"><i class="fas fa-list-ol"></i> Organizar por Bairro (Manual)</button>
                     <button class="btn btn-success" onclick="openGoogleMapsRoute()"><i class="fas fa-map-marker-alt"></i> Abrir no Google</button>
                 </div>
             </div>
 
             <div class="route-container">
                 <div style="display:flex; flex-direction:column; gap:10px">
-                    <div id="apiLoading">
-                        <span id="loadingText">Otimizando rota com Inteligência Artificial...</span>
-                        <div class="loading-bar-bg"><div class="loading-bar-fill" id="loadingBar"></div></div>
-                    </div>
                     <div id="routeListArea" class="route-list">
                         <p style="text-align:center; color:#999; margin-top:20px">Selecione um turno para ver a rota.</p>
                     </div>
@@ -257,10 +266,6 @@
                     </div>
                     <hr style="margin:15px 0; border:0; border-top:1px solid #eee">
                     <div style="text-align:center">
-                        <div style="background:#e0f2fe; padding:15px; border-radius:8px; color:#0369a1; margin-bottom:15px">
-                            <i class="fas fa-info-circle"></i><br>
-                            Para usar a Otimização GPS, configure a API Key no menu.
-                        </div>
                         <img src="https://www.google.com/images/branding/product/2x/maps_96in128dp.png" alt="Maps" style="width:64px; opacity:0.8">
                     </div>
                 </div>
@@ -286,17 +291,13 @@
         </div>
         <div class="modal-body">
             <h4 style="margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px">Impressão Cupom</h4>
-            <div class="form-row" style="grid-template-columns: 1fr;">
+            <div class="form-grid-2" style="grid-template-columns: 1fr;">
                 <div><label>Título da Loja</label><input type="text" id="cfgTitle" placeholder="Ex: DIVINE PUDIM"></div>
                 <div><label>Subtítulo</label><input type="text" id="cfgSubtitle" placeholder="Ex: GOURMET"></div>
                 <div><label>Telefone</label><input type="text" id="cfgPhone" placeholder="Ex: 88 98824-4346"></div>
                 <div><label>Rodapé Cupom</label><input type="text" id="cfgMsg"></div>
                 <div><label>Redes Sociais</label><input type="text" id="cfgSocial"></div>
             </div>
-            
-            <h4 style="margin:15px 0 10px 0; border-bottom:1px solid #eee; padding-bottom:5px; color:#f59e0b">Integração API (Opcional)</h4>
-            <div style="font-size:12px; color:#666; margin-bottom:5px">Cole aqui sua chave do <b>OpenRouteService</b> para usar a Otimização com IA.</div>
-            <input type="text" id="cfgApiKey" placeholder="Cole sua API Key aqui..." style="font-family:monospace; background:#fffbeb; border-color:#fcd34d">
             
             <div style="margin-top:20px; display:flex; justify-content:space-between;">
                 <button class="btn btn-secondary" onclick="resetPrintConfig()">Restaurar</button>
@@ -314,99 +315,110 @@
         </div>
         <form id="orderForm" onsubmit="saveOrder(event)">
             <div class="modal-body">
-                <div class="form-row">
-                    <div><label>Nome *</label><input type="text" id="cliNome" required></div>
-                    <div><label>WhatsApp *</label><input type="tel" id="cliTel" required></div>
-                    <div><label>Forma de Entrega *</label>
-                        <select id="tipoEntrega" onchange="checkTipoEntrega()" required>
-                            <option value="">Selecione</option>
-                            <option value="Delivery">Delivery</option>
-                            <option value="Retirada no local">Retirada no local</option>
-                        </select>
+                
+                <div class="form-section">
+                    <div class="form-section-title">Dados do Cliente</div>
+                    <div class="form-grid-2">
+                        <div><label>Nome *</label><input type="text" id="cliNome" required></div>
+                        <div><label>WhatsApp *</label><input type="tel" id="cliTel" required></div>
                     </div>
                 </div>
-                <div id="deliveryFields" style="display:none; background:#f9f9f9; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #eee;">
-                    <h4 style="margin-bottom:10px; color:var(--primary)">Dados de Entrega</h4>
-                    <div class="form-row">
-                        <div><label>CEP</label><div style="display:flex; gap:5px"><input type="text" id="cliCep" onblur="buscarCep()"><button type="button" class="btn btn-secondary" onclick="buscarCep()"><i class="fas fa-search"></i></button></div></div>
-                        <div style="grid-column: span 1"><label>Endereço *</label><input type="text" id="cliEnd"></div>
-                        <div><label>Número (Nº)</label><input type="text" id="cliNumero"></div>
-                    </div>
-                    <div class="form-row">
-                        <div><label>Bairro *</label><select id="cliBairro" onchange="checkBairro()"><option value="">Selecione</option></select><input type="text" id="cliBairroOutro" style="display:none; margin-top:5px" placeholder="Digite o bairro"></div>
-                        <div><label>Turno da Entrega *</label>
-                            <select id="turnoEntrega">
+
+                <div class="form-section">
+                    <div class="form-section-title">Entrega / Retirada</div>
+                    <div class="form-grid-3">
+                        <div><label>Forma de Entrega *</label>
+                            <select id="tipoEntrega" onchange="checkTipoEntrega()" required>
                                 <option value="">Selecione</option>
-                                <option value="Manhã">Manhã</option>
-                                <option value="Tarde">Tarde</option>
+                                <option value="Delivery">Delivery</option>
+                                <option value="Retirada no local">Retirada no local</option>
+                            </select>
+                        </div>
+                        <div><label>Data Entrega *</label><input type="date" id="dataEnt" required></div>
+                        <div><label>Status</label>
+                            <select id="statusPed">
+                                <option value="Pedido confirmado">Confirmado</option>
+                                <option value="Produzindo">Produzindo</option>
+                                <option value="Pronto">Pronto</option>
+                                <option value="Em rota">Em rota</option>
+                                <option value="Entregue">Entregue</option>
                             </select>
                         </div>
                     </div>
-                </div>
-                <div id="retiradaFields" style="display:none; background:#f9f9f9; padding:15px; border-radius:10px; margin-bottom:15px; border:1px solid #eee;">
-                    <h4 style="margin-bottom:10px; color:var(--primary)">Dados de Retirada</h4>
-                    <div class="form-row">
-                        <div><label>Horário da Retirada (Opcional)</label><input type="time" id="horarioRetirada"></div>
+                    
+                    <div id="deliveryFields" style="display:none; margin-top:15px; border-top:1px dashed #e5e7eb; padding-top:15px;">
+                        <div class="form-grid-3">
+                            <div><label>CEP</label><div style="display:flex; gap:5px"><input type="text" id="cliCep" onblur="buscarCep()"><button type="button" class="btn btn-secondary" onclick="buscarCep()"><i class="fas fa-search"></i></button></div></div>
+                            <div class="form-grid-full"><label>Endereço Completo *</label><input type="text" id="cliEnd" placeholder="Ex: Rua das Flores"></div>
+                            <div><label>Número (Nº)</label><input type="text" id="cliNumero"></div>
+                            <div><label>Bairro *</label><select id="cliBairro" onchange="checkBairro()"><option value="">Selecione</option></select><input type="text" id="cliBairroOutro" style="display:none; margin-top:5px" placeholder="Nome do Bairro"></div>
+                            <div><label>Turno *</label>
+                                <select id="turnoEntrega">
+                                    <option value="">Selecione</option>
+                                    <option value="Manhã">Manhã</option>
+                                    <option value="Tarde">Tarde</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="retiradaFields" style="display:none; margin-top:15px; border-top:1px dashed #e5e7eb; padding-top:15px;">
+                        <div class="form-grid-2">
+                            <div><label>Horário da Retirada (Opcional)</label><input type="time" id="horarioRetirada"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="form-row">
-                    <div><label>Data Pedido</label><input type="date" id="dataPed" required></div>
-                    <div><label>Data Entrega</label><input type="date" id="dataEnt" required></div>
-                    <div><label>Status</label>
-                        <select id="statusPed">
-                            <option value="Pedido confirmado">Confirmado</option>
-                            <option value="Produzindo">Produzindo</option>
-                            <option value="Pronto">Pronto</option>
-                            <option value="Em rota">Em rota</option>
-                            <option value="Entregue">Entregue</option>
-                        </select>
+
+                <div class="form-section">
+                    <div class="form-section-title">Itens do Pedido</div>
+                    <div class="items-header"><div>Produto</div><div>Tamanho</div><div>Qtd</div><div>Unit.</div><div>Total</div><div></div></div>
+                    <div id="itemsContainer"></div>
+                    <button type="button" class="btn btn-primary" onclick="addItem()" style="width:100%; margin-top:10px">+ Adicionar Item</button>
+                    <div style="text-align:right; font-size:18px; font-weight:bold; margin-top:15px; color:var(--primary-dark)">Total Itens: <span id="displayTotal">R$ 0,00</span></div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-section-title">Pagamento</div>
+                    
+                    <div class="form-grid-3" style="align-items: end;">
+                         <div><label>Taxa Entrega (R$)</label><input type="number" step="0.01" id="valTaxa" oninput="calcTotal()" placeholder="0,00"></div>
+                         
+                         <div style="background:#f0fdf4; padding:10px; border-radius:6px; border:1px solid #bbf7d0; grid-column: span 2; display:flex; gap:10px; align-items:center;">
+                             <label style="cursor:pointer; display:flex; align-items:center; gap:5px; font-weight:bold; color:#166534">
+                                 <input type="checkbox" id="checkAdiantamento" onchange="toggleAdiantamento()" style="width:18px; height:18px"> Recebeu Sinal?
+                             </label>
+                             <div id="areaAdiantamentoInputs" style="display:none; gap:10px; flex:1;">
+                                 <input type="number" step="0.01" id="valPago" oninput="calcTotal()" placeholder="Valor R$">
+                                 <select id="formaPagSinal">
+                                     <option value="">Forma...</option>
+                                     <option value="Pix">Pix</option>
+                                     <option value="Dinheiro">Dinheiro</option>
+                                     <option value="Cartão">Cartão</option>
+                                 </select>
+                             </div>
+                         </div>
                     </div>
-                </div>
-                <hr style="margin: 20px 0; border:0; border-top:1px solid #eee">
-                <h3>Itens</h3>
-                <div class="items-header"><div>Produto</div><div>Tamanho</div><div>Qtd</div><div>V. Unit</div><div>V. Total</div><div></div></div>
-                <div id="itemsContainer"></div>
-                <button type="button" class="btn btn-primary" onclick="addItem()" style="width:100%; margin-top:10px">+ Adicionar Item</button>
-                <div style="text-align:right; font-size:18px; font-weight:bold; margin-top:15px; color:var(--primary-dark)">Total: <span id="displayTotal">R$ 0,00</span></div>
-                <hr style="margin: 20px 0; border:0; border-top:1px solid #eee">
-                <h3 style="margin-bottom:15px; color:var(--gray-800)">Pagamento</h3>
-                <div style="margin-bottom:15px; background:#f0f9ff; padding:10px; border-radius:8px; border:1px solid #bae6fd">
-                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:bold; font-size:14px; color:#0369a1">
-                        <input type="checkbox" id="checkAdiantamento" onchange="toggleAdiantamento()" style="width:18px; height:18px">
-                        Recebeu valor antecipado (Sinal)?
-                    </label>
-                </div>
-                <div class="form-row">
-                    <div id="areaAdiantamento" style="display:none; grid-template-columns: 1fr 1fr; gap:15px; grid-column: span 2; background:#f0fdf4; padding:10px; border-radius:8px; border:1px solid #bbf7d0">
-                        <div><label style="color:#166534">Valor Pago (Sinal)</label><div class="input-group"><span>R$</span><input type="number" step="0.01" id="valPago" oninput="calcTotal()"></div></div>
-                        <div><label style="color:#166534">Forma Pagto (Sinal)</label>
-                            <select id="formaPagSinal">
-                                <option value="">Selecione</option>
+
+                    <div class="form-grid-2" style="margin-top:15px; border-top:1px solid #eee; padding-top:15px">
+                        <div>
+                            <label id="lblFormaRestante">Forma Pagto (Restante/Total)</label>
+                            <select id="formaPagRestante">
+                                <option value="">Selecione...</option>
                                 <option value="Pix">Pix</option>
                                 <option value="Dinheiro">Dinheiro</option>
                                 <option value="Cartão">Cartão</option>
                                 <option value="A decidir">A decidir</option>
                             </select>
                         </div>
+                        <div><label>Valor Final a Pagar</label><input type="text" id="valRest" readonly style="font-weight:bold; color:red; background:#fee2e2; border-color:#fca5a5"></div>
                     </div>
-                    <div style="grid-column: span 2" id="divFormaRestante">
-                        <label id="lblFormaRestante">Forma de Pagamento (Valor Total)</label>
-                        <select id="formaPagRestante">
-                            <option value="">Selecione...</option>
-                            <option value="Pix">Pix</option>
-                            <option value="Dinheiro">Dinheiro</option>
-                            <option value="Cartão">Cartão</option>
-                            <option value="A decidir">A decidir</option>
-                        </select>
-                    </div>
-                    <div><label>Taxa Entrega</label><div class="input-group"><span>R$</span><input type="number" step="0.01" id="valTaxa" oninput="calcTotal()"></div></div>
-                    <div><label>Restante a Pagar</label><div class="input-group"><span>R$</span><input type="text" id="valRest" readonly style="font-weight:bold; color:red"></div></div>
                 </div>
-                <div style="margin-top:10px"><label>Observação</label><textarea id="obs" rows="2"></textarea></div>
+
+                <div style="margin-top:10px"><label>Observações Gerais</label><textarea id="obs" rows="2"></textarea></div>
                 <input type="hidden" id="editFirebaseId">
-                <div style="margin-top:30px; display:flex; justify-content:flex-end; gap:10px">
+                <input type="hidden" id="dataPed"> <div style="margin-top:20px; display:flex; justify-content:flex-end; gap:10px; border-top:1px solid #eee; padding-top:20px">
                     <button type="button" class="btn btn-secondary" onclick="closeOrderModal()">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Salvar Pedido</button>
+                    <button type="submit" class="btn btn-primary" style="padding:10px 40px">SALVAR PEDIDO</button>
                 </div>
             </div>
         </form>
@@ -419,13 +431,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // =======================================================
-    // ÁREA DE CONFIGURAÇÃO FIXA DA API (CHAVE PREDEFINIDA)
-    // =======================================================
-    // Esta chave contém a credencial real criptografada
-    const API_KEY_FIXA = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjhiMzlhNjY4YWE4NTQxMzg5MDI1MzUxYTY1NTQ3MDM5IiwiaCI6Im11cm11cjY0In0="; 
-    // =======================================================
-
+    // --- CONFIGURAÇÃO FIREBASE ---
     const firebaseConfig = {
       apiKey: "AIzaSyBt_7_WLXqUvYqdCrTMQg7ySZUa4gSdEHY",
       authDomain: "divinepudimsystem.firebaseapp.com",
@@ -487,26 +493,8 @@
     let charts = { prod: null, fat: null };
     let sortableInstance = null;
 
-    // ============================================
-    // FUNÇÃO DE CORREÇÃO DE CHAVE (O SEGREDO)
-    // ============================================
-    function extrairChaveReal(chaveBruta) {
-        try {
-            if (chaveBruta && chaveBruta.includes("eyJ")) { // Padrão comum de JSON Base64
-                const decoded = atob(chaveBruta);
-                const json = JSON.parse(decoded);
-                if (json.org) {
-                    return json.org; // Retorna a chave real (campo 'org')
-                }
-            }
-        } catch (e) {
-            console.log("Usando chave original (não é JSON Base64 válido).");
-        }
-        return chaveBruta; // Se não for codificada, retorna ela mesma
-    }
-
     // --- CONFIGURAÇÃO ---
-    const DEFAULT_PRINT_CONFIG = { title: 'DIVINE PUDIM', subtitle: 'GOURMET', phone: '88 98824-4346', msg: 'Obrigado pela preferência!', social: '@divinepudimgourmet', apiKey: '' };
+    const DEFAULT_PRINT_CONFIG = { title: 'DIVINE PUDIM', subtitle: 'GOURMET', phone: '88 98824-4346', msg: 'Obrigado pela preferência!', social: '@divinepudimgourmet' };
 
     window.openPrintConfig = function() { 
         const cfg = JSON.parse(localStorage.getItem('printConfig')) || DEFAULT_PRINT_CONFIG; 
@@ -515,7 +503,6 @@
         if(document.getElementById('cfgPhone')) document.getElementById('cfgPhone').value = cfg.phone; 
         if(document.getElementById('cfgMsg')) document.getElementById('cfgMsg').value = cfg.msg; 
         if(document.getElementById('cfgSocial')) document.getElementById('cfgSocial').value = cfg.social; 
-        if(document.getElementById('cfgApiKey')) document.getElementById('cfgApiKey').value = cfg.apiKey || ''; 
         document.getElementById('printConfigModal').classList.add('active'); 
     };
 
@@ -525,8 +512,7 @@
             subtitle: document.getElementById('cfgSubtitle').value, 
             phone: document.getElementById('cfgPhone').value, 
             msg: document.getElementById('cfgMsg').value, 
-            social: document.getElementById('cfgSocial').value,
-            apiKey: document.getElementById('cfgApiKey') ? document.getElementById('cfgApiKey').value.trim() : ''
+            social: document.getElementById('cfgSocial').value
         }; 
         localStorage.setItem('printConfig', JSON.stringify(cfg)); 
         alert('Configuração salva!'); 
@@ -573,37 +559,258 @@
     // --- FUNÇÕES GERAIS ---
     window.toggleAdiantamento = function() {
         const chk = document.getElementById('checkAdiantamento');
-        const area = document.getElementById('areaAdiantamento');
-        const lblRestante = document.getElementById('lblFormaRestante');
+        const areaInputs = document.getElementById('areaAdiantamentoInputs');
         const inpPago = document.getElementById('valPago');
-        if(chk.checked) { area.style.display = 'grid'; lblRestante.innerText = "Forma de Pagamento (Do Restante)"; } 
-        else { area.style.display = 'none'; inpPago.value = 0; lblRestante.innerText = "Forma de Pagamento (Valor Total)"; calcTotal(); }
+        
+        if(chk.checked) { 
+            areaInputs.style.display = 'flex'; 
+        } else { 
+            areaInputs.style.display = 'none'; 
+            inpPago.value = ''; 
+            calcTotal(); 
+        }
     };
 
     window.addItem = function(data = null) {
         const id = Date.now() + Math.floor(Math.random() * 1000); 
-        const html = `<div class="item-row" id="row-${id}"><div><select class="i-prod" onchange="updItem(${id})"><option value="">Selecione...</option>${PRODUTOS.map(p => `<option value="${p.nome}" ${p.requerSabor ? 'data-sabor="1"' : ''}>${p.nome}</option>`).join('')}<option value="OUTRO">Outro (Manual)</option></select><input type="text" class="i-cust" style="display:none; margin-top:5px; width:100%" placeholder="Digite aqui..."></div><div><select class="i-tam" onchange="updPrice(${id})"><option>-</option></select></div><div><input type="number" class="i-qtd" value="1" onchange="calcTotal()" style="width:60px"></div><div><input type="number" class="i-prc" step="0.01" onchange="calcTotal()" style="width:80px"></div><div class="i-total" style="font-weight:bold; color:#666">R$ 0,00</div><button type="button" class="btn btn-danger" onclick="this.parentElement.remove(); calcTotal()">X</button></div>`;
+        // HTML da linha do item, adaptado para o novo layout de grid
+        const html = `
+            <div class="item-row" id="row-${id}">
+                <div>
+                    <select class="i-prod" onchange="updItem(${id})" style="width:100%">
+                        <option value="">Selecione...</option>
+                        ${PRODUTOS.map(p => `<option value="${p.nome}" ${p.requerSabor ? 'data-sabor="1"' : ''}>${p.nome}</option>`).join('')}
+                        <option value="OUTRO">Outro (Manual)</option>
+                    </select>
+                    <input type="text" class="i-cust" style="display:none; margin-top:5px; width:100%; font-size:12px" placeholder="Detalhe/Sabor">
+                </div>
+                <div><select class="i-tam" onchange="updPrice(${id})" style="width:100%"><option>-</option></select></div>
+                <div><input type="number" class="i-qtd" value="1" onchange="calcTotal()" style="width:100%"></div>
+                <div><input type="number" class="i-prc" step="0.01" onchange="calcTotal()" style="width:100%"></div>
+                <div class="i-total" style="font-weight:bold; color:#666; font-size:13px">R$ 0,00</div>
+                <button type="button" class="btn btn-danger" onclick="this.parentElement.remove(); calcTotal()" style="padding:5px 10px"><i class="fas fa-trash"></i></button>
+            </div>`;
+        
         document.getElementById('itemsContainer').insertAdjacentHTML('beforeend', html);
+        
         if(data) {
-            const row = document.getElementById(`row-${id}`); const selProd = row.querySelector('.i-prod'); const selTam = row.querySelector('.i-tam'); const inpCust = row.querySelector('.i-cust');
-            let baseName = data.prod; let flavor = ''; const match = data.prod.match(/^(.*)\s\((.*)\)$/); if (match && PRODUTOS.find(p => p.nome === match[1])) { baseName = match[1]; flavor = match[2]; }
+            const row = document.getElementById(`row-${id}`); 
+            const selProd = row.querySelector('.i-prod'); 
+            const selTam = row.querySelector('.i-tam'); 
+            const inpCust = row.querySelector('.i-cust');
+            
+            let baseName = data.prod; 
+            let flavor = ''; 
+            const match = data.prod.match(/^(.*)\s\((.*)\)$/); 
+            if (match && PRODUTOS.find(p => p.nome === match[1])) { 
+                baseName = match[1]; 
+                flavor = match[2]; 
+            }
+            
             const produtoObj = PRODUTOS.find(p => p.nome === baseName);
-            if(produtoObj) { selProd.value = baseName; selTam.innerHTML = produtoObj.tamanhos.map(t => `<option value="${t.t}" data-p="${t.p}">${t.t}</option>`).join(''); selTam.value = data.tam; if(produtoObj.requerSabor) { inpCust.style.display = 'block'; inpCust.placeholder = "Sabor"; inpCust.value = flavor; } } 
-            else { selProd.value = 'OUTRO'; inpCust.style.display = 'block'; inpCust.placeholder = "Produto"; inpCust.value = data.prod; selTam.innerHTML = `<option value="Único">Único</option>`; selTam.value = data.tam; }
-            row.querySelector('.i-qtd').value = data.qtd; row.querySelector('.i-prc').value = data.prc; row.querySelector('.i-total').innerText = fmtMoeda(data.qtd * data.prc);
+            if(produtoObj) { 
+                selProd.value = baseName; 
+                selTam.innerHTML = produtoObj.tamanhos.map(t => `<option value="${t.t}" data-p="${t.p}">${t.t}</option>`).join(''); 
+                selTam.value = data.tam; 
+                if(produtoObj.requerSabor) { 
+                    inpCust.style.display = 'block'; 
+                    inpCust.placeholder = "Sabor"; 
+                    inpCust.value = flavor; 
+                } 
+            } else { 
+                selProd.value = 'OUTRO'; 
+                inpCust.style.display = 'block'; 
+                inpCust.placeholder = "Produto"; 
+                inpCust.value = data.prod; 
+                selTam.innerHTML = `<option value="Único">Único</option>`; 
+                selTam.value = data.tam; 
+            }
+            row.querySelector('.i-qtd').value = data.qtd; 
+            row.querySelector('.i-prc').value = data.prc; 
+            row.querySelector('.i-total').innerText = fmtMoeda(data.qtd * data.prc);
         }
     };
 
     window.updItem = function(id) { const row = document.getElementById(`row-${id}`); const sel = row.querySelector('.i-prod'); const tam = row.querySelector('.i-tam'); const cust = row.querySelector('.i-cust'); const prc = row.querySelector('.i-prc'); const opt = sel.options[sel.selectedIndex]; const val = sel.value; if(val === 'OUTRO') { cust.style.display = 'block'; cust.placeholder = "Produto"; tam.innerHTML = '<option value="Único">Único</option>'; prc.value = ''; } else { const p = PRODUTOS.find(x => x.nome === val); if(p) { tam.innerHTML = p.tamanhos.map(t => `<option value="${t.t}" data-p="${t.p}">${t.t}</option>`).join(''); if(p.tamanhos[0]) prc.value = p.tamanhos[0].p; } if (opt.getAttribute('data-sabor')) { cust.style.display = 'block'; cust.placeholder = "Sabor"; } else { cust.style.display = 'none'; cust.value = ''; } } calcTotal(); };
     window.updPrice = function(id) { const row = document.getElementById(`row-${id}`); const tam = row.querySelector('.i-tam'); const prc = row.querySelector('.i-prc'); const opt = tam.options[tam.selectedIndex]; if(opt && opt.dataset.p) { prc.value = opt.dataset.p; calcTotal(); } };
     window.quickUpdateStatus = async function(id, newStatus) { try { await updateDoc(doc(db, "pedidos", id), { status: newStatus }); } catch(e) {} };
-    window.checkTipoEntrega = function() { const tipo = document.getElementById('tipoEntrega').value; const divDel = document.getElementById('deliveryFields'); const divRet = document.getElementById('retiradaFields'); if (tipo === 'Delivery') { divDel.style.display = 'block'; divRet.style.display = 'none'; document.getElementById('cliEnd').required = true; document.getElementById('cliBairro').required = true; document.getElementById('turnoEntrega').required = true; } else if (tipo === 'Retirada no local') { divDel.style.display = 'none'; divRet.style.display = 'block'; document.getElementById('cliEnd').required = false; document.getElementById('cliBairro').required = false; document.getElementById('turnoEntrega').required = false; } else { divDel.style.display = 'none'; divRet.style.display = 'none'; } };
+    
+    window.checkTipoEntrega = function() { 
+        const tipo = document.getElementById('tipoEntrega').value; 
+        const divDel = document.getElementById('deliveryFields'); 
+        const divRet = document.getElementById('retiradaFields'); 
+        
+        if (tipo === 'Delivery') { 
+            divDel.style.display = 'block'; 
+            divRet.style.display = 'none'; 
+            document.getElementById('cliEnd').required = true; 
+            document.getElementById('cliBairro').required = true; 
+            document.getElementById('turnoEntrega').required = true; 
+        } else if (tipo === 'Retirada no local') { 
+            divDel.style.display = 'none'; 
+            divRet.style.display = 'block'; 
+            document.getElementById('cliEnd').required = false; 
+            document.getElementById('cliBairro').required = false; 
+            document.getElementById('turnoEntrega').required = false; 
+        } else { 
+            divDel.style.display = 'none'; 
+            divRet.style.display = 'none'; 
+        } 
+    };
+    
     window.checkBairro = function() { const s = document.getElementById('cliBairro'); const i = document.getElementById('cliBairroOutro'); i.style.display = s.value === 'OUTRO' ? 'block' : 'none'; if(s.value === 'OUTRO') i.required = true; else i.required = false; };
-    window.saveOrder = async function(e) { e.preventDefault(); let itens = []; document.querySelectorAll('.item-row').forEach(row => { const prodSel = row.querySelector('.i-prod').value; let prodNome = prodSel === 'OUTRO' ? row.querySelector('.i-cust').value : prodSel; const custField = row.querySelector('.i-cust'); if (custField.style.display !== 'none' && prodSel !== 'OUTRO') { prodNome += ` (${custField.value})`; } const qtd = parseFloat(row.querySelector('.i-qtd').value); const prc = parseFloat(row.querySelector('.i-prc').value); itens.push({ prod: prodNome, tam: row.querySelector('.i-tam').value, qtd: qtd, prc: prc }); }); const tipo = document.getElementById('tipoEntrega').value; let bairroFinal = '-'; let endFinal = '-'; let turnoFinal = '-'; let horarioRet = ''; if(tipo === 'Delivery') { const bairroSel = document.getElementById('cliBairro').value; bairroFinal = bairroSel === 'OUTRO' ? document.getElementById('cliBairroOutro').value : bairroSel; const num = document.getElementById('cliNumero').value; endFinal = document.getElementById('cliEnd').value + (num ? `, Nº ${num}` : ''); turnoFinal = document.getElementById('turnoEntrega').value; } else { endFinal = 'Retirada na Loja'; horarioRet = document.getElementById('horarioRetirada').value; if(horarioRet) turnoFinal = `Retirada às ${horarioRet}`; else turnoFinal = 'Retirada'; } const taxa = parseFloat(document.getElementById('valTaxa').value) || 0; const pago = parseFloat(document.getElementById('valPago').value) || 0; const formaSinal = document.getElementById('formaPagSinal').value; const formaRestante = document.getElementById('formaPagRestante').value; let sumItens = itens.reduce((acc, i) => acc + (i.qtd * i.prc), 0); const totalFinal = sumItens + taxa; const restante = totalFinal - pago; const obj = { cliente: document.getElementById('cliNome').value, tel: document.getElementById('cliTel').value, cep: document.getElementById('cliCep').value, end: endFinal, bairro: bairroFinal, tipoEntrega: tipo, turno: turnoFinal, dataPedido: document.getElementById('dataPed').value, dataEntrega: document.getElementById('dataEnt').value, status: document.getElementById('statusPed').value, itens: itens, total: totalFinal, pago: pago, taxa: taxa, restante: restante, formaPagRestante: formaRestante, formaPagSinal: pago > 0 ? formaSinal : null, obs: document.getElementById('obs').value }; try { const editId = document.getElementById('editFirebaseId').value; if(editId) { await updateDoc(doc(db, "pedidos", editId), obj); alert('Atualizado!'); } else { await addDoc(colRef, obj); alert('Salvo!'); } closeOrderModal(); } catch(err) { console.error(err); alert('Erro ao salvar.'); } };
-    window.editOrder = function(id) { const o = orders.find(x => x.fbId === id); if(!o) return; showNewOrderModal(); document.getElementById('editFirebaseId').value = id; document.getElementById('cliNome').value = o.cliente; document.getElementById('cliTel').value = o.tel; const isDelivery = o.tipoEntrega === 'Delivery' || (o.turno && !o.turno.includes('Retirada')); document.getElementById('tipoEntrega').value = isDelivery ? 'Delivery' : 'Retirada no local'; checkTipoEntrega(); if(isDelivery) { document.getElementById('cliCep').value = o.cep || ''; if(o.end && o.end.includes(', Nº')) { const parts = o.end.split(', Nº'); document.getElementById('cliEnd').value = parts[0].trim(); document.getElementById('cliNumero').value = parts[1].trim(); } else { document.getElementById('cliEnd').value = o.end; } const sel = document.getElementById('cliBairro'); let found = false; for(let i=0; i<sel.options.length; i++) { if(sel.options[i].value === o.bairro) { sel.selectedIndex = i; found = true; break; } } if(!found) { sel.value = 'OUTRO'; checkBairro(); document.getElementById('cliBairroOutro').value = o.bairro; } document.getElementById('turnoEntrega').value = (o.turno === 'Manhã' || o.turno === 'Tarde') ? o.turno : ''; } else { if(o.turno.includes('às')) { document.getElementById('horarioRetirada').value = o.turno.split('às')[1].trim(); } } document.getElementById('dataPed').value = o.dataPedido; document.getElementById('dataEnt').value = o.dataEntrega; document.getElementById('statusPed').value = o.status; document.getElementById('valPago').value = o.pago; document.getElementById('valTaxa').value = o.taxa || 0; document.getElementById('formaPagRestante').value = o.formaPagRestante || ''; document.getElementById('obs').value = o.obs || ''; if(o.pago > 0) { document.getElementById('checkAdiantamento').checked = true; document.getElementById('areaAdiantamento').style.display = 'grid'; document.getElementById('formaPagSinal').value = o.formaPagSinal || ''; document.getElementById('lblFormaRestante').innerText = "Forma de Pagamento (Do Restante)"; } else { document.getElementById('checkAdiantamento').checked = false; document.getElementById('areaAdiantamento').style.display = 'none'; document.getElementById('lblFormaRestante').innerText = "Forma de Pagamento (Valor Total)"; } document.getElementById('itemsContainer').innerHTML = ''; o.itens.forEach(i => addItem(i)); calcTotal(); };
-    window.calcTotal = function() { let itemsTotal = 0; document.querySelectorAll('.item-row').forEach(row => { const q = parseFloat(row.querySelector('.i-qtd').value) || 0; const p = parseFloat(row.querySelector('.i-prc').value) || 0; const sub = q * p; row.querySelector('.i-total').innerText = fmtMoeda(sub); itemsTotal += sub; }); const taxa = parseFloat(document.getElementById('valTaxa').value) || 0; const pago = parseFloat(document.getElementById('valPago').value) || 0; const finalTotal = itemsTotal + taxa; const divRestante = document.getElementById('divFormaRestante'); const valRestante = finalTotal - pago; if (valRestante <= 0.01) { divRestante.style.display = 'none'; } else { divRestante.style.display = 'block'; } document.getElementById('displayTotal').innerText = fmtMoeda(finalTotal); document.getElementById('valRest').value = fmtMoeda(valRestante); };
+    
+    window.saveOrder = async function(e) { 
+        e.preventDefault(); 
+        let itens = []; 
+        document.querySelectorAll('.item-row').forEach(row => { 
+            const prodSel = row.querySelector('.i-prod').value; 
+            let prodNome = prodSel === 'OUTRO' ? row.querySelector('.i-cust').value : prodSel; 
+            const custField = row.querySelector('.i-cust'); 
+            if (custField.style.display !== 'none' && prodSel !== 'OUTRO') { prodNome += ` (${custField.value})`; } 
+            const qtd = parseFloat(row.querySelector('.i-qtd').value); 
+            const prc = parseFloat(row.querySelector('.i-prc').value); 
+            itens.push({ prod: prodNome, tam: row.querySelector('.i-tam').value, qtd: qtd, prc: prc }); 
+        }); 
+        
+        const tipo = document.getElementById('tipoEntrega').value; 
+        let bairroFinal = '-'; 
+        let endFinal = '-'; 
+        let turnoFinal = '-'; 
+        let horarioRet = ''; 
+        
+        if(tipo === 'Delivery') { 
+            const bairroSel = document.getElementById('cliBairro').value; 
+            bairroFinal = bairroSel === 'OUTRO' ? document.getElementById('cliBairroOutro').value : bairroSel; 
+            const num = document.getElementById('cliNumero').value; 
+            endFinal = document.getElementById('cliEnd').value + (num ? `, Nº ${num}` : ''); 
+            turnoFinal = document.getElementById('turnoEntrega').value; 
+        } else { 
+            endFinal = 'Retirada na Loja'; 
+            horarioRet = document.getElementById('horarioRetirada').value; 
+            if(horarioRet) turnoFinal = `Retirada às ${horarioRet}`; 
+            else turnoFinal = 'Retirada'; 
+        } 
+        
+        const taxa = parseFloat(document.getElementById('valTaxa').value) || 0; 
+        const pago = parseFloat(document.getElementById('valPago').value) || 0; 
+        const formaSinal = document.getElementById('formaPagSinal').value; 
+        const formaRestante = document.getElementById('formaPagRestante').value; 
+        
+        let sumItens = itens.reduce((acc, i) => acc + (i.qtd * i.prc), 0); 
+        const totalFinal = sumItens + taxa; 
+        const restante = totalFinal - pago; 
+        
+        const obj = { 
+            cliente: document.getElementById('cliNome').value, 
+            tel: document.getElementById('cliTel').value, 
+            cep: document.getElementById('cliCep').value, 
+            end: endFinal, 
+            bairro: bairroFinal, 
+            tipoEntrega: tipo, 
+            turno: turnoFinal, 
+            dataPedido: document.getElementById('dataPed').value, 
+            dataEntrega: document.getElementById('dataEnt').value, 
+            status: document.getElementById('statusPed').value, 
+            itens: itens, 
+            total: totalFinal, 
+            pago: pago, 
+            taxa: taxa, 
+            restante: restante, 
+            formaPagRestante: formaRestante, 
+            formaPagSinal: pago > 0 ? formaSinal : null, 
+            obs: document.getElementById('obs').value 
+        }; 
+        
+        try { 
+            const editId = document.getElementById('editFirebaseId').value; 
+            if(editId) { 
+                await updateDoc(doc(db, "pedidos", editId), obj); 
+                alert('Atualizado!'); 
+            } else { 
+                await addDoc(colRef, obj); 
+                alert('Salvo!'); 
+            } 
+            closeOrderModal(); 
+        } catch(err) { 
+            console.error(err); 
+            alert('Erro ao salvar.'); 
+        } 
+    };
 
-    // --- ROTAS (SORTABLEJS + API CORRIGIDA) ---
+    window.editOrder = function(id) { 
+        const o = orders.find(x => x.fbId === id); 
+        if(!o) return; 
+        showNewOrderModal(); 
+        
+        document.getElementById('editFirebaseId').value = id; 
+        document.getElementById('cliNome').value = o.cliente; 
+        document.getElementById('cliTel').value = o.tel; 
+        
+        const isDelivery = o.tipoEntrega === 'Delivery' || (o.turno && !o.turno.includes('Retirada')); 
+        document.getElementById('tipoEntrega').value = isDelivery ? 'Delivery' : 'Retirada no local'; 
+        checkTipoEntrega(); 
+        
+        if(isDelivery) { 
+            document.getElementById('cliCep').value = o.cep || ''; 
+            if(o.end && o.end.includes(', Nº')) { 
+                const parts = o.end.split(', Nº'); 
+                document.getElementById('cliEnd').value = parts[0].trim(); 
+                document.getElementById('cliNumero').value = parts[1].trim(); 
+            } else { 
+                document.getElementById('cliEnd').value = o.end; 
+            } 
+            const sel = document.getElementById('cliBairro'); 
+            let found = false; 
+            for(let i=0; i<sel.options.length; i++) { if(sel.options[i].value === o.bairro) { sel.selectedIndex = i; found = true; break; } } 
+            if(!found) { sel.value = 'OUTRO'; checkBairro(); document.getElementById('cliBairroOutro').value = o.bairro; } 
+            document.getElementById('turnoEntrega').value = (o.turno === 'Manhã' || o.turno === 'Tarde') ? o.turno : ''; 
+        } else { 
+            if(o.turno.includes('às')) { document.getElementById('horarioRetirada').value = o.turno.split('às')[1].trim(); } 
+        } 
+        
+        document.getElementById('dataPed').value = o.dataPedido; 
+        document.getElementById('dataEnt').value = o.dataEntrega; 
+        document.getElementById('statusPed').value = o.status; 
+        document.getElementById('valPago').value = o.pago; 
+        document.getElementById('valTaxa').value = o.taxa || 0; 
+        document.getElementById('formaPagRestante').value = o.formaPagRestante || ''; 
+        document.getElementById('obs').value = o.obs || ''; 
+        
+        if(o.pago > 0) { 
+            document.getElementById('checkAdiantamento').checked = true; 
+            toggleAdiantamento();
+            document.getElementById('formaPagSinal').value = o.formaPagSinal || ''; 
+        } else { 
+            document.getElementById('checkAdiantamento').checked = false; 
+            toggleAdiantamento();
+        } 
+        
+        document.getElementById('itemsContainer').innerHTML = ''; 
+        o.itens.forEach(i => addItem(i)); 
+        calcTotal(); 
+    };
+
+    window.calcTotal = function() { 
+        let itemsTotal = 0; 
+        document.querySelectorAll('.item-row').forEach(row => { 
+            const q = parseFloat(row.querySelector('.i-qtd').value) || 0; 
+            const p = parseFloat(row.querySelector('.i-prc').value) || 0; 
+            const sub = q * p; 
+            row.querySelector('.i-total').innerText = fmtMoeda(sub); 
+            itemsTotal += sub; 
+        }); 
+        
+        const taxa = parseFloat(document.getElementById('valTaxa').value) || 0; 
+        const pago = parseFloat(document.getElementById('valPago').value) || 0; 
+        const finalTotal = itemsTotal + taxa; 
+        const valRestante = finalTotal - pago; 
+        
+        document.getElementById('displayTotal').innerText = fmtMoeda(finalTotal); 
+        document.getElementById('valRest').value = fmtMoeda(valRestante); 
+    };
+
+    // --- ROTAS (MANUAL) ---
     window.renderRoutes = function() {
         const selectedTurno = document.getElementById('routeTurnoSelector').value;
         const listArea = document.getElementById('routeListArea');
@@ -635,106 +842,6 @@
             return valA - valB;
         });
         renderRoutes(); alert('Rota organizada por sequência lógica de bairros!');
-    };
-
-    const START_COORDS = [-39.3175, -7.2270]; // Rua Apolo XI
-    const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-    window.optimizeRouteWithAI = async function() {
-        // 1. OBTENÇÃO DA CHAVE
-        const cfg = JSON.parse(localStorage.getItem('printConfig')) || DEFAULT_PRINT_CONFIG;
-        let rawKey = cfg.apiKey;
-        if (!rawKey || rawKey.trim() === '') { 
-            rawKey = API_KEY_FIXA; 
-        }
-
-        // 2. EXTRAÇÃO INTELIGENTE DA CHAVE REAL
-        const apiKey = extrairChaveReal(rawKey);
-
-        if (!apiKey) { alert('Erro: Chave de API inválida ou vazia.'); openPrintConfig(); return; }
-        if (activeRouteOrders.length === 0) { alert('Nenhuma entrega para otimizar.'); return; }
-
-        const loadingDiv = document.getElementById('apiLoading'); const loadingBar = document.getElementById('loadingBar'); const loadingText = document.getElementById('loadingText');
-        loadingDiv.style.display = 'block'; loadingBar.style.width = '0%';
-        
-        try {
-            // A. GEOCODIFICAÇÃO (Nominatim - Grátis)
-            const coords = [];
-            for (let i = 0; i < activeRouteOrders.length; i++) {
-                const order = activeRouteOrders[i];
-                loadingText.innerText = `Lendo endereço ${i+1}/${activeRouteOrders.length}: ${order.end}`;
-                loadingBar.style.width = `${((i)/activeRouteOrders.length)*50}%`;
-                
-                const cleanEnd = order.end.replace(/[#]/g, '');
-                const query = `${cleanEnd}, ${order.bairro}, Juazeiro do Norte, CE, Brazil`;
-                
-                // Usando Nominatim (OpenStreetMap) que não precisa de chave
-                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
-                const res = await fetch(url); const data = await res.json();
-                
-                if (data && data.length > 0) { 
-                    coords.push({ id: order.fbId, location: [parseFloat(data[0].lon), parseFloat(data[0].lat)] }); 
-                }
-                await sleep(1100); // Pausa respeitosa para o Nominatim
-            }
-            
-            if (coords.length === 0) throw new Error("Nenhum endereço foi localizado pelo GPS.");
-            
-            // B. OTIMIZAÇÃO (CORREÇÃO AQUI: SEM PROXY)
-            // Removemos o 'corsproxy' para tentar conexão direta, evitando o erro de HTML
-            loadingText.innerText = "Calculando melhor rota (IA)..."; loadingBar.style.width = '75%';
-            
-            const jobs = coords.map(c => ({ id: c.id, location: c.location }));
-            const vehicle = { id: 1, profile: 'driving-car', start: START_COORDS, end: START_COORDS };
-            
-            const targetUrl = 'https://api.openrouteservice.org/v2/optimization';
-            
-            const orsRes = await fetch(targetUrl, { 
-                method: 'POST', 
-                headers: { 
-                    'Authorization': apiKey, 
-                    'Content-Type': 'application/json' 
-                }, 
-                body: JSON.stringify({ jobs: jobs, vehicles: [vehicle] }) 
-            });
-            
-            // Verificação se retornou erro HTML ou JSON
-            const contentType = orsRes.headers.get("content-type");
-            if (contentType && contentType.indexOf("application/json") === -1) {
-                // Se não for JSON, lê como texto para ver o erro real
-                const textError = await orsRes.text();
-                console.error("Erro HTML da API:", textError);
-                throw new Error("A API retornou um erro (HTML). Verifique o console (F12) para detalhes.");
-            }
-
-            if (!orsRes.ok) {
-                const errData = await orsRes.json();
-                console.error("Erro ORS:", errData);
-                throw new Error("Erro na API de Otimização. Código: " + orsRes.status);
-            }
-
-            const routeData = await orsRes.json();
-            
-            // C. REORGANIZAÇÃO DA LISTA
-            loadingText.innerText = "Reorganizando lista..."; loadingBar.style.width = '100%';
-            
-            if (routeData.routes && routeData.routes.length > 0) {
-                const steps = routeData.routes[0].steps; const optimizedOrder = [];
-                steps.forEach(step => { if (step.type === 'job') { const found = activeRouteOrders.find(o => o.fbId === step.id); if (found) optimizedOrder.push(found); } });
-                
-                // Adiciona os que não foram encontrados no final
-                activeRouteOrders.forEach(o => { if (!optimizedOrder.includes(o)) optimizedOrder.push(o); });
-                
-                activeRouteOrders = optimizedOrder; 
-                renderRoutes(); 
-                alert('Rota otimizada com sucesso via GPS!');
-            }
-        } catch (error) { 
-            console.error(error); 
-            alert('Erro ao otimizar: ' + error.message); 
-        } finally { 
-            loadingDiv.style.display = 'none'; 
-        }
     };
 
     window.openGoogleMapsRoute = function() {
