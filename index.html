@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V22 (Final)</title>
+    <title>Divine Pudim Gourmet - Sistema V23 (Correção Conexão)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -421,9 +421,8 @@
     // =======================================================
     // ÁREA DE CONFIGURAÇÃO FIXA DA API (COLE A CHAVE AQUI)
     // =======================================================
-    // Cole sua chave entre as aspas abaixo.
-    // Ex: const API_KEY_FIXA = "5b3ce3597851110001cf6248..."; 
-    const API_KEY_FIXA = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImM5ZWQ2YjBjMWEyODRmNWY4ZTJkYzY2MDg3N2VjOTRkIiwiaCI6Im11cm11cjY0In0"; 
+    // Cole sua chave abaixo (ela começa com 5b3ce...)
+    const API_KEY_FIXA = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjhiMzlhNjY4YWE4NTQxMzg5MDI1MzUxYTY1NTQ3MDM5IiwiaCI6Im11cm11cjY0In0="; 
     // =======================================================
 
     const firebaseConfig = {
@@ -508,7 +507,7 @@
             phone: document.getElementById('cfgPhone').value, 
             msg: document.getElementById('cfgMsg').value, 
             social: document.getElementById('cfgSocial').value,
-            apiKey: document.getElementById('cfgApiKey') ? document.getElementById('cfgApiKey').value : ''
+            apiKey: document.getElementById('cfgApiKey') ? document.getElementById('cfgApiKey').value.trim() : ''
         }; 
         localStorage.setItem('printConfig', JSON.stringify(cfg)); 
         alert('Configuração salva!'); 
@@ -623,8 +622,11 @@
     const sleep = ms => new Promise(r => setTimeout(r, ms));
 
     window.optimizeRouteWithAI = async function() {
+        // LÓGICA DE API KEY HÍBRIDA (Código ou LocalStorage)
         const cfg = JSON.parse(localStorage.getItem('printConfig')) || DEFAULT_PRINT_CONFIG;
-        const apiKey = cfg.apiKey || API_KEY_FIXA;
+        let apiKey = cfg.apiKey;
+        if (!apiKey || apiKey.trim() === '') { apiKey = API_KEY_FIXA; }
+
         if (!apiKey) { alert('Você precisa cadastrar uma API Key do OpenRouteService nas Configurações!'); openPrintConfig(); return; }
         if (activeRouteOrders.length === 0) { alert('Nenhuma entrega para otimizar.'); return; }
         const loadingDiv = document.getElementById('apiLoading'); const loadingBar = document.getElementById('loadingBar'); const loadingText = document.getElementById('loadingText');
@@ -635,7 +637,10 @@
                 const order = activeRouteOrders[i];
                 loadingText.innerText = `Lendo endereço ${i+1}/${activeRouteOrders.length}: ${order.end}`;
                 loadingBar.style.width = `${((i)/activeRouteOrders.length)*50}%`;
-                const query = `${order.end}, ${order.bairro}, Juazeiro do Norte, CE, Brazil`;
+                // Remove caracteres especiais para evitar erros na URL
+                const cleanEnd = order.end.replace(/[#]/g, '');
+                const query = `${cleanEnd}, ${order.bairro}, Juazeiro do Norte, CE, Brazil`;
+                
                 const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
                 const res = await fetch(url); const data = await res.json();
                 if (data && data.length > 0) { coords.push({ id: order.fbId, location: [parseFloat(data[0].lon), parseFloat(data[0].lat)] }); }
@@ -645,7 +650,17 @@
             loadingText.innerText = "Calculando melhor rota..."; loadingBar.style.width = '75%';
             const jobs = coords.map(c => ({ id: c.id, location: c.location }));
             const vehicle = { id: 1, profile: 'driving-car', start: START_COORDS, end: START_COORDS };
-            const orsRes = await fetch('https://api.openrouteservice.org/v2/optimization', { method: 'POST', headers: { 'Authorization': apiKey, 'Content-Type': 'application/json' }, body: JSON.stringify({ jobs: jobs, vehicles: [vehicle] }) });
+            
+            // USE PROXY PARA EVITAR ERRO DE CORS
+            const proxyUrl = 'https://corsproxy.io/?';
+            const targetUrl = 'https://api.openrouteservice.org/v2/optimization';
+            
+            const orsRes = await fetch(proxyUrl + encodeURIComponent(targetUrl), { 
+                method: 'POST', 
+                headers: { 'Authorization': apiKey, 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ jobs: jobs, vehicles: [vehicle] }) 
+            });
+            
             if (!orsRes.ok) throw new Error("Erro na API de Otimização. Verifique sua chave.");
             const routeData = await orsRes.json();
             loadingText.innerText = "Reorganizando lista..."; loadingBar.style.width = '100%';
