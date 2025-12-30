@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V30 (Opção B + Cards Estoque)</title>
+    <title>Divine Pudim Gourmet - Sistema V31 (Relatório Otimizado)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -242,30 +242,10 @@
 
     <section id="tabEstoque" class="tab-content">
         <div class="container">
-            <div class="dashboard-grid" style="margin-bottom: 20px;">
-                <div class="card">
-                    <div class="card-row">
-                        <div class="card-icon" style="background:#ec4899"><i class="fas fa-clipboard-list"></i></div>
-                        <div><h3 id="stkDestinado">0</h3><p>Destinado (Em Pedidos)</p></div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-row">
-                        <div class="card-icon" style="background:#10b981"><i class="fas fa-tags"></i></div>
-                        <div><h3 id="stkValor">R$ 0,00</h3><p>Valor em Estoque</p></div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-row">
-                        <div class="card-icon" style="background:#ef4444"><i class="fas fa-exclamation-triangle"></i></div>
-                        <div><h3 id="stkCritico">0</h3><p>Itens Críticos (< 5)</p></div>
-                    </div>
-                </div>
-            </div>
             <div style="background:white; padding:20px; border-radius:12px; box-shadow:var(--shadow); margin-bottom:20px">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px">
                     <h2 style="color:var(--primary-dark)"><i class="fas fa-boxes"></i> Controle de Estoque (Físico)</h2>
-                    <button class="btn btn-secondary" onclick="printStockReport()"><i class="fas fa-print"></i> Imprimir Relatório</button>
+                    <button class="btn btn-secondary" onclick="printStockReport()"><i class="fas fa-print"></i> Imprimir Relatório (Faltas/Sobras)</button>
                 </div>
                 
                 <div style="overflow-x: auto;">
@@ -520,18 +500,13 @@
     const colRef = collection(db, "pedidos");
     const stockCol = collection(db, "estoque");
 
-    // DADOS INICIAIS FORNECIDOS PELO USUÁRIO (OPTION B)
+    // DADOS E CONFIGURAÇÕES
     const INITIAL_STOCK_DATA = [
-        { prod: 'Delícia de abacaxi', tam: 'G', qtd: 6 },
-        { prod: 'Delícia de abacaxi', tam: 'P', qtd: 6 },
-        { prod: 'Ouro branco', tam: 'P', qtd: 3 },
-        { prod: 'Supreme de morango', tam: 'P', qtd: 2 },
-        { prod: 'Supreme de morango', tam: 'G', qtd: 4 },
-        { prod: 'Pudim tradicional', tam: 'M', qtd: 13 }, 
-        { prod: 'Pudim tradicional', tam: 'G', qtd: 2 },
-        { prod: 'Ferrero Rocher', tam: 'P', qtd: 1 },
-        { prod: 'Bombom de morango', tam: 'G', qtd: 2 },
-        { prod: 'Bombom de uva', tam: 'G', qtd: 1 }, 
+        { prod: 'Delícia de abacaxi', tam: 'G', qtd: 6 }, { prod: 'Delícia de abacaxi', tam: 'P', qtd: 6 },
+        { prod: 'Ouro branco', tam: 'P', qtd: 3 }, { prod: 'Supreme de morango', tam: 'P', qtd: 2 },
+        { prod: 'Supreme de morango', tam: 'G', qtd: 4 }, { prod: 'Pudim tradicional', tam: 'M', qtd: 13 }, 
+        { prod: 'Pudim tradicional', tam: 'G', qtd: 2 }, { prod: 'Ferrero Rocher', tam: 'P', qtd: 1 },
+        { prod: 'Bombom de morango', tam: 'G', qtd: 2 }, { prod: 'Bombom de uva', tam: 'G', qtd: 1 }, 
         { prod: 'Bombom de morango', tam: 'P', qtd: 2 }
     ];
 
@@ -559,33 +534,18 @@
         { nome: 'Empadão de frango', tamanhos: [{t:'Único',p:85}] }
     ];
 
-    const BAIRROS = [
-        "Aeroporto", "Antônio Vieira", "Betolândia", "Brejo Seco", "Campo Alegre", 
-        "Carité", "Centro", "Cidade Universitária", "Franciscanos", "Frei Damião", 
-        "Horto", "Jardim Gonzaga", "João Cabral", "José Geraldo da Cruz", "Juvêncio Santana", 
-        "Lagoa Seca", "Leandro Bezerra de Menezes", "Limoeiro", "Monsenhor Francisco de Sá Barreto", 
-        "Monsenhor Murilo de Sá Barreto", "Novo Juazeiro", "Palmeirinha", "Parque São Geraldo", 
-        "Pedrinhas", "Pio XII", "Pirajá", "Planalto", "Professora Maria Geli", "Romeirão", 
-        "Salesianos", "Salgadinho", "Santa Teresa", "São José", "São Miguel", "Socorro", 
-        "Tiradentes", "Três Marias", "Triângulo", "OUTRO"
-    ];
+    const BAIRROS = ["Aeroporto", "Antônio Vieira", "Betolândia", "Brejo Seco", "Campo Alegre", "Carité", "Centro", "Cidade Universitária", "Franciscanos", "Frei Damião", "Horto", "Jardim Gonzaga", "João Cabral", "José Geraldo da Cruz", "Juvêncio Santana", "Lagoa Seca", "Leandro Bezerra de Menezes", "Limoeiro", "Monsenhor Francisco de Sá Barreto", "Monsenhor Murilo de Sá Barreto", "Novo Juazeiro", "Palmeirinha", "Parque São Geraldo", "Pedrinhas", "Pio XII", "Pirajá", "Planalto", "Professora Maria Geli", "Romeirão", "Salesianos", "Salgadinho", "Santa Teresa", "São José", "São Miguel", "Socorro", "Tiradentes", "Três Marias", "Triângulo", "OUTRO"];
 
-    const SEQUENCIA_LOGICA_BAIRROS = [
-        "Salesianos", "Santo Antônio", "Santa Teresa", "Socorro", "Centro", "São Miguel",
-        "Romeirão", "Pirajá", "Franciscanos", "Limoeiro", "João Cabral", "Horto",
-        "Triângulo", "Antônio Vieira", "São José", "Frei Damião", "Jardim Gonzaga",
-        "Lagoa Seca", "Planalto", "Cidade Universitária", "Campo Alegre", "Betolândia",
-        "Aeroporto", "Novo Juazeiro", "Tiradentes", "Pedrinhas", "Brejo Seco"
-    ];
+    const SEQUENCIA_LOGICA_BAIRROS = ["Salesianos", "Santo Antônio", "Santa Teresa", "Socorro", "Centro", "São Miguel", "Romeirão", "Pirajá", "Franciscanos", "Limoeiro", "João Cabral", "Horto", "Triângulo", "Antônio Vieira", "São José", "Frei Damião", "Jardim Gonzaga", "Lagoa Seca", "Planalto", "Cidade Universitária", "Campo Alegre", "Betolândia", "Aeroporto", "Novo Juazeiro", "Tiradentes", "Pedrinhas", "Brejo Seco"];
 
     let orders = [];
     let activeRouteOrders = [];
     let stockData = {};
     let charts = { prod: null, fat: null };
     let sortableInstance = null;
-
     const DEFAULT_PRINT_CONFIG = { title: 'DIVINE PUDIM', subtitle: 'GOURMET', phone: '88 98824-4346', msg: 'Obrigado pela preferência!', social: '@divinepudimgourmet' };
 
+    // --- FUNÇÕES DE SETUP E LOGIN ---
     window.openPrintConfig = function() { 
         const cfg = JSON.parse(localStorage.getItem('printConfig')) || DEFAULT_PRINT_CONFIG; 
         if(document.getElementById('cfgTitle')) document.getElementById('cfgTitle').value = cfg.title; 
@@ -597,34 +557,17 @@
     };
 
     window.savePrintConfig = function() { 
-        const cfg = { 
-            title: document.getElementById('cfgTitle').value, 
-            subtitle: document.getElementById('cfgSubtitle').value, 
-            phone: document.getElementById('cfgPhone').value, 
-            msg: document.getElementById('cfgMsg').value, 
-            social: document.getElementById('cfgSocial').value
-        }; 
+        const cfg = { title: document.getElementById('cfgTitle').value, subtitle: document.getElementById('cfgSubtitle').value, phone: document.getElementById('cfgPhone').value, msg: document.getElementById('cfgMsg').value, social: document.getElementById('cfgSocial').value }; 
         localStorage.setItem('printConfig', JSON.stringify(cfg)); 
-        alert('Configuração salva!'); 
-        document.getElementById('printConfigModal').classList.remove('active'); 
+        alert('Configuração salva!'); document.getElementById('printConfigModal').classList.remove('active'); 
     };
 
-    window.resetPrintConfig = function() { 
-        if(confirm('Restaurar padrão?')) { 
-            localStorage.removeItem('printConfig'); 
-            window.openPrintConfig(); 
-        } 
-    };
+    window.resetPrintConfig = function() { if(confirm('Restaurar padrão?')) { localStorage.removeItem('printConfig'); window.openPrintConfig(); } };
 
-    // --- FUNÇÃO DE APLICAR ESTOQUE INICIAL (RESET) ---
     window.applyInitialStock = async function() {
         if(!confirm("Isso vai redefinir o estoque baseando-se na sua contagem física atual - os pedidos pendentes.\n\nTem certeza?")) return;
-        
-        // 1. Calcular o que está comprometido (Pending Orders)
         const pendingItems = {};
-        const activeOrders = orders.filter(o => o.status !== 'Entregue');
-        
-        activeOrders.forEach(o => {
+        orders.filter(o => o.status !== 'Entregue').forEach(o => {
             o.itens.forEach(item => {
                 let baseName = item.prod;
                 const match = item.prod.match(/^(.*)\s\((.*)\)$/);
@@ -633,37 +576,22 @@
                 pendingItems[key] = (pendingItems[key] || 0) + item.qtd;
             });
         });
-
-        // 2. Definir o estoque base
         const promises = [];
-        
         PRODUTOS.forEach(p => {
             p.tamanhos.forEach(t => {
                 const key = getStockKey(p.nome, t.t);
-                
-                // Encontra se tem valor inicial definido pelo usuario com comparação segura
-                const initData = INITIAL_STOCK_DATA.find(i => 
-                    i.prod.trim().toLowerCase() === p.nome.trim().toLowerCase() && 
-                    i.tam.trim().toLowerCase() === t.t.trim().toLowerCase()
-                );
-                
+                const initData = INITIAL_STOCK_DATA.find(i => i.prod.trim().toLowerCase() === p.nome.trim().toLowerCase() && i.tam.trim().toLowerCase() === t.t.trim().toLowerCase());
                 const physicalCount = initData ? initData.qtd : 0;
                 const reservedCount = pendingItems[key] || 0;
-                
-                // Saldo Líquido = Físico - Reservado
-                const netStock = physicalCount - reservedCount;
-                
                 const ref = doc(db, "estoque", key);
-                promises.push(setDoc(ref, { emProducao: 0, pronto: netStock }));
+                promises.push(setDoc(ref, { emProducao: 0, pronto: physicalCount - reservedCount }));
             });
         });
-
         await Promise.all(promises);
-        alert("Estoque redefinido com sucesso! Saldo calculado.");
+        alert("Estoque redefinido com sucesso!");
         document.getElementById('printConfigModal').classList.remove('active');
     };
 
-    // --- LOGIN ---
     window.handleLogin = function(e) {
         e.preventDefault();
         const u = document.getElementById('loginUser').value.toLowerCase().trim();
@@ -678,15 +606,13 @@
     function initApp() {
         const bList = document.getElementById('cliBairro');
         if(bList.options.length <= 1) {
-            BAIRROS.forEach(b => {
-                let opt = document.createElement('option');
-                opt.value = b; opt.textContent = b; bList.appendChild(opt);
-            });
+            BAIRROS.forEach(b => { let opt = document.createElement('option'); opt.value = b; opt.textContent = b; bList.appendChild(opt); });
         }
         
         onSnapshot(query(colRef), (snapshot) => {
             orders = [];
             snapshot.forEach(doc => { let d = doc.data(); d.fbId = doc.id; orders.push(d); });
+            // Ordenação padrão Global (Cronológica) para cálculo correto de estoque
             orders.sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega));
             orders.forEach((o, i) => o.displayId = (i + 1).toString().padStart(3, '0'));
             refreshAll();
@@ -702,9 +628,7 @@
     }
 
     // --- FUNÇÕES DE ESTOQUE ---
-    function getStockKey(prodName, tam) {
-        return `${prodName}_${tam}`;
-    }
+    function getStockKey(prodName, tam) { return `${prodName}_${tam}`; }
 
     window.updateStock = async function(key, type, delta) {
         const currentRef = doc(db, "estoque", key);
@@ -718,103 +642,36 @@
         const currentRef = doc(db, "estoque", key);
         const currentSnap = await getDoc(currentRef);
         let newData = currentSnap.exists() ? currentSnap.data() : { emProducao: 0, pronto: 0 };
-        if (newData.emProducao > 0) {
-            newData.emProducao -= 1;
-            newData.pronto = (newData.pronto || 0) + 1;
-            await setDoc(currentRef, newData);
-        } else {
-            alert('Não há itens em produção para finalizar.');
-        }
+        if (newData.emProducao > 0) { newData.emProducao -= 1; newData.pronto = (newData.pronto || 0) + 1; await setDoc(currentRef, newData); } 
+        else { alert('Não há itens em produção para finalizar.'); }
     };
 
-    // Helper para achar preço
-    function getProductPrice(prodName, tam) {
-        const p = PRODUTOS.find(x => x.nome === prodName);
-        if(!p) return 0;
-        const t = p.tamanhos.find(x => x.t === tam);
-        return t ? t.p : 0;
-    }
-
-    // --- NOVA FUNÇÃO DE RENDER ESTOQUE COM CARDS ---
     window.renderStock = function() {
         const tbody = document.getElementById('stockTableBody');
         let html = '';
         
-        // Variáveis para os Cards
-        let totalDestinado = 0;
-        let totalValorEstoque = 0;
-        let totalCritico = 0;
-
-        // 1. Calcular Destinados (O que está nos pedidos pendentes)
-        const destinedMap = {};
-        orders.forEach(o => {
-            if (o.status !== 'Entregue') { // Se não foi entregue, consome estoque ou está reservado
-                o.itens.forEach(i => {
-                    let baseName = i.prod;
-                    const match = i.prod.match(/^(.*)\s\((.*)\)$/);
-                    if (match && PRODUTOS.find(p => p.nome === match[1])) { baseName = match[1]; }
-                    const key = getStockKey(baseName, i.tam);
-                    destinedMap[key] = (destinedMap[key] || 0) + i.qtd;
-                    totalDestinado += i.qtd;
-                });
-            }
-        });
-
         PRODUTOS.forEach(p => {
             p.tamanhos.forEach(t => {
                 const key = getStockKey(p.nome, t.t);
                 const data = stockData[key] || { emProducao: 0, pronto: 0 };
                 const emProd = data.emProducao || 0;
-                const pronto = data.pronto || 0; // Estoque Físico
-
-                // Cálculos para cards
-                const price = t.p || 0;
-                totalValorEstoque += (pronto > 0 ? pronto * price : 0);
-                if (pronto < 5) totalCritico++; // Critério: menos de 5 unidades
-
+                const pronto = data.pronto || 0;
+                
                 const prontoClass = pronto < 0 ? 'stock-val stock-neg' : 'stock-val';
                 const alertHtml = pronto < 0 ? '<span class="stock-alert">EM FALTA</span>' : '';
                 
-                html += `<tr>
-                    <td>${p.nome}</td>
-                    <td>${t.t}</td>
-                    <td>
-                        <div class="stock-control" style="justify-content:center">
-                            <button class="btn-circle btn-minus" onclick="updateStock('${key}', 'emProducao', -1)">-</button>
-                            <span class="stock-val">${emProd}</span>
-                            <button class="btn-circle btn-plus" onclick="updateStock('${key}', 'emProducao', 1)">+</button>
-                        </div>
-                    </td>
-                    <td style="text-align:center">
-                        <button class="btn-finish" onclick="finishProduction('${key}')">Finalizar ➡️</button>
-                    </td>
-                    <td>
-                        <div class="stock-control" style="justify-content:center">
-                            <button class="btn-circle btn-minus" onclick="updateStock('${key}', 'pronto', -1)">-</button>
-                            <span class="${prontoClass}">${pronto}</span>
-                            <button class="btn-circle btn-plus" onclick="updateStock('${key}', 'pronto', 1)">+</button>
-                            ${alertHtml}
-                        </div>
-                    </td>
-                </tr>`;
+                html += `<tr><td>${p.nome}</td><td>${t.t}</td><td><div class="stock-control" style="justify-content:center"><button class="btn-circle btn-minus" onclick="updateStock('${key}', 'emProducao', -1)">-</button><span class="stock-val">${emProd}</span><button class="btn-circle btn-plus" onclick="updateStock('${key}', 'emProducao', 1)">+</button></div></td><td style="text-align:center"><button class="btn-finish" onclick="finishProduction('${key}')">Finalizar ➡️</button></td><td><div class="stock-control" style="justify-content:center"><button class="btn-circle btn-minus" onclick="updateStock('${key}', 'pronto', -1)">-</button><span class="${prontoClass}">${pronto}</span><button class="btn-circle btn-plus" onclick="updateStock('${key}', 'pronto', 1)">+</button>${alertHtml}</div></td></tr>`;
             });
         });
-        
         tbody.innerHTML = html;
-
-        // Atualizar Cards
-        document.getElementById('stkDestinado').innerText = totalDestinado;
-        document.getElementById('stkValor').innerText = fmtMoeda(totalValorEstoque);
-        document.getElementById('stkCritico').innerText = totalCritico;
     };
 
-    // --- NOVA FUNÇÃO DE IMPRESSÃO ESTOQUE ---
     window.printStockReport = function() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        
-        // Calcular Destinados
         const destinedMap = {};
+        
+        // 1. Calcula o destinado
         orders.forEach(o => {
             if (o.status !== 'Entregue') {
                 o.itens.forEach(i => {
@@ -828,53 +685,138 @@
         });
 
         const tableBody = [];
-        
         PRODUTOS.forEach(p => {
             p.tamanhos.forEach(t => {
                 const key = getStockKey(p.nome, t.t);
                 const data = stockData[key] || { emProducao: 0, pronto: 0 };
                 const fisico = data.pronto || 0;
                 const destino = destinedMap[key] || 0;
-                const saldo = fisico - destino; // O que sobra pra vender
+                const saldo = fisico - destino;
+                
+                // LÓGICA FILTRADA: Só mostra se tiver saldo positivo (sobra) OU negativo (falta)
+                // Se Saldo for 0, não mostra.
+                if (saldo !== 0) {
+                    tableBody.push([p.nome, t.t, fisico, destino, saldo]);
+                }
+            });
+        });
+        
+        tableBody.sort((a,b) => a[0].localeCompare(b[0]));
+        
+        doc.setFontSize(18); doc.text("Relatório de Sobras e Faltas", 14, 20);
+        doc.setFontSize(10); doc.text("Apenas itens com saldo positivo ou negativo.", 14, 28);
+        doc.text("Data: " + new Date().toLocaleString(), 14, 34);
+        
+        doc.autoTable({
+            head: [['Produto', 'Tam', 'Físico', 'Destinado', 'Saldo']],
+            body: tableBody, startY: 40, theme: 'grid',
+            headStyles: { fillColor: [236, 72, 153] },
+            columnStyles: { 
+                2: { halign: 'center' }, 
+                3: { halign: 'center' }, 
+                4: { halign: 'center', fontStyle: 'bold' } 
+            },
+            didParseCell: function(data) {
+                // Pinta de vermelho se o saldo (coluna 4, index 4) for negativo
+                if (data.section === 'body' && data.column.index === 4) {
+                    const val = parseInt(data.cell.raw);
+                    if (val < 0) {
+                        data.cell.styles.textColor = [220, 38, 38]; // Vermelho
+                        data.cell.styles.fillColor = [254, 226, 226]; // Fundo vermelho claro
+                    } else if (val > 0) {
+                        data.cell.styles.textColor = [22, 163, 74]; // Verde
+                        data.cell.styles.fillColor = [220, 252, 231]; // Fundo verde claro
+                    }
+                }
+            }
+        });
+        doc.save(`Relatorio_Estoque_${new Date().toISOString().split('T')[0]}.pdf`);
+    };
 
-                // Só mostrar se tiver alguma movimentação (estoque, destino ou produção)
-                if (fisico !== 0 || destino !== 0 || data.emProducao > 0) {
-                    tableBody.push([
-                        p.nome,
-                        t.t,
-                        fisico, // O que tem na prateleira
-                        destino, // O que já tem dono
-                        saldo // Disponível real
-                    ]);
+    // --- RENDER LISTA DE PEDIDOS ---
+    window.renderOrdersList = function(list = orders) {
+        const div = document.getElementById('ordersList');
+        if(!list.length) { div.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa">Nenhum pedido encontrado para este filtro.</p>'; return; }
+        
+        // 1. Cálculo Global de Estoque (SEMPRE roda na lista completa 'orders' para manter a fila correta)
+        const inventoryTracker = {}; 
+        
+        // Inicializa com o saldo atual do banco
+        for (const [key, data] of Object.entries(stockData)) {
+            inventoryTracker[key] = (data.pronto || 0);
+        }
+        
+        // Adiciona de volta o que já está "reservado" no banco para sabermos o Físico Real Total
+        const allActiveOrders = orders.filter(o => o.status !== 'Entregue');
+        allActiveOrders.forEach(o => {
+            o.itens.forEach(i => {
+                let baseName = i.prod;
+                const match = i.prod.match(/^(.*)\s\((.*)\)$/);
+                if (match && PRODUTOS.find(p => p.nome === match[1])) { baseName = match[1]; }
+                const key = getStockKey(baseName, i.tam);
+                inventoryTracker[key] = (inventoryTracker[key] || 0) + i.qtd;
+            });
+        });
+
+        // Agora percorre a lista GLOBAL cronológica para distribuir os itens (Fila)
+        // Criamos um mapa de status temporário para cada item de cada pedido
+        const badgeMap = {}; // Chave: orderId_itemIndex -> Status
+
+        orders.forEach(o => {
+            const isDelivered = o.status === 'Entregue';
+            o.itens.forEach((i, idx) => {
+                const uniqueKey = `${o.fbId}_${idx}`;
+                if (isDelivered) {
+                    badgeMap[uniqueKey] = 'DELIVERED';
+                    return;
+                }
+
+                let baseName = i.prod;
+                const match = i.prod.match(/^(.*)\s\((.*)\)$/);
+                if (match && PRODUTOS.find(p => p.nome === match[1])) { baseName = match[1]; }
+                const key = getStockKey(baseName, i.tam);
+                
+                if ((inventoryTracker[key] || 0) >= i.qtd) {
+                    inventoryTracker[key] -= i.qtd;
+                    badgeMap[uniqueKey] = 'OK';
+                } else {
+                    inventoryTracker[key] = 0; 
+                    badgeMap[uniqueKey] = 'WAIT';
                 }
             });
         });
 
-        // Ordenar alfabeticamente
-        tableBody.sort((a,b) => a[0].localeCompare(b[0]));
+        // 2. Agora renderiza APENAS a lista filtrada ('list'), mas usando o status calculado acima
+        div.innerHTML = list.map((o, index) => {
+            const numPedido = o.displayId; 
+            const statusMap = { 'Pedido confirmado': 'card-confirmado', 'Produzindo': 'card-produzindo', 'Pronto': 'card-pronto', 'Em rota': 'card-rota', 'Entregue': 'card-entregue' };
+            const statusClass = statusMap[o.status] || 'card-confirmado';
+            const colorMap = { 'Pedido confirmado': '#000000', 'Produzindo': '#facc15', 'Pronto': '#3b82f6', 'Em rota': '#a855f7', 'Entregue': '#22c55e' };
+            const selectBg = colorMap[o.status] || '#000000'; const selectColor = o.status === 'Produzindo' ? '#000000' : '#ffffff';
+            
+            const itensHtml = o.itens.map((i, idx) => {
+                const uniqueKey = `${o.fbId}_${idx}`;
+                let statusBadge = '';
+                const badgeStatus = badgeMap[uniqueKey];
 
-        doc.setFontSize(18);
-        doc.text("Relatório de Estoque (Físico vs Destinado)", 14, 20);
-        doc.setFontSize(10);
-        doc.text("Data: " + new Date().toLocaleString(), 14, 28);
-        
-        doc.autoTable({
-            head: [['Produto', 'Tam', 'Físico (Prateleira)', 'Destinado (Pedidos)', 'Saldo Livre']],
-            body: tableBody,
-            startY: 35,
-            theme: 'grid',
-            headStyles: { fillColor: [236, 72, 153] }, // Cor Primary
-            columnStyles: {
-                2: { halign: 'center', fontStyle: 'bold' },
-                3: { halign: 'center', textColor: [220, 38, 38] }, // Vermelho para o que sai
-                4: { halign: 'center', fontStyle: 'bold', fillColor: [240, 253, 244] } // Verde claro para saldo
-            }
-        });
+                if (badgeStatus === 'OK') {
+                    statusBadge = '<span class="item-status-ok">✅ Estoque</span>';
+                } else if (badgeStatus === 'WAIT') {
+                    statusBadge = '<span class="item-status-wait">⏳ Produzir</span>';
+                }
+                
+                return `<div class="item-line"><span>${i.qtd}x ${i.prod} (${i.tam})${statusBadge}</span> <span>${fmtMoeda(i.prc*i.qtd)}</span></div>`;
+            }).join('');
 
-        doc.save(`Estoque_${new Date().toISOString().split('T')[0]}.pdf`);
+            let endInfo = o.tipoEntrega === 'Delivery' || (o.turno && !o.turno.includes('Retirada')) ? `<i class="fas fa-map-marker-alt" style="color:var(--primary)"></i> ${o.end}, ${o.bairro}` : `<i class="fas fa-store" style="color:var(--primary)"></i> Retirada na Loja`;
+            const opts = ['Pedido confirmado','Produzindo','Pronto','Em rota','Entregue'].map(s => `<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('');
+            let pagInfo = o.restante <= 0.01 ? `<div class="payment-highlight" style="background:#dcfce7; color:#166534; border-color:#bbf7d0"><span>STATUS:</span> <span>PAGO TOTAL</span></div>` : (o.pago > 0 ? `<div class="payment-highlight"><span>Restante:</span> <span>${o.formaPagRestante || '?'}</span></div>` : `<div class="payment-highlight"><span>Total:</span> <span>${o.formaPagRestante || '?'}</span></div>`);
+            
+            return `<div class="order-card ${statusClass}"><div class="order-header"><div><div class="order-id">#${numPedido}</div><div class="order-date">${fmtData(o.dataEntrega)} • ${o.turno}</div></div><select class="status-select" onchange="quickUpdateStatus('${o.fbId}', this.value)" style="background:${selectBg}; color:${selectColor}">${opts}</select></div><div class="order-body"><div class="client-info"><span class="client-name">${o.cliente}</span><div class="client-detail"><i class="fas fa-phone" style="font-size:11px"></i> ${o.tel}</div><div class="client-detail">${endInfo}</div>${o.obs ? `<div class="client-detail" style="color:#e11d48;font-style:italic"><i class="fas fa-comment"></i> ${o.obs}</div>` : ''}</div><div class="items-box">${itensHtml}</div>${pagInfo}<div class="finance-box">${o.pago > 0 ? `<div class="finance-row"><span>Pago (Sinal):</span> <span style="color:#10b981">${fmtMoeda(o.pago)}</span></div>` : ''}<div class="finance-total" style="display:flex;justify-content:space-between;color:${o.restante>0?'#ef4444':'#10b981'}"><span>A PAGAR:</span> <span>${fmtMoeda(o.restante)}</span></div></div></div><div class="order-footer"><button class="btn btn-card" onclick="editOrder('${o.fbId}')"><i class="fas fa-edit"></i> Editar</button><button class="btn btn-card" onclick="printOrder('${o.fbId}', '${numPedido}')"><i class="fas fa-print"></i> Cupom</button><button class="btn btn-card" onclick="deleteOrder('${o.fbId}')" style="color:#ef4444"><i class="fas fa-trash"></i></button></div></div>`;
+        }).join('');
     };
 
-    // --- FUNÇÕES GERAIS ---
+    // --- OUTRAS FUNÇÕES (MODAIS, FORMS, ETC) ---
     window.toggleAdiantamento = function() {
         const chk = document.getElementById('checkAdiantamento');
         const areaInputs = document.getElementById('areaAdiantamentoInputs');
@@ -947,11 +889,7 @@
                 const num = document.getElementById('cliNumero').value; 
                 endFinal = document.getElementById('cliEnd').value + (num ? `, Nº ${num}` : ''); 
                 turnoFinal = document.getElementById('turnoEntrega').value; 
-            } else { 
-                endFinal = 'Retirada na Loja'; 
-                horarioRet = document.getElementById('horarioRetirada').value; 
-                if(horarioRet) turnoFinal = `Retirada às ${horarioRet}`; else turnoFinal = 'Retirada'; 
-            } 
+            } else { endFinal = 'Retirada na Loja'; horarioRet = document.getElementById('horarioRetirada').value; if(horarioRet) turnoFinal = `Retirada às ${horarioRet}`; else turnoFinal = 'Retirada'; } 
             
             const taxa = parseFloat(document.getElementById('valTaxa').value) || 0; 
             const pago = parseFloat(document.getElementById('valPago').value) || 0; 
@@ -1046,68 +984,11 @@
         window.open(url, '_blank');
     };
 
-    // --- RENDER LISTA COM LÓGICA DE SEMÁFORO (FIFO) ---
-    window.renderOrdersList = function(list = orders) {
-        const div = document.getElementById('ordersList');
-        if(!list.length) { div.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa">Nenhum pedido encontrado.</p>'; return; }
-        
-        // 1. Reconstruir Estoque Físico Total (Base DB + Pedidos Ativos)
-        const activeOrders = orders.filter(o => o.status !== 'Entregue');
-        const inventoryTracker = {}; 
-        
-        for (const [key, data] of Object.entries(stockData)) {
-            inventoryTracker[key] = (data.pronto || 0);
-        }
-        
-        activeOrders.forEach(o => {
-            o.itens.forEach(i => {
-                let baseName = i.prod;
-                const match = i.prod.match(/^(.*)\s\((.*)\)$/);
-                if (match && PRODUTOS.find(p => p.nome === match[1])) { baseName = match[1]; }
-                const key = getStockKey(baseName, i.tam);
-                inventoryTracker[key] = (inventoryTracker[key] || 0) + i.qtd;
-            });
-        });
-
-        // 2. Agora distribui FIFO
-        const sorted = [...list].sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega));
-        
-        div.innerHTML = sorted.map((o, index) => {
-            const isDelivered = o.status === 'Entregue';
-            const numPedido = o.displayId; 
-            const statusMap = { 'Pedido confirmado': 'card-confirmado', 'Produzindo': 'card-produzindo', 'Pronto': 'card-pronto', 'Em rota': 'card-rota', 'Entregue': 'card-entregue' };
-            const statusClass = statusMap[o.status] || 'card-confirmado';
-            const colorMap = { 'Pedido confirmado': '#000000', 'Produzindo': '#facc15', 'Pronto': '#3b82f6', 'Em rota': '#a855f7', 'Entregue': '#22c55e' };
-            const selectBg = colorMap[o.status] || '#000000'; const selectColor = o.status === 'Produzindo' ? '#000000' : '#ffffff';
-            
-            const itensHtml = o.itens.map(i => {
-                let statusBadge = '';
-                if (!isDelivered) {
-                    let baseName = i.prod;
-                    const match = i.prod.match(/^(.*)\s\((.*)\)$/);
-                    if (match && PRODUTOS.find(p => p.nome === match[1])) { baseName = match[1]; }
-                    const key = getStockKey(baseName, i.tam);
-                    
-                    if ((inventoryTracker[key] || 0) >= i.qtd) {
-                        inventoryTracker[key] -= i.qtd;
-                        statusBadge = '<span class="item-status-ok">✅ Estoque</span>';
-                    } else {
-                        inventoryTracker[key] = 0; 
-                        statusBadge = '<span class="item-status-wait">⏳ Produzir</span>';
-                    }
-                }
-                
-                return `<div class="item-line"><span>${i.qtd}x ${i.prod} (${i.tam})${statusBadge}</span> <span>${fmtMoeda(i.prc*i.qtd)}</span></div>`;
-            }).join('');
-
-            let endInfo = o.tipoEntrega === 'Delivery' || (o.turno && !o.turno.includes('Retirada')) ? `<i class="fas fa-map-marker-alt" style="color:var(--primary)"></i> ${o.end}, ${o.bairro}` : `<i class="fas fa-store" style="color:var(--primary)"></i> Retirada na Loja`;
-            const opts = ['Pedido confirmado','Produzindo','Pronto','Em rota','Entregue'].map(s => `<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('');
-            let pagInfo = o.restante <= 0.01 ? `<div class="payment-highlight" style="background:#dcfce7; color:#166534; border-color:#bbf7d0"><span>STATUS:</span> <span>PAGO TOTAL</span></div>` : (o.pago > 0 ? `<div class="payment-highlight"><span>Restante:</span> <span>${o.formaPagRestante || '?'}</span></div>` : `<div class="payment-highlight"><span>Total:</span> <span>${o.formaPagRestante || '?'}</span></div>`);
-            
-            return `<div class="order-card ${statusClass}"><div class="order-header"><div><div class="order-id">#${numPedido}</div><div class="order-date">${fmtData(o.dataEntrega)} • ${o.turno}</div></div><select class="status-select" onchange="quickUpdateStatus('${o.fbId}', this.value)" style="background:${selectBg}; color:${selectColor}">${opts}</select></div><div class="order-body"><div class="client-info"><span class="client-name">${o.cliente}</span><div class="client-detail"><i class="fas fa-phone" style="font-size:11px"></i> ${o.tel}</div><div class="client-detail">${endInfo}</div>${o.obs ? `<div class="client-detail" style="color:#e11d48;font-style:italic"><i class="fas fa-comment"></i> ${o.obs}</div>` : ''}</div><div class="items-box">${itensHtml}</div>${pagInfo}<div class="finance-box">${o.pago > 0 ? `<div class="finance-row"><span>Pago (Sinal):</span> <span style="color:#10b981">${fmtMoeda(o.pago)}</span></div>` : ''}<div class="finance-total" style="display:flex;justify-content:space-between;color:${o.restante>0?'#ef4444':'#10b981'}"><span>A PAGAR:</span> <span>${fmtMoeda(o.restante)}</span></div></div></div><div class="order-footer"><button class="btn btn-card" onclick="editOrder('${o.fbId}')"><i class="fas fa-edit"></i> Editar</button><button class="btn btn-card" onclick="printOrder('${o.fbId}', '${numPedido}')"><i class="fas fa-print"></i> Cupom</button><button class="btn btn-card" onclick="deleteOrder('${o.fbId}')" style="color:#ef4444"><i class="fas fa-trash"></i></button></div></div>`;
-        }).join('');
-    };
-
+    // --- RENDER LISTA DE PEDIDOS ---
+    // ESTA FUNÇÃO GARANTE QUE O FILTRO VISUAL NÃO QUEBRE O CÁLCULO DE ESTOQUE
+    // O cálculo do estoque é feito SEMPRE na lista global 'orders'
+    
+    // --- FUNÇÕES FINAIS E EXPORTS ---
     window.printOrder = function(id, numPedido) {
         const o = orders.find(x => x.fbId === id);
         const cfg = JSON.parse(localStorage.getItem('printConfig')) || DEFAULT_PRINT_CONFIG;
