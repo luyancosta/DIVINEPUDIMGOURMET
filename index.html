@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V27 (Controle de Estoque)</title>
+    <title>Divine Pudim Gourmet - V28 (Estoque Inteligente)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -85,7 +85,6 @@
         .btn-plus { background: #dcfce7; color: #166534; }
         .btn-finish { background: var(--primary); color: white; border-radius: 6px; padding: 5px 10px; font-size: 12px; border: none; cursor: pointer; }
         .btn-finish:hover { background: var(--primary-dark); }
-        
         .stock-val { font-weight: 800; font-size: 16px; min-width: 30px; text-align: center; }
         .stock-neg { color: red; }
         .stock-alert { background: #fee2e2; color: #b91c1c; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 5px; }
@@ -101,8 +100,13 @@
         .client-info { margin-bottom: 12px; }
         .client-name { font-weight: 700; font-size: 15px; display: block; margin-bottom: 2px; color:#333; }
         .client-detail { font-size: 13px; color: #666; display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+        
+        /* ITEMS NO CARD (Sinalização) */
         .items-box { background: #f8f9fa; border-radius: 8px; padding: 10px; margin: 10px 0; border: 1px dashed #ddd; }
-        .item-line { font-size: 13px; margin-bottom: 4px; display: flex; justify-content: space-between; color:#444; }
+        .item-line { font-size: 13px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; color:#444; }
+        .item-status-ok { color: #166534; font-weight: bold; font-size: 11px; background: #dcfce7; padding: 2px 6px; border-radius: 4px; margin-left: 5px; }
+        .item-status-wait { color: #b91c1c; font-weight: bold; font-size: 11px; background: #fee2e2; padding: 2px 6px; border-radius: 4px; margin-left: 5px; }
+
         .finance-box { margin-top: 10px; font-size: 13px; }
         .finance-row { display: flex; justify-content: space-between; margin-bottom: 3px; color: #666; }
         .finance-total { font-weight: 800; font-size: 15px; color: var(--gray-800); margin-top: 5px; border-top: 1px solid #eee; padding-top: 5px; }
@@ -124,7 +128,7 @@
         .route-item { 
             background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 15px; 
-            cursor: pointer; /* Indica clique */
+            cursor: pointer; 
             border-left: 5px solid var(--primary); transition: transform 0.1s, box-shadow 0.2s; position: relative; 
         }
         .route-item:hover { transform: scale(1.01); background: #fafafa; }
@@ -151,7 +155,6 @@
         .modal-header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 16px 16px 0 0; }
         .modal-body { padding: 25px; }
 
-        /* NOVA ESTRUTURA DE FORMULÁRIO (GRID LIMPO) */
         .form-section { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 15px; margin-bottom: 20px; }
         .form-section-title { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; }
         
@@ -159,7 +162,6 @@
         .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
         .form-grid-full { grid-column: 1 / -1; }
         
-        /* ITENS TABLE HEADER */
         .items-header { display: grid; grid-template-columns: 2fr 1fr 0.7fr 1fr 1fr 40px; gap: 10px; background: #e5e7eb; padding: 8px 10px; border-radius: 6px; font-weight: bold; font-size: 13px; color: #374151; margin-bottom: 10px; }
         .item-row { display: grid; grid-template-columns: 2fr 1fr 0.7fr 1fr 1fr 40px; gap: 10px; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dotted #e5e7eb; }
         
@@ -192,7 +194,7 @@
             <div class="header-content">
                 <div class="logo"><i class="fas fa-birthday-cake"></i> Divine Pudim Gourmet</div>
                 <div class="header-actions">
-                    <button class="btn btn-header" onclick="openPrintConfig()"><i class="fas fa-cog"></i> Config. Impressão</button>
+                    <button class="btn btn-header" onclick="openPrintConfig()"><i class="fas fa-cog"></i> Configurações</button>
                     <button class="btn btn-header" onclick="exportBackup()">Backup</button>
                     <button class="btn btn-header" onclick="document.getElementById('importInput').click()">Importar</button>
                     <button class="btn btn-primary" onclick="showNewOrderModal()">+ Novo Pedido</button>
@@ -209,7 +211,8 @@
             <div class="tabs-buttons">
                 <button class="tab-btn active" onclick="showTab(event, 'dashboard')"><i class="fas fa-chart-line"></i> Dashboard</button>
                 <button class="tab-btn" onclick="showTab(event, 'pedidos')"><i class="fas fa-list"></i> Pedidos</button>
-                <button class="tab-btn" onclick="showTab(event, 'estoque')"><i class="fas fa-boxes"></i> Estoque</button> <button class="tab-btn" onclick="showTab(event, 'rotas')"><i class="fas fa-map-marked-alt"></i> Rotas de Entrega</button>
+                <button class="tab-btn" onclick="showTab(event, 'estoque')"><i class="fas fa-boxes"></i> Estoque</button>
+                <button class="tab-btn" onclick="showTab(event, 'rotas')"><i class="fas fa-map-marked-alt"></i> Rotas de Entrega</button>
                 <button class="tab-btn" onclick="showTab(event, 'graficos')"><i class="fas fa-chart-pie"></i> Gráficos</button>
             </div>
         </div>
@@ -252,8 +255,7 @@
                                 <th style="text-align:center">Prontos (Estoque Real)</th>
                             </tr>
                         </thead>
-                        <tbody id="stockTableBody">
-                            </tbody>
+                        <tbody id="stockTableBody"></tbody>
                     </table>
                 </div>
             </div>
@@ -351,6 +353,12 @@
                 <div><label>Redes Sociais</label><input type="text" id="cfgSocial"></div>
             </div>
             
+            <h4 style="margin:15px 0 10px 0; border-bottom:1px solid #eee; padding-bottom:5px; color:#f59e0b">Controle de Estoque</h4>
+            <div style="background:#fffbeb; border:1px solid #fcd34d; padding:10px; border-radius:6px; margin-bottom:15px">
+                <p style="font-size:12px; color:#92400e; margin-bottom:5px">Use este botão para definir o estoque inicial com os números fornecidos (6 Delícias, 14 Pudins, etc.). Ele deduzirá automaticamente os pedidos pendentes.</p>
+                <button class="btn btn-warning" onclick="applyInitialStock()" style="width:100%; justify-content:center">📦 Aplicar Contagem Inicial (Reset)</button>
+            </div>
+
             <div style="margin-top:20px; display:flex; justify-content:space-between;">
                 <button class="btn btn-secondary" onclick="resetPrintConfig()">Restaurar</button>
                 <button class="btn btn-primary" onclick="savePrintConfig()">Salvar Configuração</button>
@@ -367,7 +375,6 @@
         </div>
         <form id="orderForm" onsubmit="saveOrder(event)">
             <div class="modal-body">
-                
                 <div class="form-section">
                     <div class="form-section-title">Dados do Cliente</div>
                     <div class="form-grid-2">
@@ -375,7 +382,6 @@
                         <div><label>WhatsApp *</label><input type="tel" id="cliTel" required></div>
                     </div>
                 </div>
-
                 <div class="form-section">
                     <div class="form-section-title">Entrega / Retirada</div>
                     <div class="form-grid-3">
@@ -397,7 +403,6 @@
                             </select>
                         </div>
                     </div>
-                    
                     <div id="deliveryFields" style="display:none; margin-top:15px; border-top:1px dashed #e5e7eb; padding-top:15px;">
                         <div class="form-grid-3">
                             <div><label>CEP</label><div style="display:flex; gap:5px"><input type="text" id="cliCep" onblur="buscarCep()"><button type="button" class="btn btn-secondary" onclick="buscarCep()"><i class="fas fa-search"></i></button></div></div>
@@ -413,14 +418,12 @@
                             </div>
                         </div>
                     </div>
-
                     <div id="retiradaFields" style="display:none; margin-top:15px; border-top:1px dashed #e5e7eb; padding-top:15px;">
                         <div class="form-grid-2">
                             <div><label>Horário da Retirada (Opcional)</label><input type="time" id="horarioRetirada"></div>
                         </div>
                     </div>
                 </div>
-
                 <div class="form-section">
                     <div class="form-section-title">Itens do Pedido</div>
                     <div class="items-header"><div>Produto</div><div>Tamanho</div><div>Qtd</div><div>Unit.</div><div>Total</div><div></div></div>
@@ -428,13 +431,10 @@
                     <button type="button" class="btn btn-primary" onclick="addItem()" style="width:100%; margin-top:10px">+ Adicionar Item</button>
                     <div style="text-align:right; font-size:18px; font-weight:bold; margin-top:15px; color:var(--primary-dark)">Total Itens: <span id="displayTotal">R$ 0,00</span></div>
                 </div>
-
                 <div class="form-section">
                     <div class="form-section-title">Pagamento</div>
-                    
                     <div class="form-grid-3" style="align-items: end;">
                          <div><label>Taxa Entrega (R$)</label><input type="number" step="0.01" id="valTaxa" oninput="calcTotal()" placeholder="0,00"></div>
-                         
                          <div style="background:#f0fdf4; padding:10px; border-radius:6px; border:1px solid #bbf7d0; grid-column: span 2; display:flex; gap:10px; align-items:center;">
                              <label style="cursor:pointer; display:flex; align-items:center; gap:5px; font-weight:bold; color:#166534">
                                  <input type="checkbox" id="checkAdiantamento" onchange="toggleAdiantamento()" style="width:18px; height:18px"> Recebeu Sinal?
@@ -450,7 +450,6 @@
                              </div>
                          </div>
                     </div>
-
                     <div class="form-grid-2" style="margin-top:15px; border-top:1px solid #eee; padding-top:15px;">
                         <div>
                             <label id="lblFormaRestante">Forma Pagto (Restante/Total)</label>
@@ -465,11 +464,9 @@
                         <div><label>Valor Final a Pagar</label><input type="text" id="valRest" readonly style="font-weight:bold; color:red; background:#fee2e2; border-color:#fca5a5"></div>
                     </div>
                 </div>
-
                 <div style="margin-top:10px"><label>Observações Gerais</label><textarea id="obs" rows="2"></textarea></div>
                 <input type="hidden" id="editFirebaseId">
                 <input type="hidden" id="dataPed"> 
-
                 <div style="margin-top:20px; display:flex; justify-content:flex-end; gap:10px; border-top:1px solid #eee; padding-top:20px">
                     <button type="button" class="btn btn-secondary" onclick="closeOrderModal()">Cancelar</button>
                     <button type="submit" class="btn btn-primary" style="padding:10px 40px">SALVAR PEDIDO</button>
@@ -485,7 +482,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // --- CONFIGURAÇÃO FIREBASE ---
     const firebaseConfig = {
       apiKey: "AIzaSyBt_7_WLXqUvYqdCrTMQg7ySZUa4gSdEHY",
       authDomain: "divinepudimsystem.firebaseapp.com",
@@ -499,6 +495,22 @@
     const db = getFirestore(app);
     const colRef = collection(db, "pedidos");
     const stockCol = collection(db, "estoque");
+
+    // DADOS INICIAIS FORNECIDOS PELO USUÁRIO (OPTION B)
+    const INITIAL_STOCK_DATA = [
+        { prod: 'Delícia de abacaxi', tam: 'G', qtd: 6 },
+        { prod: 'Delícia de abacaxi', tam: 'P', qtd: 6 },
+        { prod: 'Ouro branco', tam: 'P', qtd: 3 },
+        { prod: 'Supreme de morango', tam: 'P', qtd: 2 },
+        { prod: 'Supreme de morango', tam: 'G', qtd: 4 },
+        { prod: 'Pudim tradicional', tam: 'M', qtd: 14 },
+        { prod: 'Pudim tradicional', tam: 'G', qtd: 2 },
+        { prod: 'Ferrero Rocher', tam: 'P', qtd: 1 },
+        { prod: 'Bombom de morango', tam: 'G', qtd: 2 },
+        { prod: 'Bombom de uva', tam: 'P', qtd: 1 }, // Note: User said G(1) for Uva, adjusted logic to match name
+        { prod: 'Bombom de morango', tam: 'P', qtd: 2 }
+        // Items not listed here start at 0
+    ];
 
     const PRODUTOS = [
         { nome: 'Delícia de abacaxi', tamanhos: [{t:'P',p:35}, {t:'G',p:55}] },
@@ -545,11 +557,10 @@
 
     let orders = [];
     let activeRouteOrders = [];
-    let stockData = {}; // Guarda o estado atual do estoque
+    let stockData = {};
     let charts = { prod: null, fat: null };
     let sortableInstance = null;
 
-    // --- CONFIGURAÇÃO ---
     const DEFAULT_PRINT_CONFIG = { title: 'DIVINE PUDIM', subtitle: 'GOURMET', phone: '88 98824-4346', msg: 'Obrigado pela preferência!', social: '@divinepudimgourmet' };
 
     window.openPrintConfig = function() { 
@@ -582,6 +593,55 @@
         } 
     };
 
+    // --- FUNÇÃO DE APLICAR ESTOQUE INICIAL (RESET) ---
+    window.applyInitialStock = async function() {
+        if(!confirm("Isso vai redefinir o estoque baseando-se na sua contagem física atual - os pedidos pendentes.\n\nTem certeza?")) return;
+        
+        // 1. Calcular o que está comprometido (Pending Orders)
+        const pendingItems = {};
+        const activeOrders = orders.filter(o => o.status !== 'Entregue'); // Pedidos não entregues consomem estoque
+        
+        activeOrders.forEach(o => {
+            o.itens.forEach(item => {
+                let baseName = item.prod;
+                const match = item.prod.match(/^(.*)\s\((.*)\)$/);
+                if (match && PRODUTOS.find(p => p.nome === match[1])) { baseName = match[1]; }
+                const key = getStockKey(baseName, item.tam);
+                pendingItems[key] = (pendingItems[key] || 0) + item.qtd;
+            });
+        });
+
+        // 2. Definir o estoque base
+        // Primeiro, zera tudo ou itera sobre PRODUTOS para garantir que tudo seja tocado
+        const promises = [];
+        
+        PRODUTOS.forEach(p => {
+            p.tamanhos.forEach(t => {
+                const key = getStockKey(p.nome, t.t);
+                
+                // Encontra se tem valor inicial definido pelo usuario
+                // Obs: Comparação de strings simplificada
+                const initData = INITIAL_STOCK_DATA.find(i => 
+                    i.prod.toLowerCase() === p.nome.toLowerCase() && 
+                    i.tam.toLowerCase() === t.t.toLowerCase()
+                );
+                
+                const physicalCount = initData ? initData.qtd : 0;
+                const reservedCount = pendingItems[key] || 0;
+                
+                // Saldo Líquido = Físico - Reservado
+                const netStock = physicalCount - reservedCount;
+                
+                const ref = doc(db, "estoque", key);
+                promises.push(setDoc(ref, { emProducao: 0, pronto: netStock }));
+            });
+        });
+
+        await Promise.all(promises);
+        alert("Estoque redefinido com sucesso! Saldo calculado.");
+        document.getElementById('printConfigModal').classList.remove('active');
+    };
+
     // --- LOGIN ---
     window.handleLogin = function(e) {
         e.preventDefault();
@@ -603,20 +663,20 @@
             });
         }
         
-        // Listener Pedidos
         onSnapshot(query(colRef), (snapshot) => {
             orders = [];
             snapshot.forEach(doc => { let d = doc.data(); d.fbId = doc.id; orders.push(d); });
+            // Sort by Date Created (using delivery date as proxy since creation date wasn't tracked strictly, but delivery date works for urgency)
+            // Better: If we added timestamp, we'd use that. For FIFO logic, Delivery Date is fair.
             orders.sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega));
             orders.forEach((o, i) => o.displayId = (i + 1).toString().padStart(3, '0'));
             refreshAll();
         });
 
-        // Listener Estoque
         onSnapshot(query(stockCol), (snapshot) => {
             stockData = {};
             snapshot.forEach(doc => { stockData[doc.id] = doc.data(); });
-            renderStock();
+            refreshAll(); // Refresh orders to update indicators
         });
 
         document.getElementById('dataPed').value = new Date().toISOString().split('T')[0];
@@ -628,22 +688,17 @@
     }
 
     window.updateStock = async function(key, type, delta) {
-        // type: 'emProducao' ou 'pronto'
         const currentRef = doc(db, "estoque", key);
         const currentSnap = await getDoc(currentRef);
         let newData = currentSnap.exists() ? currentSnap.data() : { emProducao: 0, pronto: 0 };
-        
         newData[type] = (newData[type] || 0) + delta;
-        
         await setDoc(currentRef, newData);
     };
 
     window.finishProduction = async function(key) {
-        // Tira 1 de produção e joga 1 pra pronto
         const currentRef = doc(db, "estoque", key);
         const currentSnap = await getDoc(currentRef);
         let newData = currentSnap.exists() ? currentSnap.data() : { emProducao: 0, pronto: 0 };
-        
         if (newData.emProducao > 0) {
             newData.emProducao -= 1;
             newData.pronto = (newData.pronto || 0) + 1;
@@ -656,42 +711,15 @@
     window.renderStock = function() {
         const tbody = document.getElementById('stockTableBody');
         let html = '';
-        
         PRODUTOS.forEach(p => {
             p.tamanhos.forEach(t => {
                 const key = getStockKey(p.nome, t.t);
                 const data = stockData[key] || { emProducao: 0, pronto: 0 };
                 const emProd = data.emProducao || 0;
                 const pronto = data.pronto || 0;
-                
-                // Visual logic
                 const prontoClass = pronto < 0 ? 'stock-val stock-neg' : 'stock-val';
                 const alertHtml = pronto < 0 ? '<span class="stock-alert">EM FALTA</span>' : '';
-
-                html += `
-                    <tr>
-                        <td>${p.nome}</td>
-                        <td>${t.t}</td>
-                        <td>
-                            <div class="stock-control" style="justify-content:center">
-                                <button class="btn-circle btn-minus" onclick="updateStock('${key}', 'emProducao', -1)">-</button>
-                                <span class="stock-val">${emProd}</span>
-                                <button class="btn-circle btn-plus" onclick="updateStock('${key}', 'emProducao', 1)">+</button>
-                            </div>
-                        </td>
-                        <td style="text-align:center">
-                            <button class="btn-finish" onclick="finishProduction('${key}')">Finalizar ➡️</button>
-                        </td>
-                        <td>
-                            <div class="stock-control" style="justify-content:center">
-                                <button class="btn-circle btn-minus" onclick="updateStock('${key}', 'pronto', -1)">-</button>
-                                <span class="${prontoClass}">${pronto}</span>
-                                <button class="btn-circle btn-plus" onclick="updateStock('${key}', 'pronto', 1)">+</button>
-                                ${alertHtml}
-                            </div>
-                        </td>
-                    </tr>
-                `;
+                html += `<tr><td>${p.nome}</td><td>${t.t}</td><td><div class="stock-control" style="justify-content:center"><button class="btn-circle btn-minus" onclick="updateStock('${key}', 'emProducao', -1)">-</button><span class="stock-val">${emProd}</span><button class="btn-circle btn-plus" onclick="updateStock('${key}', 'emProducao', 1)">+</button></div></td><td style="text-align:center"><button class="btn-finish" onclick="finishProduction('${key}')">Finalizar ➡️</button></td><td><div class="stock-control" style="justify-content:center"><button class="btn-circle btn-minus" onclick="updateStock('${key}', 'pronto', -1)">-</button><span class="${prontoClass}">${pronto}</span><button class="btn-circle btn-plus" onclick="updateStock('${key}', 'pronto', 1)">+</button>${alertHtml}</div></td></tr>`;
             });
         });
         tbody.innerHTML = html;
@@ -702,73 +730,21 @@
         const chk = document.getElementById('checkAdiantamento');
         const areaInputs = document.getElementById('areaAdiantamentoInputs');
         const inpPago = document.getElementById('valPago');
-        
-        if(chk.checked) { 
-            areaInputs.style.display = 'flex'; 
-        } else { 
-            areaInputs.style.display = 'none'; 
-            inpPago.value = ''; 
-            calcTotal(); 
-        }
+        if(chk.checked) { areaInputs.style.display = 'flex'; } 
+        else { areaInputs.style.display = 'none'; inpPago.value = ''; calcTotal(); }
     };
 
     window.addItem = function(data = null) {
         const id = Date.now() + Math.floor(Math.random() * 1000); 
-        // HTML da linha do item, adaptado para o novo layout de grid
-        const html = `
-            <div class="item-row" id="row-${id}">
-                <div>
-                    <select class="i-prod" onchange="updItem(${id})" style="width:100%">
-                        <option value="">Selecione...</option>
-                        ${PRODUTOS.map(p => `<option value="${p.nome}" ${p.requerSabor ? 'data-sabor="1"' : ''}>${p.nome}</option>`).join('')}
-                        <option value="OUTRO">Outro (Manual)</option>
-                    </select>
-                    <input type="text" class="i-cust" style="display:none; margin-top:5px; width:100%; font-size:12px" placeholder="Detalhe/Sabor">
-                </div>
-                <div><select class="i-tam" onchange="updPrice(${id})" style="width:100%"><option>-</option></select></div>
-                <div><input type="number" class="i-qtd" value="1" onchange="calcTotal()" style="width:100%"></div>
-                <div><input type="number" class="i-prc" step="0.01" onchange="calcTotal()" style="width:100%"></div>
-                <div class="i-total" style="font-weight:bold; color:#666; font-size:13px">R$ 0,00</div>
-                <button type="button" class="btn btn-danger" onclick="this.parentElement.remove(); calcTotal()" style="padding:5px 10px"><i class="fas fa-trash"></i></button>
-            </div>`;
-        
+        const html = `<div class="item-row" id="row-${id}"><div><select class="i-prod" onchange="updItem(${id})" style="width:100%"><option value="">Selecione...</option>${PRODUTOS.map(p => `<option value="${p.nome}" ${p.requerSabor ? 'data-sabor="1"' : ''}>${p.nome}</option>`).join('')}<option value="OUTRO">Outro (Manual)</option></select><input type="text" class="i-cust" style="display:none; margin-top:5px; width:100%; font-size:12px" placeholder="Detalhe/Sabor"></div><div><select class="i-tam" onchange="updPrice(${id})" style="width:100%"><option>-</option></select></div><div><input type="number" class="i-qtd" value="1" onchange="calcTotal()" style="width:100%"></div><div><input type="number" class="i-prc" step="0.01" onchange="calcTotal()" style="width:100%"></div><div class="i-total" style="font-weight:bold; color:#666; font-size:13px">R$ 0,00</div><button type="button" class="btn btn-danger" onclick="this.parentElement.remove(); calcTotal()" style="padding:5px 10px"><i class="fas fa-trash"></i></button></div>`;
         document.getElementById('itemsContainer').insertAdjacentHTML('beforeend', html);
-        
         if(data) {
-            const row = document.getElementById(`row-${id}`); 
-            const selProd = row.querySelector('.i-prod'); 
-            const selTam = row.querySelector('.i-tam'); 
-            const inpCust = row.querySelector('.i-cust');
-            
-            let baseName = data.prod; 
-            let flavor = ''; 
-            const match = data.prod.match(/^(.*)\s\((.*)\)$/); 
-            if (match && PRODUTOS.find(p => p.nome === match[1])) { 
-                baseName = match[1]; 
-                flavor = match[2]; 
-            }
-            
+            const row = document.getElementById(`row-${id}`); const selProd = row.querySelector('.i-prod'); const selTam = row.querySelector('.i-tam'); const inpCust = row.querySelector('.i-cust');
+            let baseName = data.prod; let flavor = ''; const match = data.prod.match(/^(.*)\s\((.*)\)$/); if (match && PRODUTOS.find(p => p.nome === match[1])) { baseName = match[1]; flavor = match[2]; }
             const produtoObj = PRODUTOS.find(p => p.nome === baseName);
-            if(produtoObj) { 
-                selProd.value = baseName; 
-                selTam.innerHTML = produtoObj.tamanhos.map(t => `<option value="${t.t}" data-p="${t.p}">${t.t}</option>`).join(''); 
-                selTam.value = data.tam; 
-                if(produtoObj.requerSabor) { 
-                    inpCust.style.display = 'block'; 
-                    inpCust.placeholder = "Sabor"; 
-                    inpCust.value = flavor; 
-                } 
-            } else { 
-                selProd.value = 'OUTRO'; 
-                inpCust.style.display = 'block'; 
-                inpCust.placeholder = "Produto"; 
-                inpCust.value = data.prod; 
-                selTam.innerHTML = `<option value="Único">Único</option>`; 
-                selTam.value = data.tam; 
-            }
-            row.querySelector('.i-qtd').value = data.qtd; 
-            row.querySelector('.i-prc').value = data.prc; 
-            row.querySelector('.i-total').innerText = fmtMoeda(data.qtd * data.prc);
+            if(produtoObj) { selProd.value = baseName; selTam.innerHTML = produtoObj.tamanhos.map(t => `<option value="${t.t}" data-p="${t.p}">${t.t}</option>`).join(''); selTam.value = data.tam; if(produtoObj.requerSabor) { inpCust.style.display = 'block'; inpCust.placeholder = "Sabor"; inpCust.value = flavor; } } 
+            else { selProd.value = 'OUTRO'; inpCust.style.display = 'block'; inpCust.placeholder = "Produto"; inpCust.value = data.prod; selTam.innerHTML = `<option value="Único">Único</option>`; selTam.value = data.tam; }
+            row.querySelector('.i-qtd').value = data.qtd; row.querySelector('.i-prc').value = data.prc; row.querySelector('.i-total').innerText = fmtMoeda(data.qtd * data.prc);
         }
     };
 
@@ -777,50 +753,20 @@
     window.quickUpdateStatus = async function(id, newStatus) { try { await updateDoc(doc(db, "pedidos", id), { status: newStatus }); } catch(e) {} };
     
     window.checkTipoEntrega = function() { 
-        const tipo = document.getElementById('tipoEntrega').value; 
-        const divDel = document.getElementById('deliveryFields'); 
-        const divRet = document.getElementById('retiradaFields'); 
-        
-        const elEnd = document.getElementById('cliEnd');
-        const elBairro = document.getElementById('cliBairro');
-        const elTurno = document.getElementById('turnoEntrega');
-
-        if (tipo === 'Delivery') { 
-            divDel.style.display = 'block'; 
-            divRet.style.display = 'none'; 
-            elEnd.required = true; 
-            elBairro.required = true; 
-            elTurno.required = true; 
-        } else if (tipo === 'Retirada no local') { 
-            divDel.style.display = 'none'; 
-            divRet.style.display = 'block'; 
-            elEnd.required = false; 
-            elBairro.required = false; 
-            elTurno.required = false; 
-        } else { 
-            divDel.style.display = 'none'; 
-            divRet.style.display = 'none';
-            elEnd.required = false; 
-            elBairro.required = false; 
-            elTurno.required = false; 
-        } 
+        const tipo = document.getElementById('tipoEntrega').value; const divDel = document.getElementById('deliveryFields'); const divRet = document.getElementById('retiradaFields'); 
+        const elEnd = document.getElementById('cliEnd'); const elBairro = document.getElementById('cliBairro'); const elTurno = document.getElementById('turnoEntrega');
+        if (tipo === 'Delivery') { divDel.style.display = 'block'; divRet.style.display = 'none'; elEnd.required = true; elBairro.required = true; elTurno.required = true; } 
+        else if (tipo === 'Retirada no local') { divDel.style.display = 'none'; divRet.style.display = 'block'; elEnd.required = false; elBairro.required = false; elTurno.required = false; } 
+        else { divDel.style.display = 'none'; divRet.style.display = 'none'; elEnd.required = false; elBairro.required = false; elTurno.required = false; } 
     };
     
     window.checkBairro = function() { const s = document.getElementById('cliBairro'); const i = document.getElementById('cliBairroOutro'); i.style.display = s.value === 'OUTRO' ? 'block' : 'none'; if(s.value === 'OUTRO') i.required = true; else i.required = false; };
     
-    // --- FUNÇÃO AUXILIAR PARA ATUALIZAR O ESTOQUE EM MASSA ---
     async function processStockChanges(itemsList, action) {
-        // action: 'subtract' (venda) ou 'add' (devolução/cancelamento)
         for (let item of itemsList) {
-            // Tenta achar o produto base no array PRODUTOS pra garantir a chave correta
             let baseName = item.prod;
-            // Remove o sabor do nome se tiver ex: "Bolo (Chocolate)" -> "Bolo"
             const match = item.prod.match(/^(.*)\s\((.*)\)$/);
-            if (match && PRODUTOS.find(p => p.nome === match[1])) {
-                baseName = match[1];
-            }
-
-            // Só atualiza estoque se for um produto cadastrado (ignora OUTRO genérico se não bater nome)
+            if (match && PRODUTOS.find(p => p.nome === match[1])) { baseName = match[1]; }
             const exists = PRODUTOS.find(p => p.nome === baseName);
             if (exists) {
                 const key = getStockKey(baseName, item.tam);
@@ -830,10 +776,8 @@
         }
     }
 
-    // --- SALVAR PEDIDO (COM INTEGRAÇÃO DE ESTOQUE) ---
     window.saveOrder = async function(e) { 
         e.preventDefault(); 
-        
         try {
             let itens = []; 
             document.querySelectorAll('.item-row').forEach(row => { 
@@ -847,11 +791,7 @@
             }); 
             
             const tipo = document.getElementById('tipoEntrega').value; 
-            let bairroFinal = '-'; 
-            let endFinal = '-'; 
-            let turnoFinal = '-'; 
-            let horarioRet = ''; 
-            
+            let bairroFinal = '-'; let endFinal = '-'; let turnoFinal = '-'; let horarioRet = ''; 
             if(tipo === 'Delivery') { 
                 const bairroSel = document.getElementById('cliBairro').value; 
                 bairroFinal = bairroSel === 'OUTRO' ? document.getElementById('cliBairroOutro').value : bairroSel; 
@@ -861,89 +801,42 @@
             } else { 
                 endFinal = 'Retirada na Loja'; 
                 horarioRet = document.getElementById('horarioRetirada').value; 
-                if(horarioRet) turnoFinal = `Retirada às ${horarioRet}`; 
-                else turnoFinal = 'Retirada'; 
+                if(horarioRet) turnoFinal = `Retirada às ${horarioRet}`; else turnoFinal = 'Retirada'; 
             } 
             
             const taxa = parseFloat(document.getElementById('valTaxa').value) || 0; 
             const pago = parseFloat(document.getElementById('valPago').value) || 0; 
             const formaSinal = document.getElementById('formaPagSinal').value; 
             const formaRestante = document.getElementById('formaPagRestante').value; 
-            
             let sumItens = itens.reduce((acc, i) => acc + (i.qtd * i.prc), 0); 
             const totalFinal = sumItens + taxa; 
             const restante = totalFinal - pago; 
             
-            const obj = { 
-                cliente: document.getElementById('cliNome').value, 
-                tel: document.getElementById('cliTel').value, 
-                cep: document.getElementById('cliCep').value, 
-                end: endFinal, 
-                bairro: bairroFinal, 
-                tipoEntrega: tipo, 
-                turno: turnoFinal, 
-                dataPedido: document.getElementById('dataPed').value, 
-                dataEntrega: document.getElementById('dataEnt').value, 
-                status: document.getElementById('statusPed').value, 
-                itens: itens, 
-                total: totalFinal, 
-                pago: pago, 
-                taxa: taxa, 
-                restante: restante, 
-                formaPagRestante: formaRestante, 
-                formaPagSinal: pago > 0 ? formaSinal : null, 
-                obs: document.getElementById('obs').value 
-            }; 
-        
+            const obj = { cliente: document.getElementById('cliNome').value, tel: document.getElementById('cliTel').value, cep: document.getElementById('cliCep').value, end: endFinal, bairro: bairroFinal, tipoEntrega: tipo, turno: turnoFinal, dataPedido: document.getElementById('dataPed').value, dataEntrega: document.getElementById('dataEnt').value, status: document.getElementById('statusPed').value, itens: itens, total: totalFinal, pago: pago, taxa: taxa, restante: restante, formaPagRestante: formaRestante, formaPagSinal: pago > 0 ? formaSinal : null, obs: document.getElementById('obs').value }; 
             const editId = document.getElementById('editFirebaseId').value; 
-            
             if(editId) { 
-                // --- MODO EDIÇÃO ---
-                // 1. Pega o pedido antigo para devolver itens ao estoque
                 const oldOrderRef = await getDoc(doc(db, "pedidos", editId));
-                if (oldOrderRef.exists()) {
-                    const oldOrder = oldOrderRef.data();
-                    // Devolve itens antigos (ADD ao estoque)
-                    await processStockChanges(oldOrder.itens, 'add');
-                }
-                
-                // 2. Atualiza o pedido
+                if (oldOrderRef.exists()) { await processStockChanges(oldOrderRef.data().itens, 'add'); }
                 await updateDoc(doc(db, "pedidos", editId), obj); 
-                
-                // 3. Deduz os novos itens (SUBTRACT do estoque)
                 await processStockChanges(itens, 'subtract');
-                
                 alert('Pedido Atualizado e Estoque Ajustado!'); 
             } else { 
-                // --- MODO NOVO ---
                 await addDoc(colRef, obj); 
-                // Deduz do estoque
                 await processStockChanges(itens, 'subtract');
                 alert('Pedido Salvo e Estoque Atualizado!'); 
             } 
             closeOrderModal(); 
-        } catch(err) { 
-            console.error(err); 
-            alert('Erro ao salvar o pedido. Verifique o console.'); 
-        } 
+        } catch(err) { console.error(err); alert('Erro ao salvar o pedido.'); } 
     };
 
     window.deleteOrder = async function(id) { 
         if(confirm('Tem certeza? Isso irá excluir o pedido e DEVOLVER os itens ao estoque.')) {
             try {
-                // 1. Recupera o pedido para saber o que devolver
                 const orderRef = await getDoc(doc(db, "pedidos", id));
-                if (orderRef.exists()) {
-                    const orderData = orderRef.data();
-                    // 2. Devolve ao estoque
-                    await processStockChanges(orderData.itens, 'add');
-                }
-                // 3. Deleta
+                if (orderRef.exists()) { await processStockChanges(orderRef.data().itens, 'add'); }
                 await deleteDoc(doc(db, "pedidos", id)); 
                 alert('Pedido excluído e itens devolvidos ao estoque.');
-            } catch(e) {
-                alert('Erro ao excluir: ' + e.message);
-            }
+            } catch(e) { alert('Erro ao excluir: ' + e.message); }
         }
     };
 
@@ -951,132 +844,49 @@
         const o = orders.find(x => x.fbId === id); 
         if(!o) return; 
         showNewOrderModal(); 
-        
         document.getElementById('editFirebaseId').value = id; 
         document.getElementById('cliNome').value = o.cliente; 
         document.getElementById('cliTel').value = o.tel; 
-        
         const isDelivery = o.tipoEntrega === 'Delivery' || (o.turno && !o.turno.includes('Retirada')); 
         document.getElementById('tipoEntrega').value = isDelivery ? 'Delivery' : 'Retirada no local'; 
         checkTipoEntrega(); 
-        
         if(isDelivery) { 
             document.getElementById('cliCep').value = o.cep || ''; 
-            if(o.end && o.end.includes(', Nº')) { 
-                const parts = o.end.split(', Nº'); 
-                document.getElementById('cliEnd').value = parts[0].trim(); 
-                document.getElementById('cliNumero').value = parts[1].trim(); 
-            } else { 
-                document.getElementById('cliEnd').value = o.end; 
-            } 
-            const sel = document.getElementById('cliBairro'); 
-            let found = false; 
-            for(let i=0; i<sel.options.length; i++) { if(sel.options[i].value === o.bairro) { sel.selectedIndex = i; found = true; break; } } 
-            if(!found) { sel.value = 'OUTRO'; checkBairro(); document.getElementById('cliBairroOutro').value = o.bairro; } 
+            if(o.end && o.end.includes(', Nº')) { const parts = o.end.split(', Nº'); document.getElementById('cliEnd').value = parts[0].trim(); document.getElementById('cliNumero').value = parts[1].trim(); } else { document.getElementById('cliEnd').value = o.end; } 
+            const sel = document.getElementById('cliBairro'); let found = false; for(let i=0; i<sel.options.length; i++) { if(sel.options[i].value === o.bairro) { sel.selectedIndex = i; found = true; break; } } if(!found) { sel.value = 'OUTRO'; checkBairro(); document.getElementById('cliBairroOutro').value = o.bairro; } 
             document.getElementById('turnoEntrega').value = (o.turno === 'Manhã' || o.turno === 'Tarde') ? o.turno : ''; 
-        } else { 
-            if(o.turno.includes('às')) { document.getElementById('horarioRetirada').value = o.turno.split('às')[1].trim(); } 
-        } 
-        
-        document.getElementById('dataPed').value = o.dataPedido; 
-        document.getElementById('dataEnt').value = o.dataEntrega; 
-        document.getElementById('statusPed').value = o.status; 
-        document.getElementById('valPago').value = o.pago; 
-        document.getElementById('valTaxa').value = o.taxa || 0; 
-        document.getElementById('formaPagRestante').value = o.formaPagRestante || ''; 
-        document.getElementById('obs').value = o.obs || ''; 
-        
-        if(o.pago > 0) { 
-            document.getElementById('checkAdiantamento').checked = true; 
-            toggleAdiantamento();
-            document.getElementById('formaPagSinal').value = o.formaPagSinal || ''; 
-        } else { 
-            document.getElementById('checkAdiantamento').checked = false; 
-            toggleAdiantamento();
-        } 
-        
-        document.getElementById('itemsContainer').innerHTML = ''; 
-        o.itens.forEach(i => addItem(i)); 
-        calcTotal(); 
+        } else { if(o.turno.includes('às')) { document.getElementById('horarioRetirada').value = o.turno.split('às')[1].trim(); } } 
+        document.getElementById('dataPed').value = o.dataPedido; document.getElementById('dataEnt').value = o.dataEntrega; document.getElementById('statusPed').value = o.status; document.getElementById('valPago').value = o.pago; document.getElementById('valTaxa').value = o.taxa || 0; document.getElementById('formaPagRestante').value = o.formaPagRestante || ''; document.getElementById('obs').value = o.obs || ''; 
+        if(o.pago > 0) { document.getElementById('checkAdiantamento').checked = true; toggleAdiantamento(); document.getElementById('formaPagSinal').value = o.formaPagSinal || ''; } else { document.getElementById('checkAdiantamento').checked = false; toggleAdiantamento(); } 
+        document.getElementById('itemsContainer').innerHTML = ''; o.itens.forEach(i => addItem(i)); calcTotal(); 
     };
 
     window.calcTotal = function() { 
         let itemsTotal = 0; 
-        document.querySelectorAll('.item-row').forEach(row => { 
-            const q = parseFloat(row.querySelector('.i-qtd').value) || 0; 
-            const p = parseFloat(row.querySelector('.i-prc').value) || 0; 
-            const sub = q * p; 
-            row.querySelector('.i-total').innerText = fmtMoeda(sub); 
-            itemsTotal += sub; 
-        }); 
-        
-        const taxa = parseFloat(document.getElementById('valTaxa').value) || 0; 
-        const pago = parseFloat(document.getElementById('valPago').value) || 0; 
-        const finalTotal = itemsTotal + taxa; 
-        const valRestante = finalTotal - pago; 
-        
-        document.getElementById('displayTotal').innerText = fmtMoeda(finalTotal); 
-        document.getElementById('valRest').value = fmtMoeda(valRestante); 
+        document.querySelectorAll('.item-row').forEach(row => { const q = parseFloat(row.querySelector('.i-qtd').value) || 0; const p = parseFloat(row.querySelector('.i-prc').value) || 0; const sub = q * p; row.querySelector('.i-total').innerText = fmtMoeda(sub); itemsTotal += sub; }); 
+        const taxa = parseFloat(document.getElementById('valTaxa').value) || 0; const pago = parseFloat(document.getElementById('valPago').value) || 0; const finalTotal = itemsTotal + taxa; const valRestante = finalTotal - pago; 
+        document.getElementById('displayTotal').innerText = fmtMoeda(finalTotal); document.getElementById('valRest').value = fmtMoeda(valRestante); 
     };
 
-    // --- ROTAS (MANUAL + CHECKBOX + CLIQUE) ---
     window.markAsDelivered = async function(id, isChecked) {
-        try {
-            const newStatus = isChecked ? 'Entregue' : 'Em rota';
-            await updateDoc(doc(db, "pedidos", id), { status: newStatus });
-        } catch(e) {
-            alert('Erro ao atualizar status: ' + e.message);
-        }
+        try { const newStatus = isChecked ? 'Entregue' : 'Em rota'; await updateDoc(doc(db, "pedidos", id), { status: newStatus }); } catch(e) { alert('Erro ao atualizar status: ' + e.message); }
     };
 
     window.renderRoutes = function() {
         const selectedTurno = document.getElementById('routeTurnoSelector').value;
         const listArea = document.getElementById('routeListArea');
-        activeRouteOrders = orders.filter(o => {
-            return (o.turno === selectedTurno || (o.turno && o.turno.includes(selectedTurno))) && 
-                   o.status !== 'Entregue' && 
-                   o.tipoEntrega === 'Delivery';
-        });
+        activeRouteOrders = orders.filter(o => { return (o.turno === selectedTurno || (o.turno && o.turno.includes(selectedTurno))) && o.status !== 'Entregue' && o.tipoEntrega === 'Delivery'; });
         document.getElementById('routeCount').innerText = activeRouteOrders.length;
         document.getElementById('routeTurnoDisplay').innerText = selectedTurno;
         if(activeRouteOrders.length === 0) { listArea.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px">Nenhuma entrega pendente para este turno.</p>'; return; }
-        
-        // Novo HTML com Checkbox e Clique
-        listArea.innerHTML = activeRouteOrders.map((o, idx) => `
-            <div class="route-item" onclick="editOrder('${o.fbId}')" title="Clique para ver detalhes">
-                <div class="route-handle" onclick="event.stopPropagation()"><i class="fas fa-grip-lines"></i></div>
-                
-                <div class="route-check-container" onclick="event.stopPropagation()" title="Marcar como Entregue">
-                    <input type="checkbox" class="route-check" onchange="markAsDelivered('${o.fbId}', this.checked)">
-                </div>
-
-                <div class="route-number">${idx + 1}</div>
-                
-                <div class="route-details">
-                    <div class="route-addr">${o.end}</div>
-                    <div class="route-bairro">${o.bairro}</div>
-                    <div style="font-size:12px; color:#999">${o.cliente} (Ped #${o.displayId})</div>
-                </div>
-            </div>`).join('');
-            
+        listArea.innerHTML = activeRouteOrders.map((o, idx) => `<div class="route-item" onclick="editOrder('${o.fbId}')" title="Clique para ver detalhes"><div class="route-handle" onclick="event.stopPropagation()"><i class="fas fa-grip-lines"></i></div><div class="route-check-container" onclick="event.stopPropagation()" title="Marcar como Entregue"><input type="checkbox" class="route-check" onchange="markAsDelivered('${o.fbId}', this.checked)"></div><div class="route-number">${idx + 1}</div><div class="route-details"><div class="route-addr">${o.end}</div><div class="route-bairro">${o.bairro}</div><div style="font-size:12px; color:#999">${o.cliente} (Ped #${o.displayId})</div></div></div>`).join('');
         if (sortableInstance) { sortableInstance.destroy(); }
-        sortableInstance = Sortable.create(listArea, {
-            animation: 150, handle: '.route-handle', ghostClass: 'sortable-ghost', dragClass: 'sortable-drag',
-            onEnd: function (evt) {
-                const newOrderIds = Array.from(listArea.children).map(el => el.querySelector('.route-check').getAttribute('onchange').match(/'([^']+)'/)[1]); // Hacky but works for ID extraction or use data-attr
-                // Recalculate numbers
-                Array.from(listArea.children).forEach((el, index) => { el.querySelector('.route-number').innerText = index + 1; });
-            }
-        });
+        sortableInstance = Sortable.create(listArea, { animation: 150, handle: '.route-handle', ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', onEnd: function (evt) { Array.from(listArea.children).forEach((el, index) => { el.querySelector('.route-number').innerText = index + 1; }); } });
     };
 
     window.autoSortRouteLogic = function() {
         if(activeRouteOrders.length === 0) return;
-        activeRouteOrders.sort((a, b) => {
-            const idxA = SEQUENCIA_LOGICA_BAIRROS.indexOf(a.bairro); const idxB = SEQUENCIA_LOGICA_BAIRROS.indexOf(b.bairro);
-            const valA = idxA === -1 ? 999 : idxA; const valB = idxB === -1 ? 999 : idxB;
-            return valA - valB;
-        });
+        activeRouteOrders.sort((a, b) => { const idxA = SEQUENCIA_LOGICA_BAIRROS.indexOf(a.bairro); const idxB = SEQUENCIA_LOGICA_BAIRROS.indexOf(b.bairro); const valA = idxA === -1 ? 999 : idxA; const valB = idxB === -1 ? 999 : idxB; return valA - valB; });
         renderRoutes(); alert('Rota organizada por sequência lógica de bairros!');
     };
 
@@ -1087,21 +897,71 @@
         window.open(url, '_blank');
     };
 
-    // --- RENDER LISTA E PRINT ---
+    // --- RENDER LISTA COM LÓGICA DE SEMÁFORO (FIFO) ---
     window.renderOrdersList = function(list = orders) {
         const div = document.getElementById('ordersList');
         if(!list.length) { div.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa">Nenhum pedido encontrado.</p>'; return; }
+        
+        // 1. Reconstruir Estoque Físico Total (Base DB + Pedidos Ativos)
+        const activeOrders = orders.filter(o => o.status !== 'Entregue');
+        const inventoryTracker = {}; 
+        
+        // Inicializa com o que está no DB (que é o Net Stock)
+        for (const [key, data] of Object.entries(stockData)) {
+            inventoryTracker[key] = (data.pronto || 0);
+        }
+        
+        // Soma o que está nos pedidos para achar o físico real
+        activeOrders.forEach(o => {
+            o.itens.forEach(i => {
+                let baseName = i.prod;
+                const match = i.prod.match(/^(.*)\s\((.*)\)$/);
+                if (match && PRODUTOS.find(p => p.nome === match[1])) { baseName = match[1]; }
+                const key = getStockKey(baseName, i.tam);
+                inventoryTracker[key] = (inventoryTracker[key] || 0) + i.qtd;
+            });
+        });
+
+        // 2. Agora distribui FIFO
         const sorted = [...list].sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega));
+        
         div.innerHTML = sorted.map((o, index) => {
+            // Se o pedido já foi entregue, ignora lógica de estoque
+            const isDelivered = o.status === 'Entregue';
+            
             const numPedido = o.displayId; 
             const statusMap = { 'Pedido confirmado': 'card-confirmado', 'Produzindo': 'card-produzindo', 'Pronto': 'card-pronto', 'Em rota': 'card-rota', 'Entregue': 'card-entregue' };
             const statusClass = statusMap[o.status] || 'card-confirmado';
             const colorMap = { 'Pedido confirmado': '#000000', 'Produzindo': '#facc15', 'Pronto': '#3b82f6', 'Em rota': '#a855f7', 'Entregue': '#22c55e' };
             const selectBg = colorMap[o.status] || '#000000'; const selectColor = o.status === 'Produzindo' ? '#000000' : '#ffffff';
-            const itensHtml = o.itens.map(i => `<div class="item-line"><span>${i.qtd}x ${i.prod} (${i.tam})</span> <span>${fmtMoeda(i.prc*i.qtd)}</span></div>`).join('');
+            
+            // Gera HTML dos itens com verificação de estoque
+            const itensHtml = o.itens.map(i => {
+                let statusBadge = '';
+                if (!isDelivered) {
+                    let baseName = i.prod;
+                    const match = i.prod.match(/^(.*)\s\((.*)\)$/);
+                    if (match && PRODUTOS.find(p => p.nome === match[1])) { baseName = match[1]; }
+                    const key = getStockKey(baseName, i.tam);
+                    
+                    // Verifica disponibilidade
+                    if ((inventoryTracker[key] || 0) >= i.qtd) {
+                        inventoryTracker[key] -= i.qtd;
+                        statusBadge = '<span class="item-status-ok">✅ Estoque</span>';
+                    } else {
+                        // Consome o que tem (mesmo que parcial) ou zero
+                        inventoryTracker[key] = 0; // Zerou estoque pra esse item
+                        statusBadge = '<span class="item-status-wait">⏳ Produzir</span>';
+                    }
+                }
+                
+                return `<div class="item-line"><span>${i.qtd}x ${i.prod} (${i.tam})${statusBadge}</span> <span>${fmtMoeda(i.prc*i.qtd)}</span></div>`;
+            }).join('');
+
             let endInfo = o.tipoEntrega === 'Delivery' || (o.turno && !o.turno.includes('Retirada')) ? `<i class="fas fa-map-marker-alt" style="color:var(--primary)"></i> ${o.end}, ${o.bairro}` : `<i class="fas fa-store" style="color:var(--primary)"></i> Retirada na Loja`;
             const opts = ['Pedido confirmado','Produzindo','Pronto','Em rota','Entregue'].map(s => `<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('');
             let pagInfo = o.restante <= 0.01 ? `<div class="payment-highlight" style="background:#dcfce7; color:#166534; border-color:#bbf7d0"><span>STATUS:</span> <span>PAGO TOTAL</span></div>` : (o.pago > 0 ? `<div class="payment-highlight"><span>Restante:</span> <span>${o.formaPagRestante || '?'}</span></div>` : `<div class="payment-highlight"><span>Total:</span> <span>${o.formaPagRestante || '?'}</span></div>`);
+            
             return `<div class="order-card ${statusClass}"><div class="order-header"><div><div class="order-id">#${numPedido}</div><div class="order-date">${fmtData(o.dataEntrega)} • ${o.turno}</div></div><select class="status-select" onchange="quickUpdateStatus('${o.fbId}', this.value)" style="background:${selectBg}; color:${selectColor}">${opts}</select></div><div class="order-body"><div class="client-info"><span class="client-name">${o.cliente}</span><div class="client-detail"><i class="fas fa-phone" style="font-size:11px"></i> ${o.tel}</div><div class="client-detail">${endInfo}</div>${o.obs ? `<div class="client-detail" style="color:#e11d48;font-style:italic"><i class="fas fa-comment"></i> ${o.obs}</div>` : ''}</div><div class="items-box">${itensHtml}</div>${pagInfo}<div class="finance-box">${o.pago > 0 ? `<div class="finance-row"><span>Pago (Sinal):</span> <span style="color:#10b981">${fmtMoeda(o.pago)}</span></div>` : ''}<div class="finance-total" style="display:flex;justify-content:space-between;color:${o.restante>0?'#ef4444':'#10b981'}"><span>A PAGAR:</span> <span>${fmtMoeda(o.restante)}</span></div></div></div><div class="order-footer"><button class="btn btn-card" onclick="editOrder('${o.fbId}')"><i class="fas fa-edit"></i> Editar</button><button class="btn btn-card" onclick="printOrder('${o.fbId}', '${numPedido}')"><i class="fas fa-print"></i> Cupom</button><button class="btn btn-card" onclick="deleteOrder('${o.fbId}')" style="color:#ef4444"><i class="fas fa-trash"></i></button></div></div>`;
         }).join('');
     };
@@ -1118,7 +978,6 @@
         setTimeout(() => { w.document.close(); w.print(); w.close(); }, 500);
     };
 
-    // --- RESTANTE ---
     window.buscarCep = async function() { let cep = document.getElementById('cliCep').value.replace(/\D/g,''); if(cep.length === 8) { try { let r = await fetch(`https://viacep.com.br/ws/${cep}/json/`); let d = await r.json(); if(!d.erro) { document.getElementById('cliEnd').value = d.logradouro; const bSelect = document.getElementById('cliBairro'); let found = false; for (let i = 0; i < bSelect.options.length; i++) { if (bSelect.options[i].value.toLowerCase() === d.bairro.toLowerCase()) { bSelect.selectedIndex = i; found = true; break; } } if (!found) { bSelect.value = 'OUTRO'; document.getElementById('cliBairroOutro').value = d.bairro; } checkBairro(); } } catch(e) {} } };
     window.showNewOrderModal = function() { document.getElementById('orderForm').reset(); document.getElementById('itemsContainer').innerHTML = ''; document.getElementById('editFirebaseId').value = ''; document.getElementById('dataPed').value = new Date().toISOString().split('T')[0]; document.getElementById('checkAdiantamento').checked = false; toggleAdiantamento(); document.getElementById('orderModal').classList.add('active'); checkTipoEntrega(); addItem(); };
     window.closeOrderModal = function() { document.getElementById('orderModal').classList.remove('active'); };
