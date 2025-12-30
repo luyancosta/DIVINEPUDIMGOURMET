@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V15 (Config Print)</title>
+    <title>Divine Pudim Gourmet - Sistema V16 (Resumo Separado)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
@@ -659,7 +659,7 @@
         }).join('');
     };
 
-    // --- CONFIGURAÇÕES DE IMPRESSÃO (NOVO) ---
+    // --- CONFIGURAÇÕES DE IMPRESSÃO ---
     const DEFAULT_PRINT_CONFIG = {
         title: 'DIVINE PUDIM',
         subtitle: 'GOURMET',
@@ -698,10 +698,9 @@
         }
     };
 
-    // --- FUNÇÃO DE IMPRESSÃO OTIMIZADA PARA 48MM (Com Config Customizável) ---
+    // --- FUNÇÃO DE IMPRESSÃO OTIMIZADA PARA 48MM ---
     window.printOrder = function(id, numPedido) {
         const o = orders.find(x => x.fbId === id);
-        // Carrega configurações salvas ou usa padrão
         const cfg = JSON.parse(localStorage.getItem('printConfig')) || DEFAULT_PRINT_CONFIG;
         
         const w = window.open('', '', 'width=300,height=600');
@@ -709,7 +708,6 @@
         let headerEnd = "";
         let bodyEnd = "";
 
-        // Lógica de cabeçalho (Delivery ou Retirada)
         if (o.tipoEntrega === 'Delivery' || (o.turno && !o.turno.includes('Retirada'))) {
             headerEnd = "DELIVERY";
             bodyEnd = `
@@ -723,7 +721,6 @@
             bodyEnd = `<div class="center big" style="border:2px solid #000; padding:5px; margin:5px 0;">CLIENTE VAI RETIRAR</div>`;
         }
 
-        // Lógica de Pagamento
         let paymentBox = '';
         if(o.restante <= 0.01) {
             paymentBox = `<div class="box-pagamento">PAGO TOTAL</div>`;
@@ -756,72 +753,32 @@
                     <div class="center giant">${cfg.title}</div>
                     <div class="center" style="font-size:11px">${cfg.subtitle}</div>
                     <div class="center" style="margin-bottom:5px">${cfg.phone}</div>
-                    
                     <div class="line"></div>
-                    
-                    <div class="row big">
-                        <span>PEDIDO</span>
-                        <span>#${numPedido}</span>
-                    </div>
+                    <div class="row big"><span>PEDIDO</span><span>#${numPedido}</span></div>
                     <div class="center giant" style="margin:5px 0; background:#000; color:#fff; -webkit-print-color-adjust: exact;">${headerEnd}</div>
                     <div class="center">${fmtData(o.dataEntrega)}</div>
                     <div class="center">${o.turno}</div>
-                    
                     <div class="line"></div>
-                    
                     <div class="destaque">CLIENTE:</div>
                     <div class="big">${o.cliente}</div>
                     <div>${o.tel}</div>
-                    
                     <div class="line"></div>
-                    
                     ${bodyEnd}
-                    
                     <div class="line"></div>
                     <div class="destaque" style="margin-bottom:5px">ITENS:</div>
-                    
-                    ${o.itens.map(i => `
-                        <div class="item-row">
-                            <div style="font-size:13px">${i.qtd}x ${i.prod}</div>
-                            <div class="row">
-                                <span style="font-size:10px; font-weight:normal">${i.tam}</span>
-                                <span>${fmtMoeda(i.prc * i.qtd)}</span>
-                            </div>
-                        </div>
-                    `).join('')}
-                    
+                    ${o.itens.map(i => `<div class="item-row"><div style="font-size:13px">${i.qtd}x ${i.prod}</div><div class="row"><span style="font-size:10px; font-weight:normal">${i.tam}</span><span>${fmtMoeda(i.prc * i.qtd)}</span></div></div>`).join('')}
                     <div class="line"></div>
-                    
-                    <div class="row" style="font-size:11px">
-                        <span>Taxa:</span>
-                        <span>${fmtMoeda(o.taxa)}</span>
-                    </div>
-                    <div class="row" style="font-size:11px">
-                        <span>Sinal:</span>
-                        <span>${fmtMoeda(o.pago)}</span>
-                    </div>
-                    
-                    <div class="row giant" style="margin-top:5px">
-                        <span>TOTAL:</span>
-                        <span>${fmtMoeda(o.total)}</span>
-                    </div>
-
+                    <div class="row" style="font-size:11px"><span>Taxa:</span><span>${fmtMoeda(o.taxa)}</span></div>
+                    <div class="row" style="font-size:11px"><span>Sinal:</span><span>${fmtMoeda(o.pago)}</span></div>
+                    <div class="row giant" style="margin-top:5px"><span>TOTAL:</span><span>${fmtMoeda(o.total)}</span></div>
                     ${paymentBox}
-                    
-                    <div class="center" style="margin-top:15px; font-size:10px;">
-                        ${cfg.msg} <br>
-                        ${cfg.social}
-                    </div>
+                    <div class="center" style="margin-top:15px; font-size:10px;">${cfg.msg} <br>${cfg.social}</div>
                     <br>.
                 </div>
             </body>
             </html>
         `);
-        
-        setTimeout(() => {
-            w.print();
-            w.close();
-        }, 500);
+        setTimeout(() => { w.print(); w.close(); }, 500);
     };
 
     // --- UTILS ---
@@ -842,20 +799,77 @@
     window.refreshAll = function() { renderDashboard(); renderOrdersList(); populateBairroFilter(); };
     window.applyFilters = function() {
         const term = document.getElementById('searchInput').value.toLowerCase(); const date = document.getElementById('filterData').value; const bairro = document.getElementById('filterBairro').value; const status = document.getElementById('filterStatus').value; const tipo = document.getElementById('filterTipo').value; const turno = document.getElementById('filterTurno').value;
-        const filtered = orders.filter(o => { let ok = true; if(term && !o.cliente.toLowerCase().includes(term)) ok = false; if(date && o.dataEntrega !== date) ok = false; if(bairro && o.bairro !== bairro) ok = false; if(status && o.status !== status) ok = false; if(tipo && tipo !== 'Todas' && o.tipoEntrega !== tipo) ok = false; if(turno && turno !== 'Todos' && o.turno !== turno && !o.turno.includes(turno)) ok = false; return ok; }); renderOrdersList(filtered);
+        const filtered = orders.filter(o => { let ok = true; if(term && !o.cliente.toLowerCase().includes(term)) ok = false; if(date && o.dataEntrega !== date) ok = false; if(bairro && o.bairro !== bairro) ok = false; if(status && o.status !== status) ok = false; if(tipo && tipo !== 'Todos' && o.tipoEntrega !== tipo) ok = false; if(turno && turno !== 'Todos' && o.turno !== turno && !o.turno.includes(turno)) ok = false; return ok; }); renderOrdersList(filtered);
     };
     
-    // NEW: EXPORT PRODUCT SUMMARY REPORT (V14)
+    // --- NOVO: RESUMO DE PRODUÇÃO SEPARADO (V16) ---
     window.exportProductSummary = function() {
-        const term = document.getElementById('searchInput').value.toLowerCase(); const date = document.getElementById('filterData').value; const bairro = document.getElementById('filterBairro').value; const status = document.getElementById('filterStatus').value; const tipo = document.getElementById('filterTipo').value; const turno = document.getElementById('filterTurno').value;
-        const filtered = orders.filter(o => { let ok = true; if(term && !o.cliente.toLowerCase().includes(term)) ok = false; if(date && o.dataEntrega !== date) ok = false; if(bairro && o.bairro !== bairro) ok = false; if(status && o.status !== status) ok = false; if(tipo && tipo !== 'Todas' && o.tipoEntrega !== tipo) ok = false; if(turno && turno !== 'Todos' && o.turno !== turno && !o.turno.includes(turno)) ok = false; return ok; });
+        const term = document.getElementById('searchInput').value.toLowerCase(); const date = document.getElementById('filterData').value; const bairro = document.getElementById('filterBairro').value; const statusFilter = document.getElementById('filterStatus').value; const tipo = document.getElementById('filterTipo').value; const turno = document.getElementById('filterTurno').value;
+
+        const filtered = orders.filter(o => { let ok = true; if(term && !o.cliente.toLowerCase().includes(term)) ok = false; if(date && o.dataEntrega !== date) ok = false; if(bairro && o.bairro !== bairro) ok = false; if(statusFilter && o.status !== statusFilter) ok = false; if(tipo && tipo !== 'Todos' && o.tipoEntrega !== tipo) ok = false; if(turno && turno !== 'Todos' && o.turno !== turno && !o.turno.includes(turno)) ok = false; return ok; });
         if (filtered.length === 0) { alert("Nenhum pedido encontrado com os filtros atuais."); return; }
-        const summary = {}; filtered.forEach(o => { o.itens.forEach(i => { let key = `${i.prod} (${i.tam})`; if (!summary[key]) summary[key] = 0; summary[key] += i.qtd; }); });
-        const sortedKeys = Object.keys(summary).sort(); const tableRows = sortedKeys.map(key => [key, summary[key]]);
-        const { jsPDF } = window.jspdf; const doc = new jsPDF();
-        doc.setFontSize(16); doc.text("Resumo de Produção (Qtd. Produtos)", 14, 20); doc.setFontSize(10); let filterText = date ? `Data: ${fmtData(date)}` : "Todos os pedidos listados"; doc.text(filterText, 14, 28);
-        doc.autoTable({ head: [["Produto (Tamanho)", "Quantidade"]], body: tableRows, startY: 35, theme: 'striped', columnStyles: { 0: { cellWidth: 140 }, 1: { cellWidth: 40, halign: 'center', fontStyle: 'bold' } } });
-        doc.save(`Resumo_Producao_${new Date().toISOString().split('T')[0]}.pdf`);
+
+        const toProduce = {};
+        const produced = {};
+        let hasData = false;
+
+        filtered.forEach(o => {
+            let targetMap = null;
+            // LÓGICA:
+            // FALTA: Confirmado ou Produzindo
+            // PRONTO: Pronto
+            // IGNORA: Em rota, Entregue
+            if (o.status === 'Pedido confirmado' || o.status === 'Produzindo') { targetMap = toProduce; }
+            else if (o.status === 'Pronto') { targetMap = produced; }
+
+            if (targetMap) {
+                hasData = true;
+                o.itens.forEach(i => {
+                    let key = `${i.prod} (${i.tam})`;
+                    if (!targetMap[key]) targetMap[key] = 0;
+                    targetMap[key] += i.qtd;
+                });
+            }
+        });
+
+        if (!hasData) { alert("Nenhum pedido para produzir ou pronto encontrado nos filtros (ignorando rota/entregue)."); return; }
+
+        const rowsToProduce = Object.keys(toProduce).sort().map(k => [k, toProduce[k]]);
+        const rowsProduced = Object.keys(produced).sort().map(k => [k, produced[k]]);
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        doc.setFontSize(18); doc.text("Resumo de Produção", 14, 20);
+        doc.setFontSize(10); let filterText = date ? `Data: ${fmtData(date)}` : "Todos os pedidos listados (Filtro Atual)"; doc.text(filterText, 14, 28);
+
+        let currentY = 35;
+
+        // TABELA 1: FALTA PRODUZIR (VERMELHO/ROSA)
+        if (rowsToProduce.length > 0) {
+            doc.setFontSize(14); doc.setTextColor(220, 38, 38);
+            doc.text("FALTA PRODUZIR (Confirmados/Produzindo)", 14, currentY);
+            currentY += 5;
+            doc.autoTable({
+                head: [["Produto (Tamanho)", "Quantidade"]], body: rowsToProduce, startY: currentY, theme: 'grid',
+                headStyles: { fillColor: [220, 38, 38] },
+                columnStyles: { 0: { cellWidth: 140 }, 1: { cellWidth: 40, halign: 'center', fontStyle: 'bold' } }
+            });
+            currentY = doc.lastAutoTable.finalY + 15;
+        }
+
+        // TABELA 2: JÁ PRODUZIDOS (VERDE/AZUL)
+        if (rowsProduced.length > 0) {
+            doc.setFontSize(14); doc.setTextColor(22, 163, 74);
+            doc.text("JÁ PRODUZIDOS (Prontos no Balcão/Freezer)", 14, currentY);
+            currentY += 5;
+            doc.autoTable({
+                head: [["Produto (Tamanho)", "Quantidade"]], body: rowsProduced, startY: currentY, theme: 'grid',
+                headStyles: { fillColor: [22, 163, 74] },
+                columnStyles: { 0: { cellWidth: 140 }, 1: { cellWidth: 40, halign: 'center', fontStyle: 'bold' } }
+            });
+        }
+        doc.save(`Resumo_Producao_Separado_${new Date().toISOString().split('T')[0]}.pdf`);
     };
 
     window.populateBairroFilter = function() { const b = [...new Set(orders.map(o => o.bairro))].sort(); document.getElementById('filterBairro').innerHTML = '<option value="">Todos</option>' + b.map(x => `<option>${x}</option>`).join(''); };
