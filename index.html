@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V23 (Correção IA)</title>
+    <title>Divine Pudim Gourmet - Sistema V24 (Correção HTML/JSON)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -641,7 +641,7 @@
     const sleep = ms => new Promise(r => setTimeout(r, ms));
 
     window.optimizeRouteWithAI = async function() {
-        // 1. OBTENÇÃO DA CHAVE (CORREÇÃO APLICADA)
+        // 1. OBTENÇÃO DA CHAVE
         const cfg = JSON.parse(localStorage.getItem('printConfig')) || DEFAULT_PRINT_CONFIG;
         let rawKey = cfg.apiKey;
         if (!rawKey || rawKey.trim() === '') { 
@@ -680,29 +680,37 @@
             
             if (coords.length === 0) throw new Error("Nenhum endereço foi localizado pelo GPS.");
             
-            // B. OTIMIZAÇÃO (OpenRouteService - PRECISA DA CHAVE)
+            // B. OTIMIZAÇÃO (CORREÇÃO AQUI: SEM PROXY)
+            // Removemos o 'corsproxy' para tentar conexão direta, evitando o erro de HTML
             loadingText.innerText = "Calculando melhor rota (IA)..."; loadingBar.style.width = '75%';
             
             const jobs = coords.map(c => ({ id: c.id, location: c.location }));
             const vehicle = { id: 1, profile: 'driving-car', start: START_COORDS, end: START_COORDS };
             
-            // Proxy para evitar CORS no navegador
-            const proxyUrl = 'https://corsproxy.io/?';
             const targetUrl = 'https://api.openrouteservice.org/v2/optimization';
             
-            const orsRes = await fetch(proxyUrl + encodeURIComponent(targetUrl), { 
+            const orsRes = await fetch(targetUrl, { 
                 method: 'POST', 
                 headers: { 
-                    'Authorization': apiKey, // <--- AQUI ESTÁ A CORREÇÃO PRINCIPAL
+                    'Authorization': apiKey, 
                     'Content-Type': 'application/json' 
                 }, 
                 body: JSON.stringify({ jobs: jobs, vehicles: [vehicle] }) 
             });
             
+            // Verificação se retornou erro HTML ou JSON
+            const contentType = orsRes.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") === -1) {
+                // Se não for JSON, lê como texto para ver o erro real
+                const textError = await orsRes.text();
+                console.error("Erro HTML da API:", textError);
+                throw new Error("A API retornou um erro (HTML). Verifique o console (F12) para detalhes.");
+            }
+
             if (!orsRes.ok) {
                 const errData = await orsRes.json();
                 console.error("Erro ORS:", errData);
-                throw new Error("Erro na API de Otimização. (401/403: Chave Inválida).");
+                throw new Error("Erro na API de Otimização. Código: " + orsRes.status);
             }
 
             const routeData = await orsRes.json();
