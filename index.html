@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V26 (Rotas Interativas)</title>
+    <title>Divine Pudim Gourmet - Sistema V27 (Controle de Estoque)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -72,6 +72,23 @@
         .filters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; }
         input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-family: inherit; }
         .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+
+        /* ESTOQUE TABLE */
+        .stock-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); }
+        .stock-table th { background: var(--gray-100); color: var(--gray-600); padding: 15px; text-align: left; font-size: 14px; text-transform: uppercase; }
+        .stock-table td { padding: 15px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        .stock-table tr:last-child td { border-bottom: none; }
+        
+        .stock-control { display: flex; align-items: center; gap: 10px; }
+        .btn-circle { width: 30px; height: 30px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; transition: 0.2s; }
+        .btn-minus { background: #fee2e2; color: #ef4444; }
+        .btn-plus { background: #dcfce7; color: #166534; }
+        .btn-finish { background: var(--primary); color: white; border-radius: 6px; padding: 5px 10px; font-size: 12px; border: none; cursor: pointer; }
+        .btn-finish:hover { background: var(--primary-dark); }
+        
+        .stock-val { font-weight: 800; font-size: 16px; min-width: 30px; text-align: center; }
+        .stock-neg { color: red; }
+        .stock-alert { background: #fee2e2; color: #b91c1c; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 5px; }
 
         /* PEDIDO CARD */
         .order-card { background: white; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-direction: column; position: relative; transition: transform 0.2s; }
@@ -192,7 +209,7 @@
             <div class="tabs-buttons">
                 <button class="tab-btn active" onclick="showTab(event, 'dashboard')"><i class="fas fa-chart-line"></i> Dashboard</button>
                 <button class="tab-btn" onclick="showTab(event, 'pedidos')"><i class="fas fa-list"></i> Pedidos</button>
-                <button class="tab-btn" onclick="showTab(event, 'rotas')"><i class="fas fa-map-marked-alt"></i> Rotas de Entrega</button>
+                <button class="tab-btn" onclick="showTab(event, 'estoque')"><i class="fas fa-boxes"></i> Estoque</button> <button class="tab-btn" onclick="showTab(event, 'rotas')"><i class="fas fa-map-marked-alt"></i> Rotas de Entrega</button>
                 <button class="tab-btn" onclick="showTab(event, 'graficos')"><i class="fas fa-chart-pie"></i> Gráficos</button>
             </div>
         </div>
@@ -216,6 +233,29 @@
             <div class="card" style="display: block;">
                 <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px;"><i class="fas fa-box-open"></i> Quantidade de produtos pedidos</h3>
                 <div id="topProductsList" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:10px;"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tabEstoque" class="tab-content">
+        <div class="container">
+            <div style="background:white; padding:20px; border-radius:12px; box-shadow:var(--shadow); margin-bottom:20px">
+                <h2 style="color:var(--primary-dark); margin-bottom:15px"><i class="fas fa-boxes"></i> Controle de Estoque</h2>
+                <div style="overflow-x: auto;">
+                    <table class="stock-table">
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th>Tamanho</th>
+                                <th style="text-align:center">Em Produção</th>
+                                <th style="text-align:center">Ação</th>
+                                <th style="text-align:center">Prontos (Estoque Real)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stockTableBody">
+                            </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </section>
@@ -443,7 +483,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     // --- CONFIGURAÇÃO FIREBASE ---
     const firebaseConfig = {
@@ -458,6 +498,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const colRef = collection(db, "pedidos");
+    const stockCol = collection(db, "estoque");
 
     const PRODUTOS = [
         { nome: 'Delícia de abacaxi', tamanhos: [{t:'P',p:35}, {t:'G',p:55}] },
@@ -504,6 +545,7 @@
 
     let orders = [];
     let activeRouteOrders = [];
+    let stockData = {}; // Guarda o estado atual do estoque
     let charts = { prod: null, fat: null };
     let sortableInstance = null;
 
@@ -560,6 +602,8 @@
                 opt.value = b; opt.textContent = b; bList.appendChild(opt);
             });
         }
+        
+        // Listener Pedidos
         onSnapshot(query(colRef), (snapshot) => {
             orders = [];
             snapshot.forEach(doc => { let d = doc.data(); d.fbId = doc.id; orders.push(d); });
@@ -567,9 +611,91 @@
             orders.forEach((o, i) => o.displayId = (i + 1).toString().padStart(3, '0'));
             refreshAll();
         });
-        // Seta data de hoje no campo oculto
+
+        // Listener Estoque
+        onSnapshot(query(stockCol), (snapshot) => {
+            stockData = {};
+            snapshot.forEach(doc => { stockData[doc.id] = doc.data(); });
+            renderStock();
+        });
+
         document.getElementById('dataPed').value = new Date().toISOString().split('T')[0];
     }
+
+    // --- FUNÇÕES DE ESTOQUE ---
+    function getStockKey(prodName, tam) {
+        return `${prodName}_${tam}`;
+    }
+
+    window.updateStock = async function(key, type, delta) {
+        // type: 'emProducao' ou 'pronto'
+        const currentRef = doc(db, "estoque", key);
+        const currentSnap = await getDoc(currentRef);
+        let newData = currentSnap.exists() ? currentSnap.data() : { emProducao: 0, pronto: 0 };
+        
+        newData[type] = (newData[type] || 0) + delta;
+        
+        await setDoc(currentRef, newData);
+    };
+
+    window.finishProduction = async function(key) {
+        // Tira 1 de produção e joga 1 pra pronto
+        const currentRef = doc(db, "estoque", key);
+        const currentSnap = await getDoc(currentRef);
+        let newData = currentSnap.exists() ? currentSnap.data() : { emProducao: 0, pronto: 0 };
+        
+        if (newData.emProducao > 0) {
+            newData.emProducao -= 1;
+            newData.pronto = (newData.pronto || 0) + 1;
+            await setDoc(currentRef, newData);
+        } else {
+            alert('Não há itens em produção para finalizar.');
+        }
+    };
+
+    window.renderStock = function() {
+        const tbody = document.getElementById('stockTableBody');
+        let html = '';
+        
+        PRODUTOS.forEach(p => {
+            p.tamanhos.forEach(t => {
+                const key = getStockKey(p.nome, t.t);
+                const data = stockData[key] || { emProducao: 0, pronto: 0 };
+                const emProd = data.emProducao || 0;
+                const pronto = data.pronto || 0;
+                
+                // Visual logic
+                const prontoClass = pronto < 0 ? 'stock-val stock-neg' : 'stock-val';
+                const alertHtml = pronto < 0 ? '<span class="stock-alert">EM FALTA</span>' : '';
+
+                html += `
+                    <tr>
+                        <td>${p.nome}</td>
+                        <td>${t.t}</td>
+                        <td>
+                            <div class="stock-control" style="justify-content:center">
+                                <button class="btn-circle btn-minus" onclick="updateStock('${key}', 'emProducao', -1)">-</button>
+                                <span class="stock-val">${emProd}</span>
+                                <button class="btn-circle btn-plus" onclick="updateStock('${key}', 'emProducao', 1)">+</button>
+                            </div>
+                        </td>
+                        <td style="text-align:center">
+                            <button class="btn-finish" onclick="finishProduction('${key}')">Finalizar ➡️</button>
+                        </td>
+                        <td>
+                            <div class="stock-control" style="justify-content:center">
+                                <button class="btn-circle btn-minus" onclick="updateStock('${key}', 'pronto', -1)">-</button>
+                                <span class="${prontoClass}">${pronto}</span>
+                                <button class="btn-circle btn-plus" onclick="updateStock('${key}', 'pronto', 1)">+</button>
+                                ${alertHtml}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        });
+        tbody.innerHTML = html;
+    };
 
     // --- FUNÇÕES GERAIS ---
     window.toggleAdiantamento = function() {
@@ -650,13 +776,11 @@
     window.updPrice = function(id) { const row = document.getElementById(`row-${id}`); const tam = row.querySelector('.i-tam'); const prc = row.querySelector('.i-prc'); const opt = tam.options[tam.selectedIndex]; if(opt && opt.dataset.p) { prc.value = opt.dataset.p; calcTotal(); } };
     window.quickUpdateStatus = async function(id, newStatus) { try { await updateDoc(doc(db, "pedidos", id), { status: newStatus }); } catch(e) {} };
     
-    // --- CORREÇÃO IMPORTANTE: Lógica de campos obrigatórios (Required) ---
     window.checkTipoEntrega = function() { 
         const tipo = document.getElementById('tipoEntrega').value; 
         const divDel = document.getElementById('deliveryFields'); 
         const divRet = document.getElementById('retiradaFields'); 
         
-        // Elementos de delivery
         const elEnd = document.getElementById('cliEnd');
         const elBairro = document.getElementById('cliBairro');
         const elTurno = document.getElementById('turnoEntrega');
@@ -664,21 +788,18 @@
         if (tipo === 'Delivery') { 
             divDel.style.display = 'block'; 
             divRet.style.display = 'none'; 
-            // Ativa required
             elEnd.required = true; 
             elBairro.required = true; 
             elTurno.required = true; 
         } else if (tipo === 'Retirada no local') { 
             divDel.style.display = 'none'; 
             divRet.style.display = 'block'; 
-            // Desativa required para não travar o formulário
             elEnd.required = false; 
             elBairro.required = false; 
             elTurno.required = false; 
         } else { 
             divDel.style.display = 'none'; 
             divRet.style.display = 'none';
-            // Limpa required
             elEnd.required = false; 
             elBairro.required = false; 
             elTurno.required = false; 
@@ -687,7 +808,29 @@
     
     window.checkBairro = function() { const s = document.getElementById('cliBairro'); const i = document.getElementById('cliBairroOutro'); i.style.display = s.value === 'OUTRO' ? 'block' : 'none'; if(s.value === 'OUTRO') i.required = true; else i.required = false; };
     
-    // --- SALVAR PEDIDO (CORRIGIDO) ---
+    // --- FUNÇÃO AUXILIAR PARA ATUALIZAR O ESTOQUE EM MASSA ---
+    async function processStockChanges(itemsList, action) {
+        // action: 'subtract' (venda) ou 'add' (devolução/cancelamento)
+        for (let item of itemsList) {
+            // Tenta achar o produto base no array PRODUTOS pra garantir a chave correta
+            let baseName = item.prod;
+            // Remove o sabor do nome se tiver ex: "Bolo (Chocolate)" -> "Bolo"
+            const match = item.prod.match(/^(.*)\s\((.*)\)$/);
+            if (match && PRODUTOS.find(p => p.nome === match[1])) {
+                baseName = match[1];
+            }
+
+            // Só atualiza estoque se for um produto cadastrado (ignora OUTRO genérico se não bater nome)
+            const exists = PRODUTOS.find(p => p.nome === baseName);
+            if (exists) {
+                const key = getStockKey(baseName, item.tam);
+                const delta = action === 'add' ? item.qtd : -item.qtd;
+                await updateStock(key, 'pronto', delta);
+            }
+        }
+    }
+
+    // --- SALVAR PEDIDO (COM INTEGRAÇÃO DE ESTOQUE) ---
     window.saveOrder = async function(e) { 
         e.preventDefault(); 
         
@@ -753,18 +896,55 @@
             }; 
         
             const editId = document.getElementById('editFirebaseId').value; 
+            
             if(editId) { 
+                // --- MODO EDIÇÃO ---
+                // 1. Pega o pedido antigo para devolver itens ao estoque
+                const oldOrderRef = await getDoc(doc(db, "pedidos", editId));
+                if (oldOrderRef.exists()) {
+                    const oldOrder = oldOrderRef.data();
+                    // Devolve itens antigos (ADD ao estoque)
+                    await processStockChanges(oldOrder.itens, 'add');
+                }
+                
+                // 2. Atualiza o pedido
                 await updateDoc(doc(db, "pedidos", editId), obj); 
-                alert('Pedido Atualizado com Sucesso!'); 
+                
+                // 3. Deduz os novos itens (SUBTRACT do estoque)
+                await processStockChanges(itens, 'subtract');
+                
+                alert('Pedido Atualizado e Estoque Ajustado!'); 
             } else { 
+                // --- MODO NOVO ---
                 await addDoc(colRef, obj); 
-                alert('Pedido Salvo com Sucesso!'); 
+                // Deduz do estoque
+                await processStockChanges(itens, 'subtract');
+                alert('Pedido Salvo e Estoque Atualizado!'); 
             } 
             closeOrderModal(); 
         } catch(err) { 
             console.error(err); 
             alert('Erro ao salvar o pedido. Verifique o console.'); 
         } 
+    };
+
+    window.deleteOrder = async function(id) { 
+        if(confirm('Tem certeza? Isso irá excluir o pedido e DEVOLVER os itens ao estoque.')) {
+            try {
+                // 1. Recupera o pedido para saber o que devolver
+                const orderRef = await getDoc(doc(db, "pedidos", id));
+                if (orderRef.exists()) {
+                    const orderData = orderRef.data();
+                    // 2. Devolve ao estoque
+                    await processStockChanges(orderData.itens, 'add');
+                }
+                // 3. Deleta
+                await deleteDoc(doc(db, "pedidos", id)); 
+                alert('Pedido excluído e itens devolvidos ao estoque.');
+            } catch(e) {
+                alert('Erro ao excluir: ' + e.message);
+            }
+        }
     };
 
     window.editOrder = function(id) { 
@@ -840,12 +1020,10 @@
     };
 
     // --- ROTAS (MANUAL + CHECKBOX + CLIQUE) ---
-    // Nova função para mudar status via checkbox
     window.markAsDelivered = async function(id, isChecked) {
         try {
             const newStatus = isChecked ? 'Entregue' : 'Em rota';
             await updateDoc(doc(db, "pedidos", id), { status: newStatus });
-            // O snapshot listener vai atualizar a tela automaticamente
         } catch(e) {
             alert('Erro ao atualizar status: ' + e.message);
         }
@@ -944,13 +1122,12 @@
     window.buscarCep = async function() { let cep = document.getElementById('cliCep').value.replace(/\D/g,''); if(cep.length === 8) { try { let r = await fetch(`https://viacep.com.br/ws/${cep}/json/`); let d = await r.json(); if(!d.erro) { document.getElementById('cliEnd').value = d.logradouro; const bSelect = document.getElementById('cliBairro'); let found = false; for (let i = 0; i < bSelect.options.length; i++) { if (bSelect.options[i].value.toLowerCase() === d.bairro.toLowerCase()) { bSelect.selectedIndex = i; found = true; break; } } if (!found) { bSelect.value = 'OUTRO'; document.getElementById('cliBairroOutro').value = d.bairro; } checkBairro(); } } catch(e) {} } };
     window.showNewOrderModal = function() { document.getElementById('orderForm').reset(); document.getElementById('itemsContainer').innerHTML = ''; document.getElementById('editFirebaseId').value = ''; document.getElementById('dataPed').value = new Date().toISOString().split('T')[0]; document.getElementById('checkAdiantamento').checked = false; toggleAdiantamento(); document.getElementById('orderModal').classList.add('active'); checkTipoEntrega(); addItem(); };
     window.closeOrderModal = function() { document.getElementById('orderModal').classList.remove('active'); };
-    window.deleteOrder = async function(id) { if(confirm('Excluir?')) await deleteDoc(doc(db, "pedidos", id)); };
     window.fmtMoeda = v => v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
     window.fmtData = d => d.split('-').reverse().join('/');
     window.searchOrders = function() { applyFilters(); };
     window.clearFilters = function() { document.getElementById('searchInput').value = ''; document.getElementById('filterData').value = ''; document.getElementById('filterBairro').value = ''; document.getElementById('filterStatus').value = ''; document.getElementById('filterTipo').value = ''; document.getElementById('filterTurno').value = ''; applyFilters(); };
-    window.showTab = function(e, tabId) { if(e) e.preventDefault(); document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active')); document.getElementById('tab' + tabId.charAt(0).toUpperCase() + tabId.slice(1)).classList.add('active'); if(e && e.target) e.target.closest('.tab-btn').classList.add('active'); if(tabId === 'graficos') window.renderCharts(); if(tabId === 'rotas') window.renderRoutes(); };
-    window.refreshAll = function() { renderDashboard(); renderOrdersList(); populateBairroFilter(); if(document.getElementById('tabRotas').classList.contains('active')) renderRoutes(); };
+    window.showTab = function(e, tabId) { if(e) e.preventDefault(); document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active')); document.getElementById('tab' + tabId.charAt(0).toUpperCase() + tabId.slice(1)).classList.add('active'); if(e && e.target) e.target.closest('.tab-btn').classList.add('active'); if(tabId === 'graficos') window.renderCharts(); if(tabId === 'rotas') window.renderRoutes(); if(tabId === 'estoque') window.renderStock(); };
+    window.refreshAll = function() { renderDashboard(); renderOrdersList(); populateBairroFilter(); if(document.getElementById('tabRotas').classList.contains('active')) renderRoutes(); if(document.getElementById('tabEstoque').classList.contains('active')) renderStock(); };
     window.applyFilters = function() { const term = document.getElementById('searchInput').value.toLowerCase(); const date = document.getElementById('filterData').value; const bairro = document.getElementById('filterBairro').value; const status = document.getElementById('filterStatus').value; const tipo = document.getElementById('filterTipo').value; const turno = document.getElementById('filterTurno').value; const filtered = orders.filter(o => { let ok = true; if(term && !o.cliente.toLowerCase().includes(term)) ok = false; if(date && o.dataEntrega !== date) ok = false; if(bairro && o.bairro !== bairro) ok = false; if(status && o.status !== status) ok = false; if(tipo && tipo !== 'Todos' && o.tipoEntrega !== tipo) ok = false; if(turno && turno !== 'Todos' && o.turno !== turno && !o.turno.includes(turno)) ok = false; return ok; }); renderOrdersList(filtered); };
     window.exportProductSummary = function() {
         const term = document.getElementById('searchInput').value.toLowerCase(); const date = document.getElementById('filterData').value; const bairro = document.getElementById('filterBairro').value; const statusFilter = document.getElementById('filterStatus').value; const tipo = document.getElementById('filterTipo').value; const turno = document.getElementById('filterTurno').value;
@@ -969,7 +1146,7 @@
     };
     window.populateBairroFilter = function() { const b = [...new Set(orders.map(o => o.bairro))].sort(); document.getElementById('filterBairro').innerHTML = '<option value="">Todos</option>' + b.map(x => `<option>${x}</option>`).join(''); };
     window.exportBackup = function() { const b = new Blob([JSON.stringify(orders)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'backup.json'; a.click(); };
-    window.handleImport = function(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = async (ev) => { try { const arr = JSON.parse(ev.target.result); if(confirm(`Importar ${arr.length} pedidos?`)) { for(let o of arr) { delete o.fbId; await addDoc(colRef, o); } alert('Concluído!'); } } catch(x) { alert('Erro arquivo invalido'); } }; r.readAsText(f); };
+    window.handleImport = function(e) { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = async (ev) => { try { const arr = JSON.parse(ev.target.result); if(confirm(`Importar ${arr.length} pedidos?`)) { for(let o of arr) { delete o.fbId; await addDoc(colRef, o); await processStockChanges(o.itens, 'subtract'); } alert('Concluído!'); } } catch(x) { alert('Erro arquivo invalido'); } }; r.readAsText(f); };
     window.exportToPDF = function() { const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); doc.setFontSize(18); doc.text("Relatório de Pedidos - Divine Pudim Gourmet", 14, 20); doc.setFontSize(10); doc.text("Gerado em: " + new Date().toLocaleString(), 14, 28); const tableColumn = ["Entregue Em", "Cliente/Contato", "Endereço Completo", "Itens", "Total", "Pago", "Falta"]; const tableRows = []; orders.sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega)).forEach(o => { const itemsStr = o.itens.map(i => `${i.qtd}x ${i.prod} (${i.tam})`).join('\n'); const endStr = o.tipoEntrega === 'Retirada no local' ? 'RETIRADA' : `${o.end}\n${o.bairro}\nObs: ${o.obs || '-'}`; tableRows.push([`${fmtData(o.dataEntrega)}\n${o.turno}`, `${o.cliente}\n${o.tel}`, endStr, itemsStr, fmtMoeda(o.total), fmtMoeda(o.pago), fmtMoeda(o.restante)]); }); doc.autoTable({ head: [tableColumn], body: tableRows, startY: 35, theme: 'grid', styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' }, columnStyles: { 0: {cellWidth:25}, 1:{cellWidth:35}, 2:{cellWidth:60}, 3:{cellWidth:70}, 4:{cellWidth:20, halign:'right'}, 5:{cellWidth:20, halign:'right'}, 6:{cellWidth:20, halign:'right'} } }); doc.save(`Relatorio_${new Date().toISOString().split('T')[0]}.pdf`); };
     window.exportToExcel = function() { const wb = XLSX.utils.book_new(); const data = orders.map(o => ({ "Data Entrega": fmtData(o.dataEntrega), "Tipo": o.tipoEntrega, "Turno": o.turno, "Status": o.status, "Cliente": o.cliente, "Telefone": o.tel, "Endereço": o.end, "Bairro": o.bairro, "Obs": o.obs, "Itens": o.itens.map(i => `${i.qtd}x ${i.prod}`).join('; '), "Total": o.total, "Pago": o.pago, "Restante": o.restante })); const ws = XLSX.utils.json_to_sheet(data); ws['!cols'] = [{wch:12}, {wch:15}, {wch:15}, {wch:15}, {wch:25}, {wch:15}, {wch:40}, {wch:15}, {wch:20}, {wch:50}]; XLSX.utils.book_append_sheet(wb, ws, "Pedidos"); XLSX.writeFile(wb, `Relatorio_${new Date().toISOString().split('T')[0]}.xlsx`); };
     window.renderCharts = function() { const ctxProd = document.getElementById('chartProd'); const ctxFat = document.getElementById('chartFat'); if(charts.prod) charts.prod.destroy(); if(charts.fat) charts.fat.destroy(); const counts = {}; orders.forEach(o => o.itens.forEach(i => { let key = `${i.prod} (${i.tam})`; counts[key] = (counts[key] || 0) + i.qtd; })); charts.prod = new Chart(ctxProd, { type: 'bar', data: { labels: Object.keys(counts), datasets: [{ label: 'Qtd', data: Object.values(counts), backgroundColor: '#ec4899' }] }, options: { responsive: true, maintainAspectRatio: false } }); const statusFat = {}; orders.forEach(o => statusFat[o.status] = (statusFat[o.status] || 0) + o.total); charts.fat = new Chart(ctxFat, { type: 'doughnut', data: { labels: Object.keys(statusFat), datasets: [{ data: Object.values(statusFat), backgroundColor: ['#3b82f6','#f59e0b','#8b5cf6','#06b6d4','#10b981'] }] }, options: { responsive: true, maintainAspectRatio: false } }); };
