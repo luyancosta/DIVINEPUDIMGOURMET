@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V31 (Relatório Otimizado)</title>
+    <title>Divine Pudim Gourmet - Sistema V32 (Relatório Separado)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -666,12 +666,13 @@
         tbody.innerHTML = html;
     };
 
+    // --- NOVA FUNÇÃO DE RELATÓRIO PDF SEPARADO ---
     window.printStockReport = function() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         const destinedMap = {};
         
-        // 1. Calcula o destinado
+        // 1. Calcula o destinado (o que já saiu do estoque virtualmente)
         orders.forEach(o => {
             if (o.status !== 'Entregue') {
                 o.itens.forEach(i => {
@@ -684,7 +685,10 @@
             }
         });
 
-        const tableBody = [];
+        // 2. Separa em dois grupos
+        const rowsMissing = [];
+        const rowsSurplus = [];
+
         PRODUTOS.forEach(p => {
             p.tamanhos.forEach(t => {
                 const key = getStockKey(p.nome, t.t);
@@ -693,44 +697,76 @@
                 const destino = destinedMap[key] || 0;
                 const saldo = fisico - destino;
                 
-                // LÓGICA FILTRADA: Só mostra se tiver saldo positivo (sobra) OU negativo (falta)
-                // Se Saldo for 0, não mostra.
-                if (saldo !== 0) {
-                    tableBody.push([p.nome, t.t, fisico, destino, saldo]);
+                // Se negativo: FALTA PRODUZIR
+                if (saldo < 0) {
+                    // Mostra o saldo negativo
+                    rowsMissing.push([p.nome, t.t, fisico, destino, saldo]);
+                } 
+                // Se positivo: ESTÃO SOBRANDO
+                else if (saldo > 0) {
+                    rowsSurplus.push([p.nome, t.t, fisico, destino, saldo]);
                 }
             });
         });
         
-        tableBody.sort((a,b) => a[0].localeCompare(b[0]));
+        // Ordena alfabeticamente
+        rowsMissing.sort((a,b) => a[0].localeCompare(b[0]));
+        rowsSurplus.sort((a,b) => a[0].localeCompare(b[0]));
         
-        doc.setFontSize(18); doc.text("Relatório de Sobras e Faltas", 14, 20);
-        doc.setFontSize(10); doc.text("Apenas itens com saldo positivo ou negativo.", 14, 28);
-        doc.text("Data: " + new Date().toLocaleString(), 14, 34);
+        // Título Geral
+        doc.setFontSize(18); doc.text("Relatório de Situação de Estoque", 14, 20);
+        doc.setFontSize(10); doc.text("Data: " + new Date().toLocaleString(), 14, 28);
         
-        doc.autoTable({
-            head: [['Produto', 'Tam', 'Físico', 'Destinado', 'Saldo']],
-            body: tableBody, startY: 40, theme: 'grid',
-            headStyles: { fillColor: [236, 72, 153] },
-            columnStyles: { 
-                2: { halign: 'center' }, 
-                3: { halign: 'center' }, 
-                4: { halign: 'center', fontStyle: 'bold' } 
-            },
-            didParseCell: function(data) {
-                // Pinta de vermelho se o saldo (coluna 4, index 4) for negativo
-                if (data.section === 'body' && data.column.index === 4) {
-                    const val = parseInt(data.cell.raw);
-                    if (val < 0) {
-                        data.cell.styles.textColor = [220, 38, 38]; // Vermelho
-                        data.cell.styles.fillColor = [254, 226, 226]; // Fundo vermelho claro
-                    } else if (val > 0) {
-                        data.cell.styles.textColor = [22, 163, 74]; // Verde
-                        data.cell.styles.fillColor = [220, 252, 231]; // Fundo verde claro
-                    }
+        let currentY = 35;
+
+        // Tabela 1: FALTA PRODUZIR
+        if (rowsMissing.length > 0) {
+            doc.setFontSize(14);
+            doc.setTextColor(220, 38, 38); // Vermelho
+            doc.text("FALTA PRODUZIR (Saldo Negativo)", 14, currentY);
+            currentY += 5;
+
+            doc.autoTable({
+                head: [['Produto', 'Tam', 'Físico', 'Destinado', 'Falta']],
+                body: rowsMissing,
+                startY: currentY,
+                theme: 'grid',
+                headStyles: { fillColor: [220, 38, 38] }, // Cabeçalho Vermelho
+                columnStyles: { 
+                    2: { halign: 'center' }, 
+                    3: { halign: 'center' }, 
+                    4: { halign: 'center', fontStyle: 'bold', textColor: [220, 38, 38] } 
                 }
-            }
-        });
-        doc.save(`Relatorio_Estoque_${new Date().toISOString().split('T')[0]}.pdf`);
+            });
+            currentY = doc.lastAutoTable.finalY + 15;
+        }
+
+        // Tabela 2: ESTÃO SOBRANDO
+        if (rowsSurplus.length > 0) {
+            doc.setFontSize(14);
+            doc.setTextColor(22, 163, 74); // Verde
+            doc.text("ESTÃO SOBRANDO (Prontos no Estoque)", 14, currentY);
+            currentY += 5;
+
+            doc.autoTable({
+                head: [['Produto', 'Tam', 'Físico', 'Destinado', 'Sobra']],
+                body: rowsSurplus,
+                startY: currentY,
+                theme: 'grid',
+                headStyles: { fillColor: [22, 163, 74] }, // Cabeçalho Verde
+                columnStyles: { 
+                    2: { halign: 'center' }, 
+                    3: { halign: 'center' }, 
+                    4: { halign: 'center', fontStyle: 'bold', textColor: [22, 163, 74] } 
+                }
+            });
+        }
+
+        if (rowsMissing.length === 0 && rowsSurplus.length === 0) {
+            doc.text("Nenhum item com falta ou sobra (Estoque zerado perfeitamente).", 14, currentY);
+        }
+
+        doc.save(`Relatorio_Estoque_Separado_${new Date().toISOString().split('T')[0]}.pdf`);
     };
 
     // --- RENDER LISTA DE PEDIDOS ---
@@ -984,10 +1020,6 @@
         window.open(url, '_blank');
     };
 
-    // --- RENDER LISTA DE PEDIDOS ---
-    // ESTA FUNÇÃO GARANTE QUE O FILTRO VISUAL NÃO QUEBRE O CÁLCULO DE ESTOQUE
-    // O cálculo do estoque é feito SEMPRE na lista global 'orders'
-    
     // --- FUNÇÕES FINAIS E EXPORTS ---
     window.printOrder = function(id, numPedido) {
         const o = orders.find(x => x.fbId === id);
