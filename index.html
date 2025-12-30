@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V21 (Final)</title>
+    <title>Divine Pudim Gourmet - Sistema V22 (Final)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -251,7 +251,7 @@
                         <p><i class="fas fa-truck"></i> Entregas: <strong id="routeCount">0</strong></p>
                         <p><i class="fas fa-clock"></i> Turno: <strong id="routeTurnoDisplay">-</strong></p>
                         <p style="margin-top:10px; font-size:12px; line-height:1.4">
-                            <i>* Arraste os cartões na lista para ajustar.</i><br>
+                            <i>* Arraste os cartões na lista ao lado para ajustar a ordem.</i><br>
                             <i>* Saída: Rua Apolo XI, 519.</i>
                         </p>
                     </div>
@@ -417,6 +417,14 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // =======================================================
+    // ÁREA DE CONFIGURAÇÃO FIXA DA API (COLE A CHAVE AQUI)
+    // =======================================================
+    // Cole sua chave entre as aspas abaixo.
+    // Ex: const API_KEY_FIXA = "5b3ce3597851110001cf6248..."; 
+    const API_KEY_FIXA = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6ImM5ZWQ2YjBjMWEyODRmNWY4ZTJkYzY2MDg3N2VjOTRkIiwiaCI6Im11cm11cjY0In0"; 
+    // =======================================================
 
     const firebaseConfig = {
       apiKey: "AIzaSyBt_7_WLXqUvYqdCrTMQg7ySZUa4gSdEHY",
@@ -616,7 +624,7 @@
 
     window.optimizeRouteWithAI = async function() {
         const cfg = JSON.parse(localStorage.getItem('printConfig')) || DEFAULT_PRINT_CONFIG;
-        const apiKey = cfg.apiKey;
+        const apiKey = cfg.apiKey || API_KEY_FIXA;
         if (!apiKey) { alert('Você precisa cadastrar uma API Key do OpenRouteService nas Configurações!'); openPrintConfig(); return; }
         if (activeRouteOrders.length === 0) { alert('Nenhuma entrega para otimizar.'); return; }
         const loadingDiv = document.getElementById('apiLoading'); const loadingBar = document.getElementById('loadingBar'); const loadingText = document.getElementById('loadingText');
