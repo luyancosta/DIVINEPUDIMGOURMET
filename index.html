@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V34 (Final Corrigido)</title>
+    <title>Divine Pudim Gourmet - Sistema V35 (Relatório Ajustado)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -592,7 +592,6 @@
         document.getElementById('printConfigModal').classList.remove('active');
     };
 
-    // --- FUNÇÃO DE LOGIN CORRIGIDA ---
     window.handleLogin = function(e) {
         e.preventDefault();
         const u = document.getElementById('loginUser').value.toLowerCase().trim();
@@ -744,7 +743,7 @@
             doc.text("Tudo Zerado (Estoque Perfeito ou Vazio).", 14, currentY);
         }
 
-        doc.save(`Relatorio_Estoque_Simples_${new Date().toISOString().split('T')[0]}.pdf`);
+        doc.save(`Relatorio_Estoque_${new Date().toISOString().split('T')[0]}.pdf`);
     };
 
     // --- RENDER LISTA DE PEDIDOS ---
@@ -1081,210 +1080,6 @@
         }).join('');
     };
 
-    // --- OUTRAS FUNÇÕES (MODAIS, FORMS, ETC) ---
-    window.toggleAdiantamento = function() {
-        const chk = document.getElementById('checkAdiantamento');
-        const areaInputs = document.getElementById('areaAdiantamentoInputs');
-        const inpPago = document.getElementById('valPago');
-        if(chk.checked) { areaInputs.style.display = 'flex'; } 
-        else { areaInputs.style.display = 'none'; inpPago.value = ''; calcTotal(); }
-    };
-
-    window.addItem = function(data = null) {
-        const id = Date.now() + Math.floor(Math.random() * 1000); 
-        const html = `<div class="item-row" id="row-${id}"><div><select class="i-prod" onchange="updItem(${id})" style="width:100%"><option value="">Selecione...</option>${PRODUTOS.map(p => `<option value="${p.nome}" ${p.requerSabor ? 'data-sabor="1"' : ''}>${p.nome}</option>`).join('')}<option value="OUTRO">Outro (Manual)</option></select><input type="text" class="i-cust" style="display:none; margin-top:5px; width:100%; font-size:12px" placeholder="Detalhe/Sabor"></div><div><select class="i-tam" onchange="updPrice(${id})" style="width:100%"><option>-</option></select></div><div><input type="number" class="i-qtd" value="1" onchange="calcTotal()" style="width:100%"></div><div><input type="number" class="i-prc" step="0.01" onchange="calcTotal()" style="width:100%"></div><div class="i-total" style="font-weight:bold; color:#666; font-size:13px">R$ 0,00</div><button type="button" class="btn btn-danger" onclick="this.parentElement.remove(); calcTotal()" style="padding:5px 10px"><i class="fas fa-trash"></i></button></div>`;
-        document.getElementById('itemsContainer').insertAdjacentHTML('beforeend', html);
-        if(data) {
-            const row = document.getElementById(`row-${id}`); const selProd = row.querySelector('.i-prod'); const selTam = row.querySelector('.i-tam'); const inpCust = row.querySelector('.i-cust');
-            let baseName = data.prod; let flavor = ''; const match = data.prod.match(/^(.*)\s\((.*)\)$/); if (match && PRODUTOS.find(p => p.nome === match[1])) { baseName = match[1]; flavor = match[2]; }
-            const produtoObj = PRODUTOS.find(p => p.nome === baseName);
-            if(produtoObj) { selProd.value = baseName; selTam.innerHTML = produtoObj.tamanhos.map(t => `<option value="${t.t}" data-p="${t.p}">${t.t}</option>`).join(''); selTam.value = data.tam; if(produtoObj.requerSabor) { inpCust.style.display = 'block'; inpCust.placeholder = "Sabor"; inpCust.value = flavor; } } 
-            else { selProd.value = 'OUTRO'; inpCust.style.display = 'block'; inpCust.placeholder = "Produto"; inpCust.value = data.prod; selTam.innerHTML = `<option value="Único">Único</option>`; selTam.value = data.tam; }
-            row.querySelector('.i-qtd').value = data.qtd; row.querySelector('.i-prc').value = data.prc; row.querySelector('.i-total').innerText = fmtMoeda(data.qtd * data.prc);
-        }
-    };
-
-    window.updItem = function(id) { const row = document.getElementById(`row-${id}`); const sel = row.querySelector('.i-prod'); const tam = row.querySelector('.i-tam'); const cust = row.querySelector('.i-cust'); const prc = row.querySelector('.i-prc'); const opt = sel.options[sel.selectedIndex]; const val = sel.value; if(val === 'OUTRO') { cust.style.display = 'block'; cust.placeholder = "Produto"; tam.innerHTML = '<option value="Único">Único</option>'; prc.value = ''; } else { const p = PRODUTOS.find(x => x.nome === val); if(p) { tam.innerHTML = p.tamanhos.map(t => `<option value="${t.t}" data-p="${t.p}">${t.t}</option>`).join(''); if(p.tamanhos[0]) prc.value = p.tamanhos[0].p; } if (opt.getAttribute('data-sabor')) { cust.style.display = 'block'; cust.placeholder = "Sabor"; } else { cust.style.display = 'none'; cust.value = ''; } } calcTotal(); };
-    window.updPrice = function(id) { const row = document.getElementById(`row-${id}`); const tam = row.querySelector('.i-tam'); const prc = row.querySelector('.i-prc'); const opt = tam.options[tam.selectedIndex]; if(opt && opt.dataset.p) { prc.value = opt.dataset.p; calcTotal(); } };
-    window.quickUpdateStatus = async function(id, newStatus) { try { await updateDoc(doc(db, "pedidos", id), { status: newStatus }); } catch(e) {} };
-    window.checkTipoEntrega = function() { 
-        const tipo = document.getElementById('tipoEntrega').value; const divDel = document.getElementById('deliveryFields'); const divRet = document.getElementById('retiradaFields'); 
-        const elEnd = document.getElementById('cliEnd'); const elBairro = document.getElementById('cliBairro'); const elTurno = document.getElementById('turnoEntrega');
-        if (tipo === 'Delivery') { divDel.style.display = 'block'; divRet.style.display = 'none'; elEnd.required = true; elBairro.required = true; elTurno.required = true; } 
-        else if (tipo === 'Retirada no local') { divDel.style.display = 'none'; divRet.style.display = 'block'; elEnd.required = false; elBairro.required = false; elTurno.required = false; } 
-        else { divDel.style.display = 'none'; divRet.style.display = 'none'; elEnd.required = false; elBairro.required = false; elTurno.required = false; } 
-    };
-    window.checkBairro = function() { const s = document.getElementById('cliBairro'); const i = document.getElementById('cliBairroOutro'); i.style.display = s.value === 'OUTRO' ? 'block' : 'none'; if(s.value === 'OUTRO') i.required = true; else i.required = false; };
-    async function processStockChanges(itemsList, action) {
-        for (let item of itemsList) {
-            let baseName = item.prod;
-            const match = item.prod.match(/^(.*)\s\((.*)\)$/);
-            if (match && PRODUTOS.find(p => p.nome === match[1])) { baseName = match[1]; }
-            const exists = PRODUTOS.find(p => p.nome === baseName);
-            if (exists) {
-                const key = getStockKey(baseName, item.tam);
-                const delta = action === 'add' ? item.qtd : -item.qtd;
-                await updateStock(key, 'pronto', delta);
-            }
-        }
-    }
-    window.saveOrder = async function(e) { 
-        e.preventDefault(); 
-        try {
-            let itens = []; 
-            document.querySelectorAll('.item-row').forEach(row => { 
-                const prodSel = row.querySelector('.i-prod').value; 
-                let prodNome = prodSel === 'OUTRO' ? row.querySelector('.i-cust').value : prodSel; 
-                const custField = row.querySelector('.i-cust'); 
-                if (custField.style.display !== 'none' && prodSel !== 'OUTRO') { prodNome += ` (${custField.value})`; } 
-                const qtd = parseFloat(row.querySelector('.i-qtd').value); 
-                const prc = parseFloat(row.querySelector('.i-prc').value); 
-                itens.push({ prod: prodNome, tam: row.querySelector('.i-tam').value, qtd: qtd, prc: prc }); 
-            }); 
-            
-            const tipo = document.getElementById('tipoEntrega').value; 
-            let bairroFinal = '-'; let endFinal = '-'; let turnoFinal = '-'; let horarioRet = ''; 
-            if(tipo === 'Delivery') { 
-                const bairroSel = document.getElementById('cliBairro').value; 
-                bairroFinal = bairroSel === 'OUTRO' ? document.getElementById('cliBairroOutro').value : bairroSel; 
-                const num = document.getElementById('cliNumero').value; 
-                endFinal = document.getElementById('cliEnd').value + (num ? `, Nº ${num}` : ''); 
-                turnoFinal = document.getElementById('turnoEntrega').value; 
-            } else { endFinal = 'Retirada na Loja'; horarioRet = document.getElementById('horarioRetirada').value; if(horarioRet) turnoFinal = `Retirada às ${horarioRet}`; else turnoFinal = 'Retirada'; } 
-            
-            const taxa = parseFloat(document.getElementById('valTaxa').value) || 0; 
-            const pago = parseFloat(document.getElementById('valPago').value) || 0; 
-            const formaSinal = document.getElementById('formaPagSinal').value; 
-            const formaRestante = document.getElementById('formaPagRestante').value; 
-            let sumItens = itens.reduce((acc, i) => acc + (i.qtd * i.prc), 0); 
-            const totalFinal = sumItens + taxa; 
-            const restante = totalFinal - pago; 
-            
-            const obj = { cliente: document.getElementById('cliNome').value, tel: document.getElementById('cliTel').value, cep: document.getElementById('cliCep').value, end: endFinal, bairro: bairroFinal, tipoEntrega: tipo, turno: turnoFinal, dataPedido: document.getElementById('dataPed').value, dataEntrega: document.getElementById('dataEnt').value, status: document.getElementById('statusPed').value, itens: itens, total: totalFinal, pago: pago, taxa: taxa, restante: restante, formaPagRestante: formaRestante, formaPagSinal: pago > 0 ? formaSinal : null, obs: document.getElementById('obs').value }; 
-            const editId = document.getElementById('editFirebaseId').value; 
-            if(editId) { 
-                const oldOrderRef = await getDoc(doc(db, "pedidos", editId));
-                if (oldOrderRef.exists()) { await processStockChanges(oldOrderRef.data().itens, 'add'); }
-                await updateDoc(doc(db, "pedidos", editId), obj); 
-                await processStockChanges(itens, 'subtract');
-                alert('Pedido Atualizado e Estoque Ajustado!'); 
-            } else { 
-                await addDoc(colRef, obj); 
-                await processStockChanges(itens, 'subtract');
-                alert('Pedido Salvo e Estoque Atualizado!'); 
-            } 
-            closeOrderModal(); 
-        } catch(err) { console.error(err); alert('Erro ao salvar o pedido.'); } 
-    };
-    window.deleteOrder = async function(id) { 
-        if(confirm('Tem certeza? Isso irá excluir o pedido e DEVOLVER os itens ao estoque.')) {
-            try {
-                const orderRef = await getDoc(doc(db, "pedidos", id));
-                if (orderRef.exists()) { await processStockChanges(orderRef.data().itens, 'add'); }
-                await deleteDoc(doc(db, "pedidos", id)); 
-                alert('Pedido excluído e itens devolvidos ao estoque.');
-            } catch(e) { alert('Erro ao excluir: ' + e.message); }
-        }
-    };
-    window.editOrder = function(id) { 
-        const o = orders.find(x => x.fbId === id); 
-        if(!o) return; 
-        showNewOrderModal(); 
-        document.getElementById('editFirebaseId').value = id; 
-        document.getElementById('cliNome').value = o.cliente; 
-        document.getElementById('cliTel').value = o.tel; 
-        const isDelivery = o.tipoEntrega === 'Delivery' || (o.turno && !o.turno.includes('Retirada')); 
-        document.getElementById('tipoEntrega').value = isDelivery ? 'Delivery' : 'Retirada no local'; 
-        checkTipoEntrega(); 
-        if(isDelivery) { 
-            document.getElementById('cliCep').value = o.cep || ''; 
-            if(o.end && o.end.includes(', Nº')) { const parts = o.end.split(', Nº'); document.getElementById('cliEnd').value = parts[0].trim(); document.getElementById('cliNumero').value = parts[1].trim(); } else { document.getElementById('cliEnd').value = o.end; } 
-            const sel = document.getElementById('cliBairro'); let found = false; for(let i=0; i<sel.options.length; i++) { if(sel.options[i].value === o.bairro) { sel.selectedIndex = i; found = true; break; } } if(!found) { sel.value = 'OUTRO'; checkBairro(); document.getElementById('cliBairroOutro').value = o.bairro; } 
-            document.getElementById('turnoEntrega').value = (o.turno === 'Manhã' || o.turno === 'Tarde') ? o.turno : ''; 
-        } else { if(o.turno.includes('às')) { document.getElementById('horarioRetirada').value = o.turno.split('às')[1].trim(); } } 
-        document.getElementById('dataPed').value = o.dataPedido; document.getElementById('dataEnt').value = o.dataEntrega; document.getElementById('statusPed').value = o.status; document.getElementById('valPago').value = o.pago; document.getElementById('valTaxa').value = o.taxa || 0; document.getElementById('formaPagRestante').value = o.formaPagRestante || ''; document.getElementById('obs').value = o.obs || ''; 
-        if(o.pago > 0) { document.getElementById('checkAdiantamento').checked = true; toggleAdiantamento(); document.getElementById('formaPagSinal').value = o.formaPagSinal || ''; } else { document.getElementById('checkAdiantamento').checked = false; toggleAdiantamento(); } 
-        document.getElementById('itemsContainer').innerHTML = ''; o.itens.forEach(i => addItem(i)); calcTotal(); 
-    };
-    window.calcTotal = function() { 
-        let itemsTotal = 0; 
-        document.querySelectorAll('.item-row').forEach(row => { const q = parseFloat(row.querySelector('.i-qtd').value) || 0; const p = parseFloat(row.querySelector('.i-prc').value) || 0; const sub = q * p; row.querySelector('.i-total').innerText = fmtMoeda(sub); itemsTotal += sub; }); 
-        const taxa = parseFloat(document.getElementById('valTaxa').value) || 0; const pago = parseFloat(document.getElementById('valPago').value) || 0; const finalTotal = itemsTotal + taxa; const valRestante = finalTotal - pago; 
-        document.getElementById('displayTotal').innerText = fmtMoeda(finalTotal); document.getElementById('valRest').value = fmtMoeda(valRestante); 
-    };
-    window.markAsDelivered = async function(id, isChecked) {
-        try { const newStatus = isChecked ? 'Entregue' : 'Em rota'; await updateDoc(doc(db, "pedidos", id), { status: newStatus }); } catch(e) { alert('Erro ao atualizar status: ' + e.message); }
-    };
-    window.renderRoutes = function() {
-        const selectedTurno = document.getElementById('routeTurnoSelector').value;
-        const listArea = document.getElementById('routeListArea');
-        activeRouteOrders = orders.filter(o => { return (o.turno === selectedTurno || (o.turno && o.turno.includes(selectedTurno))) && o.status !== 'Entregue' && o.tipoEntrega === 'Delivery'; });
-        document.getElementById('routeCount').innerText = activeRouteOrders.length;
-        document.getElementById('routeTurnoDisplay').innerText = selectedTurno;
-        if(activeRouteOrders.length === 0) { listArea.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px">Nenhuma entrega pendente para este turno.</p>'; return; }
-        listArea.innerHTML = activeRouteOrders.map((o, idx) => `<div class="route-item" onclick="editOrder('${o.fbId}')" title="Clique para ver detalhes"><div class="route-handle" onclick="event.stopPropagation()"><i class="fas fa-grip-lines"></i></div><div class="route-check-container" onclick="event.stopPropagation()" title="Marcar como Entregue"><input type="checkbox" class="route-check" onchange="markAsDelivered('${o.fbId}', this.checked)"></div><div class="route-number">${idx + 1}</div><div class="route-details"><div class="route-addr">${o.end}</div><div class="route-bairro">${o.bairro}</div><div style="font-size:12px; color:#999">${o.cliente} (Ped #${o.displayId})</div></div></div>`).join('');
-        if (sortableInstance) { sortableInstance.destroy(); }
-        sortableInstance = Sortable.create(listArea, { animation: 150, handle: '.route-handle', ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', onEnd: function (evt) { Array.from(listArea.children).forEach((el, index) => { el.querySelector('.route-number').innerText = index + 1; }); } });
-    };
-    window.autoSortRouteLogic = function() {
-        if(activeRouteOrders.length === 0) return;
-        activeRouteOrders.sort((a, b) => { const idxA = SEQUENCIA_LOGICA_BAIRROS.indexOf(a.bairro); const idxB = SEQUENCIA_LOGICA_BAIRROS.indexOf(b.bairro); const valA = idxA === -1 ? 999 : idxA; const valB = idxB === -1 ? 999 : idxB; return valA - valB; });
-        renderRoutes(); alert('Rota organizada por sequência lógica de bairros!');
-    };
-    window.openGoogleMapsRoute = function() {
-        if(activeRouteOrders.length === 0) { alert('A rota está vazia.'); return; }
-        let url = "https://www.google.com/maps/dir/Rua+Apolo+XI,+519,+Juazeiro+do+Norte+-+CE/";
-        activeRouteOrders.forEach(o => { let cleanAddr = `${o.end}, ${o.bairro}, Juazeiro do Norte - CE`; url += encodeURIComponent(cleanAddr) + "/"; });
-        window.open(url, '_blank');
-    };
-    window.renderOrdersList = function(list = orders) {
-        const div = document.getElementById('ordersList');
-        if(!list.length) { div.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa">Nenhum pedido encontrado para este filtro.</p>'; return; }
-        const inventoryTracker = {}; 
-        for (const [key, data] of Object.entries(stockData)) { inventoryTracker[key] = (data.pronto || 0); }
-        orders.filter(o => o.status !== 'Entregue').forEach(o => {
-            o.itens.forEach(i => {
-                let baseName = i.prod;
-                const match = i.prod.match(/^(.*)\s\((.*)\)$/);
-                if (match && PRODUTOS.find(p => p.nome === match[1])) { baseName = match[1]; }
-                const key = getStockKey(baseName, i.tam);
-                inventoryTracker[key] = (inventoryTracker[key] || 0) + i.qtd;
-            });
-        });
-        const badgeMap = {};
-        orders.forEach(o => {
-            const isDelivered = o.status === 'Entregue';
-            o.itens.forEach((i, idx) => {
-                const uniqueKey = `${o.fbId}_${idx}`;
-                if (isDelivered) { badgeMap[uniqueKey] = 'DELIVERED'; return; }
-                let baseName = i.prod;
-                const match = i.prod.match(/^(.*)\s\((.*)\)$/);
-                if (match && PRODUTOS.find(p => p.nome === match[1])) { baseName = match[1]; }
-                const key = getStockKey(baseName, i.tam);
-                if ((inventoryTracker[key] || 0) >= i.qtd) { inventoryTracker[key] -= i.qtd; badgeMap[uniqueKey] = 'OK'; } 
-                else { inventoryTracker[key] = 0; badgeMap[uniqueKey] = 'WAIT'; }
-            });
-        });
-        div.innerHTML = list.map((o, index) => {
-            const numPedido = o.displayId; 
-            const statusMap = { 'Pedido confirmado': 'card-confirmado', 'Produzindo': 'card-produzindo', 'Pronto': 'card-pronto', 'Em rota': 'card-rota', 'Entregue': 'card-entregue' };
-            const statusClass = statusMap[o.status] || 'card-confirmado';
-            const colorMap = { 'Pedido confirmado': '#000000', 'Produzindo': '#facc15', 'Pronto': '#3b82f6', 'Em rota': '#a855f7', 'Entregue': '#22c55e' };
-            const selectBg = colorMap[o.status] || '#000000'; const selectColor = o.status === 'Produzindo' ? '#000000' : '#ffffff';
-            const itensHtml = o.itens.map((i, idx) => {
-                const uniqueKey = `${o.fbId}_${idx}`;
-                let statusBadge = '';
-                const badgeStatus = badgeMap[uniqueKey];
-                if (badgeStatus === 'OK') statusBadge = '<span class="item-status-ok">✅ Estoque</span>';
-                else if (badgeStatus === 'WAIT') statusBadge = '<span class="item-status-wait">⏳ Produzir</span>';
-                return `<div class="item-line"><span>${i.qtd}x ${i.prod} (${i.tam})${statusBadge}</span> <span>${fmtMoeda(i.prc*i.qtd)}</span></div>`;
-            }).join('');
-            let endInfo = o.tipoEntrega === 'Delivery' || (o.turno && !o.turno.includes('Retirada')) ? `<i class="fas fa-map-marker-alt" style="color:var(--primary)"></i> ${o.end}, ${o.bairro}` : `<i class="fas fa-store" style="color:var(--primary)"></i> Retirada na Loja`;
-            const opts = ['Pedido confirmado','Produzindo','Pronto','Em rota','Entregue'].map(s => `<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('');
-            let pagInfo = o.restante <= 0.01 ? `<div class="payment-highlight" style="background:#dcfce7; color:#166534; border-color:#bbf7d0"><span>STATUS:</span> <span>PAGO TOTAL</span></div>` : (o.pago > 0 ? `<div class="payment-highlight"><span>Restante:</span> <span>${o.formaPagRestante || '?'}</span></div>` : `<div class="payment-highlight"><span>Total:</span> <span>${o.formaPagRestante || '?'}</span></div>`);
-            return `<div class="order-card ${statusClass}"><div class="order-header"><div><div class="order-id">#${numPedido}</div><div class="order-date">${fmtData(o.dataEntrega)} • ${o.turno}</div></div><select class="status-select" onchange="quickUpdateStatus('${o.fbId}', this.value)" style="background:${selectBg}; color:${selectColor}">${opts}</select></div><div class="order-body"><div class="client-info"><span class="client-name">${o.cliente}</span><div class="client-detail"><i class="fas fa-phone" style="font-size:11px"></i> ${o.tel}</div><div class="client-detail">${endInfo}</div>${o.obs ? `<div class="client-detail" style="color:#e11d48;font-style:italic"><i class="fas fa-comment"></i> ${o.obs}</div>` : ''}</div><div class="items-box">${itensHtml}</div>${pagInfo}<div class="finance-box">${o.pago > 0 ? `<div class="finance-row"><span>Pago (Sinal):</span> <span style="color:#10b981">${fmtMoeda(o.pago)}</span></div>` : ''}<div class="finance-total" style="display:flex;justify-content:space-between;color:${o.restante>0?'#ef4444':'#10b981'}"><span>A PAGAR:</span> <span>${fmtMoeda(o.restante)}</span></div></div></div><div class="order-footer"><button class="btn btn-card" onclick="editOrder('${o.fbId}')"><i class="fas fa-edit"></i> Editar</button><button class="btn btn-card" onclick="printOrder('${o.fbId}', '${numPedido}')"><i class="fas fa-print"></i> Cupom</button><button class="btn btn-card" onclick="deleteOrder('${o.fbId}')" style="color:#ef4444"><i class="fas fa-trash"></i></button></div></div>`;
-        }).join('');
-    };
     window.printOrder = function(id, numPedido) {
         const o = orders.find(x => x.fbId === id);
         const cfg = JSON.parse(localStorage.getItem('printConfig')) || DEFAULT_PRINT_CONFIG;
