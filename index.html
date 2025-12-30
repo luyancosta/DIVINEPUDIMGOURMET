@@ -3,9 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V18 (Rota Lógica)</title>
+    <title>Divine Pudim Gourmet - Sistema V19 (Rotas Pro)</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     
     <style>
         /* ================= ESTILOS GERAIS ================= */
@@ -68,46 +75,83 @@
         .search-bar, .filters { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 20px; }
         .filters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; }
         input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-family: inherit; }
-        
         .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
 
-        /* ================= ESTILOS DA ROTA (NOVO) ================= */
+        /* ================= ESTILOS DA ROTA (REFINADO V19) ================= */
         .route-container { display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
-        .route-list { background: #f8fafc; padding: 20px; border-radius: 12px; min-height: 500px; border: 2px dashed #cbd5e1; }
-        .route-map-placeholder { background: white; border-radius: 12px; padding: 20px; height: fit-content; box-shadow: var(--shadow); position: sticky; top: 140px; }
         
+        /* Lista onde ficam os itens */
+        .route-list { 
+            background: #fff; 
+            padding: 10px; 
+            border-radius: 12px; 
+            min-height: 500px; 
+            border: 2px dashed #cbd5e1; 
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05); 
+        }
+        
+        .route-map-placeholder { 
+            background: white; 
+            border-radius: 12px; 
+            padding: 20px; 
+            height: fit-content; 
+            box-shadow: var(--shadow); 
+            position: sticky; 
+            top: 140px; 
+        }
+        
+        /* Item da Rota (Cartão) */
         .route-item { 
             background: white; 
             padding: 15px; 
             margin-bottom: 10px; 
             border-radius: 8px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08); 
             display: flex; 
             align-items: center; 
             gap: 15px; 
-            cursor: move; 
+            cursor: grab; /* Mãozinha aberta */
             border-left: 5px solid var(--primary);
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.1s, box-shadow 0.2s;
+            position: relative;
         }
-        .route-item:hover { transform: translateX(5px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .route-item.dragging { opacity: 0.5; border: 2px dashed var(--primary); }
+        
+        /* Quando estiver arrastando */
+        .route-item:active { cursor: grabbing; } /* Mãozinha fechada */
+        
+        /* Classe adicionada pelo SortableJS ao item fantasma (onde vai cair) */
+        .sortable-ghost { 
+            opacity: 0.4; 
+            background: #fdf2f8; 
+            border: 2px dashed var(--primary); 
+        }
+        
+        /* Classe adicionada ao item sendo arrastado */
+        .sortable-drag { 
+            background: #fff; 
+            opacity: 1; 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2); 
+            transform: scale(1.02); 
+        }
         
         .route-number { 
             background: var(--gray-800); 
             color: white; 
-            width: 30px; 
-            height: 30px; 
+            width: 28px; 
+            height: 28px; 
             border-radius: 50%; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             font-weight: bold; 
+            font-size: 14px;
             flex-shrink: 0;
         }
-        .route-details { flex: 1; }
-        .route-addr { font-size: 14px; color: #333; font-weight: 600; }
-        .route-bairro { font-size: 12px; color: #666; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 2px; }
-        .route-actions { display: flex; flex-direction: column; gap: 5px; }
+        .route-details { flex: 1; user-select: none; }
+        .route-addr { font-size: 14px; color: #333; font-weight: 600; margin-bottom: 2px; }
+        .route-bairro { font-size: 12px; color: #666; background: #f1f5f9; padding: 2px 8px; border-radius: 10px; display: inline-block; font-weight: 600; }
+        .route-handle { color: #ccc; padding: 5px; font-size: 18px; }
+        .route-handle:hover { color: var(--primary); }
 
         @media(max-width: 900px) {
             .route-container { grid-template-columns: 1fr; }
@@ -115,17 +159,7 @@
         }
 
         /* ================= CARD DO PEDIDO ================= */
-        .order-card { 
-            background: white; 
-            border-radius: 16px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.05);
-            overflow: hidden; 
-            display: flex; 
-            flex-direction: column; 
-            position: relative;
-            transition: transform 0.2s;
-        }
+        .order-card { background: white; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-direction: column; position: relative; transition: transform 0.2s; }
         .order-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .order-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 12px; background: var(--card-color, var(--primary)); }
         .order-header { padding: 15px 15px 15px 25px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; background: #fafafa; }
@@ -264,13 +298,13 @@
                     </select>
                 </div>
                 <div style="display:flex; gap:10px">
-                    <button class="btn btn-secondary" onclick="autoSortRoute()"><i class="fas fa-magic"></i> Auto-Organizar por Rota Lógica</button>
+                    <button class="btn btn-secondary" onclick="autoSortRoute()"><i class="fas fa-magic"></i> Auto-Organizar (Inteligente)</button>
                     <button class="btn btn-success" onclick="openGoogleMapsRoute()"><i class="fas fa-map-marker-alt"></i> <b>Abrir Rota no GPS</b></button>
                 </div>
             </div>
 
             <div class="route-container">
-                <div class="route-list" id="routeListArea" ondragover="allowDrop(event)" ondrop="drop(event)">
+                <div id="routeListArea" class="route-list">
                     <p style="text-align:center; color:#999; margin-top:20px">Selecione um turno para ver a rota.</p>
                 </div>
 
@@ -279,13 +313,16 @@
                     <div style="margin-bottom:20px; font-size:14px; color:#555">
                         <p><i class="fas fa-truck"></i> Entregas: <strong id="routeCount">0</strong></p>
                         <p><i class="fas fa-clock"></i> Turno: <strong id="routeTurnoDisplay">-</strong></p>
-                        <p style="margin-top:10px; font-size:12px"><i>* Arraste os cartões na lista ao lado para reordenar a sequência de entrega.</i></p>
+                        <p style="margin-top:10px; font-size:12px; line-height:1.4">
+                            <i>* Arraste os cartões na lista ao lado para ajustar a ordem.</i><br>
+                            <i>* Saída definida: Rua Apolo XI, 519.</i>
+                        </p>
                     </div>
                     <hr style="margin:15px 0; border:0; border-top:1px solid #eee">
                     <div style="text-align:center">
                         <div style="background:#e0f2fe; padding:15px; border-radius:8px; color:#0369a1; margin-bottom:15px">
                             <i class="fas fa-info-circle"></i><br>
-                            Após organizar a lista, clique em <b>"Abrir Rota no GPS"</b> para enviar a sequência otimizada para o Google Maps do celular do motorista.
+                            Após organizar, clique em <b>"Abrir Rota no GPS"</b> para gerar o trajeto no Google Maps.
                         </div>
                         <img src="https://www.google.com/images/branding/product/2x/maps_96in128dp.png" alt="Maps" style="width:64px; opacity:0.8">
                     </div>
@@ -480,7 +517,6 @@
         { nome: 'Empadão de frango', tamanhos: [{t:'Único',p:85}] }
     ];
 
-    // LISTA DE BAIRROS PARA O SELECT (ALFABÉTICA)
     const BAIRROS = [
         "Aeroporto", "Antônio Vieira", "Betolândia", "Brejo Seco", "Campo Alegre", 
         "Carité", "Centro", "Cidade Universitária", "Franciscanos", "Frei Damião", 
@@ -492,19 +528,42 @@
         "Tiradentes", "Três Marias", "Triângulo", "OUTRO"
     ];
 
-    // --- LÓGICA INTELIGENTE: ORDEM DE ENTREGA SUGERIDA PARA JUAZEIRO DO NORTE ---
-    // Essa lista define a prioridade de entrega. Você pode alterar a ordem aqui se preferir.
+    // --- LÓGICA REFINADA PARA JUAZEIRO DO NORTE (BASE: RUA APOLO XI - SALESIANOS) ---
+    // A lógica é: Centro/Próximo -> Norte/Leste -> Oeste -> Sul/Distantes (Espiral)
     const SEQUENCIA_LOGICA_BAIRROS = [
-        "Lagoa Seca", "Planalto", "Jardim Gonzaga", "Romeirão", "Pirajá", 
-        "Limoeiro", "João Cabral", "Salesianos", "Centro", "Socorro", 
-        "Santa Teresa", "Franciscanos", "Pio XII", "Horto", "Novo Juazeiro", 
-        "Tiradentes", "Betolândia", "Aeroporto", "São José", "Frei Damião",
-        "Triângulo", "Antônio Vieira", "São Miguel", "Pedrinhas"
+        "Salesianos", // Ponto de partida
+        "Santo Antônio",
+        "Santa Teresa", 
+        "Socorro",
+        "Centro",
+        "São Miguel",
+        "Romeirão",
+        "Pirajá",
+        "Franciscanos",
+        "Limoeiro",
+        "João Cabral",
+        "Horto",
+        "Triângulo",
+        "Antônio Vieira",
+        "São José",
+        "Frei Damião",
+        "Jardim Gonzaga",
+        "Lagoa Seca",
+        "Planalto",
+        "Cidade Universitária",
+        "Campo Alegre",
+        "Betolândia",
+        "Aeroporto",
+        "Novo Juazeiro",
+        "Tiradentes",
+        "Pedrinhas",
+        "Brejo Seco"
     ];
 
     let orders = [];
     let charts = { prod: null, fat: null };
     let activeRouteOrders = [];
+    let sortableInstance = null; // Variável para controlar o SortableJS
 
     // --- LOGIN ---
     window.handleLogin = function(e) {
@@ -576,9 +635,9 @@
     window.editOrder = function(id) { const o = orders.find(x => x.fbId === id); if(!o) return; showNewOrderModal(); document.getElementById('editFirebaseId').value = id; document.getElementById('cliNome').value = o.cliente; document.getElementById('cliTel').value = o.tel; const isDelivery = o.tipoEntrega === 'Delivery' || (o.turno && !o.turno.includes('Retirada')); document.getElementById('tipoEntrega').value = isDelivery ? 'Delivery' : 'Retirada no local'; checkTipoEntrega(); if(isDelivery) { document.getElementById('cliCep').value = o.cep || ''; if(o.end && o.end.includes(', Nº')) { const parts = o.end.split(', Nº'); document.getElementById('cliEnd').value = parts[0].trim(); document.getElementById('cliNumero').value = parts[1].trim(); } else { document.getElementById('cliEnd').value = o.end; } const sel = document.getElementById('cliBairro'); let found = false; for(let i=0; i<sel.options.length; i++) { if(sel.options[i].value === o.bairro) { sel.selectedIndex = i; found = true; break; } } if(!found) { sel.value = 'OUTRO'; checkBairro(); document.getElementById('cliBairroOutro').value = o.bairro; } document.getElementById('turnoEntrega').value = (o.turno === 'Manhã' || o.turno === 'Tarde') ? o.turno : ''; } else { if(o.turno.includes('às')) { document.getElementById('horarioRetirada').value = o.turno.split('às')[1].trim(); } } document.getElementById('dataPed').value = o.dataPedido; document.getElementById('dataEnt').value = o.dataEntrega; document.getElementById('statusPed').value = o.status; document.getElementById('valPago').value = o.pago; document.getElementById('valTaxa').value = o.taxa || 0; document.getElementById('formaPagRestante').value = o.formaPagRestante || ''; document.getElementById('obs').value = o.obs || ''; if(o.pago > 0) { document.getElementById('checkAdiantamento').checked = true; document.getElementById('areaAdiantamento').style.display = 'grid'; document.getElementById('formaPagSinal').value = o.formaPagSinal || ''; document.getElementById('lblFormaRestante').innerText = "Forma de Pagamento (Do Restante)"; } else { document.getElementById('checkAdiantamento').checked = false; document.getElementById('areaAdiantamento').style.display = 'none'; document.getElementById('lblFormaRestante').innerText = "Forma de Pagamento (Valor Total)"; } document.getElementById('itemsContainer').innerHTML = ''; o.itens.forEach(i => addItem(i)); calcTotal(); };
     window.calcTotal = function() { let itemsTotal = 0; document.querySelectorAll('.item-row').forEach(row => { const q = parseFloat(row.querySelector('.i-qtd').value) || 0; const p = parseFloat(row.querySelector('.i-prc').value) || 0; const sub = q * p; row.querySelector('.i-total').innerText = fmtMoeda(sub); itemsTotal += sub; }); const taxa = parseFloat(document.getElementById('valTaxa').value) || 0; const pago = parseFloat(document.getElementById('valPago').value) || 0; const finalTotal = itemsTotal + taxa; const divRestante = document.getElementById('divFormaRestante'); const valRestante = finalTotal - pago; if (valRestante <= 0.01) { divRestante.style.display = 'none'; } else { divRestante.style.display = 'block'; } document.getElementById('displayTotal').innerText = fmtMoeda(finalTotal); document.getElementById('valRest').value = fmtMoeda(valRestante); };
 
-    // --- NOVA FUNCIONALIDADE: ROTAS DE ENTREGA (V17 & V18) ---
+    // --- NOVA FUNCIONALIDADE: ROTAS DE ENTREGA (V19 - SORTABLEJS) ---
     
-    // 1. Renderizar Rota
+    // 1. Renderizar Rota e Inicializar SortableJS
     window.renderRoutes = function() {
         const selectedTurno = document.getElementById('routeTurnoSelector').value;
         const listArea = document.getElementById('routeListArea');
@@ -598,40 +657,49 @@
             return;
         }
 
+        // Renderiza lista
         listArea.innerHTML = activeRouteOrders.map((o, idx) => `
-            <div class="route-item" draggable="true" ondragstart="drag(event)" id="route-${idx}" data-idx="${idx}">
+            <div class="route-item" data-fb-id="${o.fbId}">
                 <div class="route-number">${idx + 1}</div>
                 <div class="route-details">
                     <div class="route-addr">${o.end}</div>
                     <div class="route-bairro">${o.bairro}</div>
                     <div style="font-size:12px; color:#999">${o.cliente} (Ped #${o.displayId})</div>
                 </div>
-                <div class="route-actions">
-                    <i class="fas fa-bars" style="color:#ccc; cursor:move"></i>
-                </div>
+                <i class="fas fa-grip-lines route-handle"></i>
             </div>
         `).join('');
-    };
 
-    // 2. Drag and Drop Logic
-    let draggedIdx = null;
-    window.allowDrop = function(ev) { ev.preventDefault(); };
-    window.drag = function(ev) { draggedIdx = ev.target.getAttribute('data-idx'); ev.target.classList.add('dragging'); };
-    window.drop = function(ev) {
-        ev.preventDefault();
-        const target = ev.target.closest('.route-item');
-        if (!target) return;
-        const targetIdx = target.getAttribute('data-idx');
+        // Inicializa/Reinicializa o SortableJS (Biblioteca Pro)
+        if (sortableInstance) { sortableInstance.destroy(); }
         
-        if (draggedIdx !== null && targetIdx !== null && draggedIdx !== targetIdx) {
-            const item = activeRouteOrders.splice(draggedIdx, 1)[0];
-            activeRouteOrders.splice(targetIdx, 0, item);
-            renderRoutes(); 
-        }
+        sortableInstance = Sortable.create(listArea, {
+            animation: 150,
+            handle: '.route-item', // Pode arrastar clicando em qualquer lugar do item
+            ghostClass: 'sortable-ghost',
+            dragClass: 'sortable-drag',
+            onEnd: function (evt) {
+                // Ao soltar, reconstruímos o array activeRouteOrders baseado na nova ordem do DOM
+                const newOrderIds = Array.from(listArea.children).map(el => el.getAttribute('data-fb-id'));
+                const newRouteArray = [];
+                newOrderIds.forEach(id => {
+                    const found = activeRouteOrders.find(o => o.fbId === id);
+                    if(found) newRouteArray.push(found);
+                });
+                activeRouteOrders = newRouteArray;
+                
+                // Atualiza apenas os números visuais sem recriar todo o HTML para não perder a fluidez
+                Array.from(listArea.children).forEach((el, index) => {
+                    el.querySelector('.route-number').innerText = index + 1;
+                });
+            }
+        });
     };
 
-    // 3. Auto-Sort LÓGICO (V18 - Inteligência de Juazeiro do Norte)
+    // 2. Auto-Sort LÓGICO (V19 - Inteligência de Juazeiro do Norte)
     window.autoSortRoute = function() {
+        if(activeRouteOrders.length === 0) return;
+
         activeRouteOrders.sort((a, b) => {
             const idxA = SEQUENCIA_LOGICA_BAIRROS.indexOf(a.bairro);
             const idxB = SEQUENCIA_LOGICA_BAIRROS.indexOf(b.bairro);
@@ -642,19 +710,22 @@
             
             return valA - valB;
         });
-        renderRoutes();
-        alert('Rota organizada por sequência de bairros!');
+        
+        renderRoutes(); // Re-renderiza com a nova ordem
+        alert('Rota organizada! Verifique a sequência.');
     };
 
-    // 4. Gerar Link do Google Maps
+    // 3. Gerar Link do Google Maps (Com Ponto de Partida Fixo)
     window.openGoogleMapsRoute = function() {
         if(activeRouteOrders.length === 0) { alert('A rota está vazia.'); return; }
         
         let url = "https://www.google.com/maps/dir/";
         
-        // Opcional: Adicionar ponto de partida fixo (Sua loja)
-        // url += "Endereço da Loja, Juazeiro do Norte/";
+        // PONTO DE PARTIDA FIXO (Rua Apolo XI)
+        const origin = "Rua Apolo XI, 519, Juazeiro do Norte - CE";
+        url += encodeURIComponent(origin) + "/";
 
+        // Pontos Intermediários
         activeRouteOrders.forEach(o => {
             let cleanAddr = `${o.end}, ${o.bairro}, Juazeiro do Norte - CE`;
             url += encodeURIComponent(cleanAddr) + "/";
