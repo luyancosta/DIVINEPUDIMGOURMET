@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Pudim Gourmet - Sistema V35 (Relatório Ajustado)</title>
+    <title>Divine Pudim Gourmet - Sistema V36 (Rotas com Save)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -299,7 +299,8 @@
                     </select>
                 </div>
                 <div style="display:flex; gap:10px">
-                    <button class="btn btn-secondary" onclick="autoSortRouteLogic()"><i class="fas fa-list-ol"></i> Organizar por Bairro (Manual)</button>
+                    <button class="btn btn-secondary" onclick="autoSortRouteLogic()"><i class="fas fa-list-ol"></i> Organizar por Bairro</button>
+                    <button class="btn btn-primary" onclick="saveRouteOrder()"><i class="fas fa-save"></i> Salvar Ordem</button>
                     <button class="btn btn-success" onclick="openGoogleMapsRoute()"><i class="fas fa-map-marker-alt"></i> Abrir no Google</button>
                 </div>
             </div>
@@ -318,6 +319,7 @@
                         <p><i class="fas fa-clock"></i> Turno: <strong id="routeTurnoDisplay">-</strong></p>
                         <p style="margin-top:10px; font-size:12px; line-height:1.4">
                             <i>* Arraste os cartões para ajustar a ordem.</i><br>
+                            <i>* Clique no botão "Salvar Ordem" para gravar.</i><br>
                             <i>* Clique no card para ver detalhes.</i><br>
                             <i>* Marque a caixa para finalizar (Entregue).</i>
                         </p>
@@ -495,12 +497,20 @@
       appId: "1:529626240432:web:ca9c80a061a555f6007275"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const colRef = collection(db, "pedidos");
-    const stockCol = collection(db, "estoque");
+    // Inicializa Firebase
+    let app, db, colRef, stockCol;
+    try {
+        app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        colRef = collection(db, "pedidos");
+        stockCol = collection(db, "estoque");
+        console.log("Firebase conectado com sucesso");
+    } catch (error) {
+        console.error("Erro ao conectar Firebase:", error);
+        alert("Erro de conexão com o banco de dados. Verifique a internet.");
+    }
 
-    // DADOS E CONFIGURAÇÕES
+    // --- DADOS E CONFIGURAÇÕES ---
     const INITIAL_STOCK_DATA = [
         { prod: 'Delícia de abacaxi', tam: 'G', qtd: 6 }, { prod: 'Delícia de abacaxi', tam: 'P', qtd: 6 },
         { prod: 'Ouro branco', tam: 'P', qtd: 3 }, { prod: 'Supreme de morango', tam: 'P', qtd: 2 },
@@ -545,7 +555,7 @@
     let sortableInstance = null;
     const DEFAULT_PRINT_CONFIG = { title: 'DIVINE PUDIM', subtitle: 'GOURMET', phone: '88 98824-4346', msg: 'Obrigado pela preferência!', social: '@divinepudimgourmet' };
 
-    // --- FUNÇÕES DE SETUP E LOGIN ---
+    // --- FUNÇÕES GLOBAIS DE SETUP ---
     window.openPrintConfig = function() { 
         const cfg = JSON.parse(localStorage.getItem('printConfig')) || DEFAULT_PRINT_CONFIG; 
         if(document.getElementById('cfgTitle')) document.getElementById('cfgTitle').value = cfg.title; 
@@ -563,6 +573,21 @@
     };
 
     window.resetPrintConfig = function() { if(confirm('Restaurar padrão?')) { localStorage.removeItem('printConfig'); window.openPrintConfig(); } };
+
+    // --- FUNÇÃO LOGIN CORRIGIDA ---
+    window.handleLogin = function(e) {
+        e.preventDefault();
+        const u = document.getElementById('loginUser').value.toLowerCase().trim();
+        const p = document.getElementById('loginPass').value.trim(); // Remove espaços
+        
+        if(u === 'divinepudimgourmet' && p === '1810') {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appContent').style.display = 'block';
+            initApp();
+        } else { 
+            alert('Acesso negado. Verifique usuário e senha.'); 
+        }
+    };
 
     window.applyInitialStock = async function() {
         if(!confirm("Isso vai redefinir o estoque baseando-se na sua contagem física atual - os pedidos pendentes.\n\nTem certeza?")) return;
@@ -592,17 +617,6 @@
         document.getElementById('printConfigModal').classList.remove('active');
     };
 
-    window.handleLogin = function(e) {
-        e.preventDefault();
-        const u = document.getElementById('loginUser').value.toLowerCase().trim();
-        const p = document.getElementById('loginPass').value.trim(); // Corrigido para remover espaços
-        if(u === 'divinepudimgourmet' && p === '1810') {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('appContent').style.display = 'block';
-            initApp();
-        } else { alert('Acesso negado.'); }
-    };
-
     function initApp() {
         const bList = document.getElementById('cliBairro');
         if(bList.options.length <= 1) {
@@ -612,7 +626,6 @@
         onSnapshot(query(colRef), (snapshot) => {
             orders = [];
             snapshot.forEach(doc => { let d = doc.data(); d.fbId = doc.id; orders.push(d); });
-            // Ordenação padrão Global (Cronológica) para cálculo correto de estoque
             orders.sort((a,b) => new Date(a.dataEntrega) - new Date(b.dataEntrega));
             orders.forEach((o, i) => o.displayId = (i + 1).toString().padStart(3, '0'));
             refreshAll();
@@ -677,21 +690,17 @@
         PRODUTOS.forEach(p => {
             p.tamanhos.forEach(t => {
                 const key = getStockKey(p.nome, t.t);
-                // ACESSA DIRETAMENTE O VALOR DO BANCO (O QUE APARECE NA TABELA)
                 const data = stockData[key] || { emProducao: 0, pronto: 0 };
                 const realStock = data.pronto || 0; 
 
                 if (realStock < 0) {
-                    // Se é -5, falta produzir 5
                     missing.push([p.nome, t.t, Math.abs(realStock)]);
                 } else if (realStock > 0) {
-                    // Se é 5, tem 5 sobrando
                     surplus.push([p.nome, t.t, realStock]);
                 }
             });
         });
         
-        // Ordena alfabeticamente
         missing.sort((a,b) => a[0].localeCompare(b[0]));
         surplus.sort((a,b) => a[0].localeCompare(b[0]));
         
@@ -700,68 +709,36 @@
         
         let currentY = 35;
 
-        // Tabela 1: FALTA PRODUZIR
         if (missing.length > 0) {
-            doc.setFontSize(14);
-            doc.setTextColor(220, 38, 38); // Vermelho
+            doc.setFontSize(14); doc.setTextColor(220, 38, 38); 
             doc.text("FALTA PRODUZIR (Negativos na Tabela)", 14, currentY);
             currentY += 5;
-
-            doc.autoTable({
-                head: [['Produto', 'Tamanho', 'Quantidade']],
-                body: missing,
-                startY: currentY,
-                theme: 'grid',
-                headStyles: { fillColor: [220, 38, 38] }, // Cabeçalho Vermelho
-                columnStyles: { 
-                    2: { halign: 'center', fontStyle: 'bold', textColor: [220, 38, 38] } 
-                }
-            });
+            doc.autoTable({ head: [['Produto', 'Tamanho', 'Quantidade']], body: missing, startY: currentY, theme: 'grid', headStyles: { fillColor: [220, 38, 38] }, columnStyles: { 2: { halign: 'center', fontStyle: 'bold', textColor: [220, 38, 38] } } });
             currentY = doc.lastAutoTable.finalY + 15;
         }
 
-        // Tabela 2: ESTÃO SOBRANDO
         if (surplus.length > 0) {
-            doc.setFontSize(14);
-            doc.setTextColor(22, 163, 74); // Verde
+            doc.setFontSize(14); doc.setTextColor(22, 163, 74); 
             doc.text("ESTÃO SOBRANDO (Positivos na Tabela)", 14, currentY);
             currentY += 5;
-
-            doc.autoTable({
-                head: [['Produto', 'Tamanho', 'Quantidade']],
-                body: surplus,
-                startY: currentY,
-                theme: 'grid',
-                headStyles: { fillColor: [22, 163, 74] }, // Cabeçalho Verde
-                columnStyles: { 
-                    2: { halign: 'center', fontStyle: 'bold', textColor: [22, 163, 74] } 
-                }
-            });
+            doc.autoTable({ head: [['Produto', 'Tamanho', 'Quantidade']], body: surplus, startY: currentY, theme: 'grid', headStyles: { fillColor: [22, 163, 74] }, columnStyles: { 2: { halign: 'center', fontStyle: 'bold', textColor: [22, 163, 74] } } });
         }
 
         if (missing.length === 0 && surplus.length === 0) {
             doc.text("Tudo Zerado (Estoque Perfeito ou Vazio).", 14, currentY);
         }
-
         doc.save(`Relatorio_Estoque_${new Date().toISOString().split('T')[0]}.pdf`);
     };
 
-    // --- RENDER LISTA DE PEDIDOS ---
+    // --- RENDERIZADORES ---
     window.renderOrdersList = function(list = orders) {
         const div = document.getElementById('ordersList');
         if(!list.length) { div.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa">Nenhum pedido encontrado para este filtro.</p>'; return; }
         
-        // 1. Cálculo Global de Estoque (SEMPRE roda na lista completa 'orders' para manter a fila correta)
         const inventoryTracker = {}; 
+        for (const [key, data] of Object.entries(stockData)) { inventoryTracker[key] = (data.pronto || 0); }
         
-        // Inicializa com o saldo atual do banco
-        for (const [key, data] of Object.entries(stockData)) {
-            inventoryTracker[key] = (data.pronto || 0);
-        }
-        
-        // Adiciona de volta o que já está "reservado" no banco para sabermos o Físico Real Total
-        const allActiveOrders = orders.filter(o => o.status !== 'Entregue');
-        allActiveOrders.forEach(o => {
+        orders.filter(o => o.status !== 'Entregue').forEach(o => {
             o.itens.forEach(i => {
                 let baseName = i.prod;
                 const match = i.prod.match(/^(.*)\s\((.*)\)$/);
@@ -771,35 +748,21 @@
             });
         });
 
-        // Agora percorre a lista GLOBAL cronológica para distribuir os itens (Fila)
-        // Criamos um mapa de status temporário para cada item de cada pedido
-        const badgeMap = {}; // Chave: orderId_itemIndex -> Status
-
+        const badgeMap = {};
         orders.forEach(o => {
             const isDelivered = o.status === 'Entregue';
             o.itens.forEach((i, idx) => {
                 const uniqueKey = `${o.fbId}_${idx}`;
-                if (isDelivered) {
-                    badgeMap[uniqueKey] = 'DELIVERED';
-                    return;
-                }
-
+                if (isDelivered) { badgeMap[uniqueKey] = 'DELIVERED'; return; }
                 let baseName = i.prod;
                 const match = i.prod.match(/^(.*)\s\((.*)\)$/);
                 if (match && PRODUTOS.find(p => p.nome === match[1])) { baseName = match[1]; }
                 const key = getStockKey(baseName, i.tam);
-                
-                if ((inventoryTracker[key] || 0) >= i.qtd) {
-                    inventoryTracker[key] -= i.qtd;
-                    badgeMap[uniqueKey] = 'OK';
-                } else {
-                    inventoryTracker[key] = 0; 
-                    badgeMap[uniqueKey] = 'WAIT';
-                }
+                if ((inventoryTracker[key] || 0) >= i.qtd) { inventoryTracker[key] -= i.qtd; badgeMap[uniqueKey] = 'OK'; } 
+                else { inventoryTracker[key] = 0; badgeMap[uniqueKey] = 'WAIT'; }
             });
         });
 
-        // 2. Agora renderiza APENAS a lista filtrada ('list'), mas usando o status calculado acima
         div.innerHTML = list.map((o, index) => {
             const numPedido = o.displayId; 
             const statusMap = { 'Pedido confirmado': 'card-confirmado', 'Produzindo': 'card-produzindo', 'Pronto': 'card-pronto', 'Em rota': 'card-rota', 'Entregue': 'card-entregue' };
@@ -811,13 +774,8 @@
                 const uniqueKey = `${o.fbId}_${idx}`;
                 let statusBadge = '';
                 const badgeStatus = badgeMap[uniqueKey];
-
-                if (badgeStatus === 'OK') {
-                    statusBadge = '<span class="item-status-ok">✅ Estoque</span>';
-                } else if (badgeStatus === 'WAIT') {
-                    statusBadge = '<span class="item-status-wait">⏳ Produzir</span>';
-                }
-                
+                if (badgeStatus === 'OK') statusBadge = '<span class="item-status-ok">✅ Estoque</span>';
+                else if (badgeStatus === 'WAIT') statusBadge = '<span class="item-status-wait">⏳ Produzir</span>';
                 return `<div class="item-line"><span>${i.qtd}x ${i.prod} (${i.tam})${statusBadge}</span> <span>${fmtMoeda(i.prc*i.qtd)}</span></div>`;
             }).join('');
 
@@ -855,7 +813,6 @@
     window.updItem = function(id) { const row = document.getElementById(`row-${id}`); const sel = row.querySelector('.i-prod'); const tam = row.querySelector('.i-tam'); const cust = row.querySelector('.i-cust'); const prc = row.querySelector('.i-prc'); const opt = sel.options[sel.selectedIndex]; const val = sel.value; if(val === 'OUTRO') { cust.style.display = 'block'; cust.placeholder = "Produto"; tam.innerHTML = '<option value="Único">Único</option>'; prc.value = ''; } else { const p = PRODUTOS.find(x => x.nome === val); if(p) { tam.innerHTML = p.tamanhos.map(t => `<option value="${t.t}" data-p="${t.p}">${t.t}</option>`).join(''); if(p.tamanhos[0]) prc.value = p.tamanhos[0].p; } if (opt.getAttribute('data-sabor')) { cust.style.display = 'block'; cust.placeholder = "Sabor"; } else { cust.style.display = 'none'; cust.value = ''; } } calcTotal(); };
     window.updPrice = function(id) { const row = document.getElementById(`row-${id}`); const tam = row.querySelector('.i-tam'); const prc = row.querySelector('.i-prc'); const opt = tam.options[tam.selectedIndex]; if(opt && opt.dataset.p) { prc.value = opt.dataset.p; calcTotal(); } };
     window.quickUpdateStatus = async function(id, newStatus) { try { await updateDoc(doc(db, "pedidos", id), { status: newStatus }); } catch(e) {} };
-    
     window.checkTipoEntrega = function() { 
         const tipo = document.getElementById('tipoEntrega').value; const divDel = document.getElementById('deliveryFields'); const divRet = document.getElementById('retiradaFields'); 
         const elEnd = document.getElementById('cliEnd'); const elBairro = document.getElementById('cliBairro'); const elTurno = document.getElementById('turnoEntrega');
@@ -863,9 +820,7 @@
         else if (tipo === 'Retirada no local') { divDel.style.display = 'none'; divRet.style.display = 'block'; elEnd.required = false; elBairro.required = false; elTurno.required = false; } 
         else { divDel.style.display = 'none'; divRet.style.display = 'none'; elEnd.required = false; elBairro.required = false; elTurno.required = false; } 
     };
-    
     window.checkBairro = function() { const s = document.getElementById('cliBairro'); const i = document.getElementById('cliBairroOutro'); i.style.display = s.value === 'OUTRO' ? 'block' : 'none'; if(s.value === 'OUTRO') i.required = true; else i.required = false; };
-    
     async function processStockChanges(itemsList, action) {
         for (let item of itemsList) {
             let baseName = item.prod;
@@ -879,7 +834,6 @@
             }
         }
     }
-
     window.saveOrder = async function(e) { 
         e.preventDefault(); 
         try {
@@ -928,7 +882,6 @@
             closeOrderModal(); 
         } catch(err) { console.error(err); alert('Erro ao salvar o pedido.'); } 
     };
-
     window.deleteOrder = async function(id) { 
         if(confirm('Tem certeza? Isso irá excluir o pedido e DEVOLVER os itens ao estoque.')) {
             try {
@@ -939,7 +892,6 @@
             } catch(e) { alert('Erro ao excluir: ' + e.message); }
         }
     };
-
     window.editOrder = function(id) { 
         const o = orders.find(x => x.fbId === id); 
         if(!o) return; 
@@ -960,59 +912,74 @@
         if(o.pago > 0) { document.getElementById('checkAdiantamento').checked = true; toggleAdiantamento(); document.getElementById('formaPagSinal').value = o.formaPagSinal || ''; } else { document.getElementById('checkAdiantamento').checked = false; toggleAdiantamento(); } 
         document.getElementById('itemsContainer').innerHTML = ''; o.itens.forEach(i => addItem(i)); calcTotal(); 
     };
-
     window.calcTotal = function() { 
         let itemsTotal = 0; 
         document.querySelectorAll('.item-row').forEach(row => { const q = parseFloat(row.querySelector('.i-qtd').value) || 0; const p = parseFloat(row.querySelector('.i-prc').value) || 0; const sub = q * p; row.querySelector('.i-total').innerText = fmtMoeda(sub); itemsTotal += sub; }); 
         const taxa = parseFloat(document.getElementById('valTaxa').value) || 0; const pago = parseFloat(document.getElementById('valPago').value) || 0; const finalTotal = itemsTotal + taxa; const valRestante = finalTotal - pago; 
         document.getElementById('displayTotal').innerText = fmtMoeda(finalTotal); document.getElementById('valRest').value = fmtMoeda(valRestante); 
     };
-
     window.markAsDelivered = async function(id, isChecked) {
         try { const newStatus = isChecked ? 'Entregue' : 'Em rota'; await updateDoc(doc(db, "pedidos", id), { status: newStatus }); } catch(e) { alert('Erro ao atualizar status: ' + e.message); }
     };
-
     window.renderRoutes = function() {
         const selectedTurno = document.getElementById('routeTurnoSelector').value;
         const listArea = document.getElementById('routeListArea');
         activeRouteOrders = orders.filter(o => { return (o.turno === selectedTurno || (o.turno && o.turno.includes(selectedTurno))) && o.status !== 'Entregue' && o.tipoEntrega === 'Delivery'; });
+        // ORDENAÇÃO BASEADA NA ORDEM SALVA
+        activeRouteOrders.sort((a, b) => (a.routeOrder || 9999) - (b.routeOrder || 9999));
+        
         document.getElementById('routeCount').innerText = activeRouteOrders.length;
         document.getElementById('routeTurnoDisplay').innerText = selectedTurno;
         if(activeRouteOrders.length === 0) { listArea.innerHTML = '<p style="text-align:center; color:#999; margin-top:20px">Nenhuma entrega pendente para este turno.</p>'; return; }
-        listArea.innerHTML = activeRouteOrders.map((o, idx) => `<div class="route-item" onclick="editOrder('${o.fbId}')" title="Clique para ver detalhes"><div class="route-handle" onclick="event.stopPropagation()"><i class="fas fa-grip-lines"></i></div><div class="route-check-container" onclick="event.stopPropagation()" title="Marcar como Entregue"><input type="checkbox" class="route-check" onchange="markAsDelivered('${o.fbId}', this.checked)"></div><div class="route-number">${idx + 1}</div><div class="route-details"><div class="route-addr">${o.end}</div><div class="route-bairro">${o.bairro}</div><div style="font-size:12px; color:#999">${o.cliente} (Ped #${o.displayId})</div></div></div>`).join('');
+        listArea.innerHTML = activeRouteOrders.map((o, idx) => `<div class="route-item" data-id="${o.fbId}" onclick="editOrder('${o.fbId}')" title="Clique para ver detalhes"><div class="route-handle" onclick="event.stopPropagation()"><i class="fas fa-grip-lines"></i></div><div class="route-check-container" onclick="event.stopPropagation()" title="Marcar como Entregue"><input type="checkbox" class="route-check" onchange="markAsDelivered('${o.fbId}', this.checked)"></div><div class="route-number">${idx + 1}</div><div class="route-details"><div class="route-addr">${o.end}</div><div class="route-bairro">${o.bairro}</div><div style="font-size:12px; color:#999">${o.cliente} (Ped #${o.displayId})</div></div></div>`).join('');
         if (sortableInstance) { sortableInstance.destroy(); }
         sortableInstance = Sortable.create(listArea, { animation: 150, handle: '.route-handle', ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', onEnd: function (evt) { Array.from(listArea.children).forEach((el, index) => { el.querySelector('.route-number').innerText = index + 1; }); } });
+    };
+    
+    // --- NOVA FUNÇÃO PARA SALVAR A ORDEM DA ROTA ---
+    window.saveRouteOrder = async function() {
+        const listArea = document.getElementById('routeListArea');
+        const items = listArea.querySelectorAll('.route-item');
+        const promises = [];
+        
+        items.forEach((item, index) => {
+            const id = item.getAttribute('data-id');
+            if (id) {
+                // Salva o índice atual como 'routeOrder' no Firestore
+                promises.push(updateDoc(doc(db, "pedidos", id), { routeOrder: index }));
+            }
+        });
+        
+        if(promises.length > 0) {
+            try {
+                await Promise.all(promises);
+                alert('Ordem da rota salva com sucesso!');
+            } catch (e) {
+                console.error(e);
+                alert('Erro ao salvar a ordem.');
+            }
+        } else {
+            alert('Nada para salvar.');
+        }
     };
 
     window.autoSortRouteLogic = function() {
         if(activeRouteOrders.length === 0) return;
         activeRouteOrders.sort((a, b) => { const idxA = SEQUENCIA_LOGICA_BAIRROS.indexOf(a.bairro); const idxB = SEQUENCIA_LOGICA_BAIRROS.indexOf(b.bairro); const valA = idxA === -1 ? 999 : idxA; const valB = idxB === -1 ? 999 : idxB; return valA - valB; });
-        renderRoutes(); alert('Rota organizada por sequência lógica de bairros!');
+        renderRoutes(); alert('Rota organizada por sequência lógica de bairros! Clique em "Salvar Ordem" para persistir.');
     };
-
     window.openGoogleMapsRoute = function() {
         if(activeRouteOrders.length === 0) { alert('A rota está vazia.'); return; }
         let url = "https://www.google.com/maps/dir/Rua+Apolo+XI,+519,+Juazeiro+do+Norte+-+CE/";
         activeRouteOrders.forEach(o => { let cleanAddr = `${o.end}, ${o.bairro}, Juazeiro do Norte - CE`; url += encodeURIComponent(cleanAddr) + "/"; });
         window.open(url, '_blank');
     };
-
-    // --- RENDER LISTA DE PEDIDOS ---
     window.renderOrdersList = function(list = orders) {
         const div = document.getElementById('ordersList');
         if(!list.length) { div.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa">Nenhum pedido encontrado para este filtro.</p>'; return; }
-        
-        // 1. Cálculo Global de Estoque (SEMPRE roda na lista completa 'orders' para manter a fila correta)
         const inventoryTracker = {}; 
-        
-        // Inicializa com o saldo atual do banco
-        for (const [key, data] of Object.entries(stockData)) {
-            inventoryTracker[key] = (data.pronto || 0);
-        }
-        
-        // Adiciona de volta o que já está "reservado" no banco para sabermos o Físico Real Total
-        const allActiveOrders = orders.filter(o => o.status !== 'Entregue');
-        allActiveOrders.forEach(o => {
+        for (const [key, data] of Object.entries(stockData)) { inventoryTracker[key] = (data.pronto || 0); }
+        orders.filter(o => o.status !== 'Entregue').forEach(o => {
             o.itens.forEach(i => {
                 let baseName = i.prod;
                 const match = i.prod.match(/^(.*)\s\((.*)\)$/);
@@ -1021,65 +988,40 @@
                 inventoryTracker[key] = (inventoryTracker[key] || 0) + i.qtd;
             });
         });
-
-        // Agora percorre a lista GLOBAL cronológica para distribuir os itens (Fila)
-        // Criamos um mapa de status temporário para cada item de cada pedido
-        const badgeMap = {}; // Chave: orderId_itemIndex -> Status
-
+        const badgeMap = {};
         orders.forEach(o => {
             const isDelivered = o.status === 'Entregue';
             o.itens.forEach((i, idx) => {
                 const uniqueKey = `${o.fbId}_${idx}`;
-                if (isDelivered) {
-                    badgeMap[uniqueKey] = 'DELIVERED';
-                    return;
-                }
-
+                if (isDelivered) { badgeMap[uniqueKey] = 'DELIVERED'; return; }
                 let baseName = i.prod;
                 const match = i.prod.match(/^(.*)\s\((.*)\)$/);
                 if (match && PRODUTOS.find(p => p.nome === match[1])) { baseName = match[1]; }
                 const key = getStockKey(baseName, i.tam);
-                
-                if ((inventoryTracker[key] || 0) >= i.qtd) {
-                    inventoryTracker[key] -= i.qtd;
-                    badgeMap[uniqueKey] = 'OK';
-                } else {
-                    inventoryTracker[key] = 0; 
-                    badgeMap[uniqueKey] = 'WAIT';
-                }
+                if ((inventoryTracker[key] || 0) >= i.qtd) { inventoryTracker[key] -= i.qtd; badgeMap[uniqueKey] = 'OK'; } 
+                else { inventoryTracker[key] = 0; badgeMap[uniqueKey] = 'WAIT'; }
             });
         });
-
-        // 2. Agora renderiza APENAS a lista filtrada ('list'), mas usando o status calculado acima
         div.innerHTML = list.map((o, index) => {
             const numPedido = o.displayId; 
             const statusMap = { 'Pedido confirmado': 'card-confirmado', 'Produzindo': 'card-produzindo', 'Pronto': 'card-pronto', 'Em rota': 'card-rota', 'Entregue': 'card-entregue' };
             const statusClass = statusMap[o.status] || 'card-confirmado';
             const colorMap = { 'Pedido confirmado': '#000000', 'Produzindo': '#facc15', 'Pronto': '#3b82f6', 'Em rota': '#a855f7', 'Entregue': '#22c55e' };
             const selectBg = colorMap[o.status] || '#000000'; const selectColor = o.status === 'Produzindo' ? '#000000' : '#ffffff';
-            
             const itensHtml = o.itens.map((i, idx) => {
                 const uniqueKey = `${o.fbId}_${idx}`;
                 let statusBadge = '';
                 const badgeStatus = badgeMap[uniqueKey];
-
-                if (badgeStatus === 'OK') {
-                    statusBadge = '<span class="item-status-ok">✅ Estoque</span>';
-                } else if (badgeStatus === 'WAIT') {
-                    statusBadge = '<span class="item-status-wait">⏳ Produzir</span>';
-                }
-                
+                if (badgeStatus === 'OK') statusBadge = '<span class="item-status-ok">✅ Estoque</span>';
+                else if (badgeStatus === 'WAIT') statusBadge = '<span class="item-status-wait">⏳ Produzir</span>';
                 return `<div class="item-line"><span>${i.qtd}x ${i.prod} (${i.tam})${statusBadge}</span> <span>${fmtMoeda(i.prc*i.qtd)}</span></div>`;
             }).join('');
-
             let endInfo = o.tipoEntrega === 'Delivery' || (o.turno && !o.turno.includes('Retirada')) ? `<i class="fas fa-map-marker-alt" style="color:var(--primary)"></i> ${o.end}, ${o.bairro}` : `<i class="fas fa-store" style="color:var(--primary)"></i> Retirada na Loja`;
             const opts = ['Pedido confirmado','Produzindo','Pronto','Em rota','Entregue'].map(s => `<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('');
             let pagInfo = o.restante <= 0.01 ? `<div class="payment-highlight" style="background:#dcfce7; color:#166534; border-color:#bbf7d0"><span>STATUS:</span> <span>PAGO TOTAL</span></div>` : (o.pago > 0 ? `<div class="payment-highlight"><span>Restante:</span> <span>${o.formaPagRestante || '?'}</span></div>` : `<div class="payment-highlight"><span>Total:</span> <span>${o.formaPagRestante || '?'}</span></div>`);
-            
             return `<div class="order-card ${statusClass}"><div class="order-header"><div><div class="order-id">#${numPedido}</div><div class="order-date">${fmtData(o.dataEntrega)} • ${o.turno}</div></div><select class="status-select" onchange="quickUpdateStatus('${o.fbId}', this.value)" style="background:${selectBg}; color:${selectColor}">${opts}</select></div><div class="order-body"><div class="client-info"><span class="client-name">${o.cliente}</span><div class="client-detail"><i class="fas fa-phone" style="font-size:11px"></i> ${o.tel}</div><div class="client-detail">${endInfo}</div>${o.obs ? `<div class="client-detail" style="color:#e11d48;font-style:italic"><i class="fas fa-comment"></i> ${o.obs}</div>` : ''}</div><div class="items-box">${itensHtml}</div>${pagInfo}<div class="finance-box">${o.pago > 0 ? `<div class="finance-row"><span>Pago (Sinal):</span> <span style="color:#10b981">${fmtMoeda(o.pago)}</span></div>` : ''}<div class="finance-total" style="display:flex;justify-content:space-between;color:${o.restante>0?'#ef4444':'#10b981'}"><span>A PAGAR:</span> <span>${fmtMoeda(o.restante)}</span></div></div></div><div class="order-footer"><button class="btn btn-card" onclick="editOrder('${o.fbId}')"><i class="fas fa-edit"></i> Editar</button><button class="btn btn-card" onclick="printOrder('${o.fbId}', '${numPedido}')"><i class="fas fa-print"></i> Cupom</button><button class="btn btn-card" onclick="deleteOrder('${o.fbId}')" style="color:#ef4444"><i class="fas fa-trash"></i></button></div></div>`;
         }).join('');
     };
-
     window.printOrder = function(id, numPedido) {
         const o = orders.find(x => x.fbId === id);
         const cfg = JSON.parse(localStorage.getItem('printConfig')) || DEFAULT_PRINT_CONFIG;
